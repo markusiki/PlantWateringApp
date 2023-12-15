@@ -1,3 +1,10 @@
 ion-content {
   --background: #FAFAFA;
 }
+
+ion-card {
+  --background: #F0FEE5;
+}
+.align-center {
+  text-align: center;
+}

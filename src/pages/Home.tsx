@@ -1,29 +1,17 @@
-import { IonButton, IonButtons, IonCard, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
+import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar } from '@ionic/react';
+import { settingsOutline } from 'ionicons/icons'
 import './Home.css';
 import { useState } from 'react';
+import { IUnitState } from '../interfaces';
 
-class Unit {
-  id: string
-  name: string
-  moistLimit: number
-  waterTime: number
-  moistMeasureIntervall: number
-  constructor(id: string, name: string, moistLimit: number, waterTime: number, moistMeasureIntervall: number) {
-    this.id = id;
-    this.name = name
-    this.moistLimit = moistLimit
-    this.waterTime = waterTime
-    this.moistMeasureIntervall = moistMeasureIntervall
-  }
-}
 
 const Home: React.FC = () => {
 
-  const [units, setUnits] = useState([
-    {uni: "", name: "" }
-  ])
-
+  const [unit1, setUnit1] = useState<IUnitState>({ id: "Unit 1", name: "Plant name", status: "OK", moistLevel: 50, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800 })
+  const [unit2, setUnit2] = useState<IUnitState>({ id: "Unit 2", name: "Plant name", status: "OK", moistLevel: 50, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800 })
+  const [unit3, setUnit3] = useState<IUnitState>({ id: "Unit 3", name: "Plant name", status: "OK", moistLevel: 50, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800 })
+  const [unit4, setUnit4] = useState<IUnitState>({ id: "Unit 4", name: "Plant name", status: "OK", moistLevel: 50, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800 })
+  const units = [unit1, unit2, unit3, unit4]
   
   return (
     <IonPage>
@@ -36,9 +24,32 @@ const Home: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <IonCard>
-          
-        </IonCard>
+        {units.map(unit => 
+          <IonCard>
+            <IonGrid>
+              <IonRow>
+                <IonCol size='2'><p>{unit.id}</p></IonCol>
+                <IonCol size='8'><h2 className='align-center'>{unit.name}</h2></IonCol>
+                <IonCol size='2'>
+                  <IonButtons>
+                    <IonButton>
+                      <IonIcon icon={settingsOutline}></IonIcon>
+                    </IonButton>
+                  </IonButtons>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+            <IonCardContent>
+              <IonGrid>
+                <IonRow class="ion-justify-content-center">
+                  <IonCol><p className='align-center'>Status: {unit.status}</p></IonCol>
+                </IonRow>
+              </IonGrid>
+
+            </IonCardContent>
+            
+          </IonCard>
+        )}
       </IonContent>
     </IonPage>
   );
