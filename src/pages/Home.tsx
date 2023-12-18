@@ -1,4 +1,4 @@
-import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonPage, IonProgressBar, IonRow, IonText, IonTitle, IonToolbar } from '@ionic/react';
+import { IonAlert, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonPage, IonProgressBar, IonRow, IonText, IonTitle, IonToolbar } from '@ionic/react';
 import { settingsOutline } from 'ionicons/icons'
 import './Home.css';
 import { useState } from 'react';
@@ -7,10 +7,10 @@ import { IUnitState } from '../interfaces';
 
 const Home: React.FC = () => {
 
-  const [unit1, setUnit1] = useState<IUnitState>({ id: "Unit 1", name: "Plant name", status: "OK", moistLevel: 0.5, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00"] })
-  const [unit2, setUnit2] = useState<IUnitState>({ id: "Unit 2", name: "Plant name", status: "ERROR", moistLevel: 0.1, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00"] })
-  const [unit3, setUnit3] = useState<IUnitState>({ id: "Unit 3", name: "Plant name", status: "OK", moistLevel: 0.3, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00"] })
-  const [unit4, setUnit4] = useState<IUnitState>({ id: "Unit 4", name: "Plant name", status: "OK", moistLevel: 0.9, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00"] })
+  const [unit1, setUnit1] = useState<IUnitState>({ id: "Unit 1", name: "Plant name", status: "OK", moistLevel: 0.5, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00", "18.12.2023 12:00", "25.12.2023 12:00", "29.12.2023 12:00"] })
+  const [unit2, setUnit2] = useState<IUnitState>({ id: "Unit 2", name: "Plant name", status: "ERROR", moistLevel: 0.1, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00", "17.12.2023 12:00", "24.12.2023 12:00", "29.12.2023 12:00"] })
+  const [unit3, setUnit3] = useState<IUnitState>({ id: "Unit 3", name: "Plant name", status: "OK", moistLevel: 0.3, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00", "19.12.2023 12:00", "28.12.2023 12:00", "29.12.2023 12:00"] })
+  const [unit4, setUnit4] = useState<IUnitState>({ id: "Unit 4", name: "Plant name", status: "OK", moistLevel: 0.9, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00", "16.12.2023 12:00", "20.12.2023 12:00", "25.12.2023 12:00"] })
   const units = [unit1, unit2, unit3, unit4]
 
   const setColor = (unit: IUnitState) => {
@@ -23,6 +23,16 @@ const Home: React.FC = () => {
     else {
       return 'primary'
     }
+  }
+
+  const waterNow = (unit: IUnitState) => {
+    /* code to water */
+    console.log(unit.id)
+    return (
+      <>
+       
+      </>
+    );
   }
   
   return (
@@ -66,12 +76,12 @@ const Home: React.FC = () => {
                 </IonCol>
               </IonRow>
               <IonRow class="ion-align-items-center">
-                <IonCol>
+                <IonCol size='5'>
                   <IonText>
                     <p className='align-center'>Moist level:</p>
                   </IonText>
                 </IonCol>
-                <IonCol>
+                <IonCol size='6'>
                   <IonProgressBar value={unit.moistLevel} color={setColor(unit)}></IonProgressBar>               
                 </IonCol>
               </IonRow>
@@ -87,7 +97,29 @@ const Home: React.FC = () => {
                   <IonButton shape='round' expand='block' color='danger'>Log</IonButton>
                 </IonCol>
                 <IonCol class='ion-text-center'>
-                  <IonButton shape='round' expand='block' color='primary'>Water now</IonButton>
+                  <IonButton id={`confirm-water-${unit.id}`} shape='round' expand='block' color='primary'>Water now</IonButton>
+                  <IonAlert
+                    header="Confirm"
+                    trigger={`confirm-water-${unit.id}`}
+                    buttons={[
+                      {
+                        text: 'CANCEL',
+                        role: 'cancel',
+                        handler: () => {
+                          console.log('Watering canceled ' + unit.id);
+                        },
+                      },
+                      {
+                        text: 'WATER NOW',
+                        role: 'confirm',
+                        handler: () => {
+                          waterNow(unit)
+                          console.log('Watering confirmed ' + unit.id);
+                        },
+                      },
+                    ]}
+                    onDidDismiss={({ detail }) => console.log(`Dismissed with role: ${detail.role}`)}
+                  ></IonAlert>
                 </IonCol>
               </IonRow>
             </IonGrid>  

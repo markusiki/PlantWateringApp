@@ -6,5 +6,5 @@ export interface IUnitState {
   moistLimit: number
   waterTime: number
   moistMeasureIntervall: number
-  log: [string]
+  log: string[]
 }
