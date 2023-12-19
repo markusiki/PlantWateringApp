@@ -14,8 +14,6 @@ const Home: React.FC = () => {
   const [unit4, setUnit4] = useState<IUnitState>({ id: "Unit 4", name: "Plant name", status: "OK", moistLevel: 0.9, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, logs: ["12.12.2023 12:00", "16.12.2023 12:00", "20.12.2023 12:00", "25.12.2023 12:00"] })
   const units = [unit1, unit2, unit3, unit4]
 
-  const [isLogOpen, setIsLogOpen] = useState(false)
-
   const setColor = (unit: IUnitState) => {
     if (unit.moistLevel < 0.33) {
       return 'danger'
@@ -97,7 +95,7 @@ const Home: React.FC = () => {
               </IonRow>
               <IonRow class="ion-align-items-center">
                 <IonCol class='ion-text-center'>
-                  <IonButton id={unit.id} shape='round' expand='block' color='danger' onClick={() => setIsLogOpen(true)}>Log</IonButton>
+                  <IonButton id={unit.id} shape='round' expand='block' color='danger' >Log</IonButton>
                   <Log unit={unit}></Log>
                 </IonCol>
                 <IonCol class='ion-text-center'>
