@@ -3,15 +3,18 @@ import { settingsOutline } from 'ionicons/icons'
 import './Home.css';
 import { useState } from 'react';
 import { IUnitState } from '../interfaces';
+import Log from './Log';
 
 
 const Home: React.FC = () => {
 
-  const [unit1, setUnit1] = useState<IUnitState>({ id: "Unit 1", name: "Plant name", status: "OK", moistLevel: 0.5, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00", "18.12.2023 12:00", "25.12.2023 12:00", "29.12.2023 12:00"] })
-  const [unit2, setUnit2] = useState<IUnitState>({ id: "Unit 2", name: "Plant name", status: "ERROR", moistLevel: 0.1, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00", "17.12.2023 12:00", "24.12.2023 12:00", "29.12.2023 12:00"] })
-  const [unit3, setUnit3] = useState<IUnitState>({ id: "Unit 3", name: "Plant name", status: "OK", moistLevel: 0.3, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00", "19.12.2023 12:00", "28.12.2023 12:00", "29.12.2023 12:00"] })
-  const [unit4, setUnit4] = useState<IUnitState>({ id: "Unit 4", name: "Plant name", status: "OK", moistLevel: 0.9, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, log: ["12.12.2023 12:00", "16.12.2023 12:00", "20.12.2023 12:00", "25.12.2023 12:00"] })
+  const [unit1, setUnit1] = useState<IUnitState>({ id: "Unit 1", name: "Plant name", status: "OK", moistLevel: 0.5, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, logs: ["12.12.2023 12:00", "18.12.2023 12:00", "25.12.2023 12:00", "29.12.2023 12:00"] })
+  const [unit2, setUnit2] = useState<IUnitState>({ id: "Unit 2", name: "Plant name", status: "ERROR", moistLevel: 0.1, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, logs: ["12.12.2023 12:00", "17.12.2023 12:00", "24.12.2023 12:00", "29.12.2023 12:00"] })
+  const [unit3, setUnit3] = useState<IUnitState>({ id: "Unit 3", name: "Plant name", status: "OK", moistLevel: 0.3, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, logs: ["12.12.2023 12:00", "19.12.2023 12:00", "28.12.2023 12:00", "29.12.2023 12:00"] })
+  const [unit4, setUnit4] = useState<IUnitState>({ id: "Unit 4", name: "Plant name", status: "OK", moistLevel: 0.9, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, logs: ["12.12.2023 12:00", "16.12.2023 12:00", "20.12.2023 12:00", "25.12.2023 12:00"] })
   const units = [unit1, unit2, unit3, unit4]
+
+  const [isLogOpen, setIsLogOpen] = useState(false)
 
   const setColor = (unit: IUnitState) => {
     if (unit.moistLevel < 0.33) {
@@ -47,7 +50,7 @@ const Home: React.FC = () => {
       </IonHeader>
       <IonContent>
         {units.map(unit => 
-          <IonCard>
+          <IonCard key={unit.id}>
             <IonGrid>
               <IonRow>
                 <IonCol size='2'><p>{unit.id}</p></IonCol>
@@ -88,18 +91,20 @@ const Home: React.FC = () => {
               <IonRow>
                 <IonCol>
                   <IonText>
-                    <p className='last-time-watered'>Last time watered: <br/> {unit.log[0]} </p>
+                    <p className='last-time-watered'>Last time watered: <br/> {unit.logs[0]} </p>
                   </IonText>
                 </IonCol>
               </IonRow>
               <IonRow class="ion-align-items-center">
                 <IonCol class='ion-text-center'>
-                  <IonButton shape='round' expand='block' color='danger'>Log</IonButton>
+                  <IonButton id={unit.id} shape='round' expand='block' color='danger' onClick={() => setIsLogOpen(true)}>Log</IonButton>
+                  <Log unit={unit}></Log>
                 </IonCol>
                 <IonCol class='ion-text-center'>
                   <IonButton id={`confirm-water-${unit.id}`} shape='round' expand='block' color='primary'>Water now</IonButton>
                   <IonAlert
                     header="Confirm"
+                    message={`Confirm watering for ${unit.name}`}
                     trigger={`confirm-water-${unit.id}`}
                     buttons={[
                       {

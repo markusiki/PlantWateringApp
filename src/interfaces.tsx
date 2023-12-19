@@ -6,5 +6,9 @@ export interface IUnitState {
   moistLimit: number
   waterTime: number
   moistMeasureIntervall: number
-  log: string[]
+  logs: string[]
+}
+
+export interface ILogProps {
+  unit: IUnitState
 }
