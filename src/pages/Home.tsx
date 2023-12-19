@@ -3,16 +3,17 @@ import { settingsOutline } from 'ionicons/icons'
 import './Home.css';
 import { useState } from 'react';
 import { IUnitState } from '../interfaces';
-import Log from './Log';
+import Log from '../components/Log';
+import Settings from '../components/Settings';
 
 
 const Home: React.FC = () => {
 
-  const [unit1, setUnit1] = useState<IUnitState>({ id: "Unit 1", name: "Plant name", status: "OK", moistLevel: 0.5, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, logs: ["12.12.2023 12:00", "18.12.2023 12:00", "25.12.2023 12:00", "29.12.2023 12:00"] })
-  const [unit2, setUnit2] = useState<IUnitState>({ id: "Unit 2", name: "Plant name", status: "ERROR", moistLevel: 0.1, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, logs: ["12.12.2023 12:00", "17.12.2023 12:00", "24.12.2023 12:00", "29.12.2023 12:00"] })
-  const [unit3, setUnit3] = useState<IUnitState>({ id: "Unit 3", name: "Plant name", status: "OK", moistLevel: 0.3, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, logs: ["12.12.2023 12:00", "19.12.2023 12:00", "28.12.2023 12:00", "29.12.2023 12:00"] })
-  const [unit4, setUnit4] = useState<IUnitState>({ id: "Unit 4", name: "Plant name", status: "OK", moistLevel: 0.9, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 604800, logs: ["12.12.2023 12:00", "16.12.2023 12:00", "20.12.2023 12:00", "25.12.2023 12:00"] })
-  const units = [unit1, unit2, unit3, unit4]
+  const [unit1, setUnit1] = useState<IUnitState>({ id: "Unit 1", name: "Plant name", status: "OK", moistLevel: 0.5, moistLimit: 15000, waterTime: 10, moistMeasureIntervall: 10, logs: ["12.12.2023 12:00", "18.12.2023 12:00", "25.12.2023 12:00", "29.12.2023 12:00"] })
+  const [unit2, setUnit2] = useState<IUnitState>({ id: "Unit 2", name: "Plant name", status: "ERROR", moistLevel: 0.1, moistLimit: 15000, waterTime: 15, moistMeasureIntervall: 4, logs: ["12.12.2023 12:00", "17.12.2023 12:00", "24.12.2023 12:00", "29.12.2023 12:00"] })
+  const [unit3, setUnit3] = useState<IUnitState>({ id: "Unit 3", name: "Plant name", status: "OK", moistLevel: 0.3, moistLimit: 15000, waterTime: 20, moistMeasureIntervall: 7, logs: ["12.12.2023 12:00", "19.12.2023 12:00", "28.12.2023 12:00", "29.12.2023 12:00"] })
+  const [unit4, setUnit4] = useState<IUnitState>({ id: "Unit 4", name: "Plant name", status: "OK", moistLevel: 0.9, moistLimit: 15000, waterTime: 25, moistMeasureIntervall: 5, logs: ["12.12.2023 12:00", "16.12.2023 12:00", "20.12.2023 12:00", "25.12.2023 12:00"] })
+  const units = [{unit: unit1, setUnit: setUnit1}, {unit: unit2, setUnit: setUnit2}, {unit: unit3, setUnit: setUnit3}, {unit: unit4, setUnit: setUnit4}]
 
   const setColor = (unit: IUnitState) => {
     if (unit.moistLevel < 0.33) {
@@ -47,32 +48,33 @@ const Home: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        {units.map(unit => 
-          <IonCard key={unit.id}>
+        {units.map(u => 
+          <IonCard key={u.unit.id}>
             <IonGrid>
               <IonRow>
-                <IonCol size='2'><p>{unit.id}</p></IonCol>
-                <IonCol size='8'><h2 className='align-center'>{unit.name}</h2></IonCol>
+                <IonCol size='2'><p>{u.unit.id}</p></IonCol>
+                <IonCol size='8'><h2 className='align-center'>{u.unit.name}</h2></IonCol>
                 <IonCol size='2'>
                   <IonButtons>
-                    <IonButton>
+                    <IonButton id={`${u.unit.id}-settings`}>
                       <IonIcon icon={settingsOutline}></IonIcon>
                     </IonButton>
                   </IonButtons>
+                  <Settings unit={u.unit} setUnit={u.setUnit}/>
                 </IonCol>
               </IonRow>
               <IonRow>
-                {unit.status === 'OK'
+                {u.unit.status === 'OK'
                 ?
-                <IonCol><p className='align-center'>Status: <IonText color='success'>{unit.status}</IonText></p></IonCol>
+                <IonCol><p className='align-center'>Status: <IonText color='success'>{u.unit.status}</IonText></p></IonCol>
                 :
-                <IonCol><p className='align-center'>Status: <IonText color='danger'>{unit.status}</IonText></p></IonCol>
+                <IonCol><p className='align-center'>Status: <IonText color='danger'>{u.unit.status}</IonText></p></IonCol>
                 }
               </IonRow>
               <IonRow>
                 <IonCol size='6' offset='6'>
                   <IonText>
-                    <p className='moist-percent'>{unit.moistLevel * 100}%</p>
+                    <p className='moist-percent'>{u.unit.moistLevel * 100}%</p>
                   </IonText>
                 </IonCol>
               </IonRow>
@@ -83,41 +85,41 @@ const Home: React.FC = () => {
                   </IonText>
                 </IonCol>
                 <IonCol size='6'>
-                  <IonProgressBar value={unit.moistLevel} color={setColor(unit)}></IonProgressBar>               
+                  <IonProgressBar value={u.unit.moistLevel} color={setColor(u.unit)}></IonProgressBar>               
                 </IonCol>
               </IonRow>
               <IonRow>
                 <IonCol>
                   <IonText>
-                    <p className='last-time-watered'>Last time watered: <br/> {unit.logs[0]} </p>
+                    <p className='last-time-watered'>Last time watered: <br/> {u.unit.logs[0]} </p>
                   </IonText>
                 </IonCol>
               </IonRow>
               <IonRow class="ion-align-items-center">
                 <IonCol class='ion-text-center'>
-                  <IonButton id={unit.id} shape='round' expand='block' color='danger' >Log</IonButton>
-                  <Log unit={unit}></Log>
+                  <IonButton id={`${u.unit.id}-log`} shape='round' expand='block' color='danger' >Log</IonButton>
+                  <Log unit={u.unit}></Log>
                 </IonCol>
                 <IonCol class='ion-text-center'>
-                  <IonButton id={`confirm-water-${unit.id}`} shape='round' expand='block' color='primary'>Water now</IonButton>
+                  <IonButton id={`confirm-water-${u.unit.id}`} shape='round' expand='block' color='primary'>Water now</IonButton>
                   <IonAlert
                     header="Confirm"
-                    message={`Confirm watering for ${unit.name}`}
-                    trigger={`confirm-water-${unit.id}`}
+                    message={`Confirm watering for ${u.unit.name}`}
+                    trigger={`confirm-water-${u.unit.id}`}
                     buttons={[
                       {
                         text: 'CANCEL',
                         role: 'cancel',
                         handler: () => {
-                          console.log('Watering canceled ' + unit.id);
+                          console.log('Watering canceled ' + u.unit.id);
                         },
                       },
                       {
                         text: 'WATER NOW',
                         role: 'confirm',
                         handler: () => {
-                          waterNow(unit)
-                          console.log('Watering confirmed ' + unit.id);
+                          waterNow(u.unit)
+                          console.log('Watering confirmed ' + u.unit.id);
                         },
                       },
                     ]}

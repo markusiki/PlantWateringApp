@@ -12,3 +12,15 @@ export interface IUnitState {
 export interface ILogProps {
   unit: IUnitState
 }
+
+export interface ISettingsProps {
+  unit: IUnitState
+  setUnit: React.Dispatch<React.SetStateAction<IUnitState>>
+}
+
+export interface ISettingsState {
+  name: string
+  moistLimit: number
+  waterTime: number
+  moistMeasureIntervall: number
+}

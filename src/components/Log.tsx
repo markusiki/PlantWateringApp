@@ -1,6 +1,7 @@
-import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonLabel } from "@ionic/react"
+import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonLabel, IonIcon } from "@ionic/react"
 import {ILogProps } from "../interfaces"
 import { useRef } from "react";
+import { arrowBackOutline } from 'ionicons/icons'
 
 
 const Log: React.FC<ILogProps> = ({ unit }) => {
@@ -8,13 +9,15 @@ const Log: React.FC<ILogProps> = ({ unit }) => {
   const modal = useRef<HTMLIonModalElement>(null);
   return (
     <>
-      <IonModal trigger={unit.id} ref={modal}>
+      <IonModal trigger={`${unit.id}-log`} ref={modal}>
         <IonHeader>
           <IonToolbar>
-            <IonTitle slot="secondary">{unit.name} log</IonTitle>
-            <IonButtons slot="end">
-              <IonButton onClick={() => modal.current?.dismiss()}>Close</IonButton>
+            <IonButtons slot="start">
+              <IonButton onClick={() => modal.current?.dismiss()}>
+                <IonIcon icon={arrowBackOutline}></IonIcon>  
+              </IonButton>
             </IonButtons>
+            <IonTitle >{unit.name} log</IonTitle>
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding">
