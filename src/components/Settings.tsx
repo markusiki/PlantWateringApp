@@ -9,18 +9,23 @@ import {
   IonList,
   IonItem,
   IonInput,
-} from "@ionic/react";
-import { ISettingsProps, ISettingsState } from "../interfaces";
-import { useEffect, useRef, useState } from "react";
+} from '@ionic/react'
+import { ISettingsProps, ISettingsState } from '../interfaces'
+import { useEffect, useRef, useState } from 'react'
 
-const Settings: React.FC<ISettingsProps> = ({ unit, setUnit }) => {
+const Settings: React.FC<ISettingsProps> = ({
+  unit,
+  index,
+  units,
+  setUnits,
+}) => {
   const [settings, setSettings] = useState<ISettingsState>({
-    name: "",
+    name: '',
     moistLimit: 0,
     waterTime: 0,
     moistMeasureIntervall: 0,
-  });
-  const modal = useRef<HTMLIonModalElement>(null);
+  })
+  const modal = useRef<HTMLIonModalElement>(null)
 
   useEffect(() => {
     setSettings({
@@ -28,23 +33,33 @@ const Settings: React.FC<ISettingsProps> = ({ unit, setUnit }) => {
       moistLimit: unit.moistLimit,
       waterTime: unit.waterTime,
       moistMeasureIntervall: unit.moistMeasureIntervall,
-    });
-  }, [unit.moistLimit, unit.moistMeasureIntervall, unit.name, unit.waterTime]);
+    })
+  }, [unit.moistLimit, unit.moistMeasureIntervall, unit.name, unit.waterTime])
 
   const confirm = () => {
-    setUnit({
-      ...unit,
-      name: settings.name,
-      moistLimit: settings.moistLimit,
-      waterTime: settings.waterTime,
-      moistMeasureIntervall: settings.moistMeasureIntervall,
-    });
-    modal.current?.dismiss();
-  };
+    const changedUnit = units.map((unit, i) => {
+      if (i === index) {
+        return {
+          ...unit,
+          name: settings.name,
+          moistLimit: settings.moistLimit,
+          waterTime: settings.waterTime,
+          moistMeasureIntervall: settings.moistMeasureIntervall,
+        }
+      } else {
+        return {
+          ...unit,
+        }
+      }
+    })
+    setUnits(changedUnit)
+
+    modal.current?.dismiss()
+  }
 
   const handleChange = (event: any) => {
-    setSettings({ ...settings, [event.target.name]: event.target.value });
-  };
+    setSettings({ ...settings, [event.target.name]: event.target.value })
+  }
 
   return (
     <>
@@ -108,7 +123,7 @@ const Settings: React.FC<ISettingsProps> = ({ unit, setUnit }) => {
         </IonContent>
       </IonModal>
     </>
-  );
-};
+  )
+}
 
-export default Settings;
+export default Settings

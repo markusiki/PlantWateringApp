@@ -15,7 +15,9 @@ export interface ILogProps {
 
 export interface ISettingsProps {
   unit: IUnitState
-  setUnit: React.Dispatch<React.SetStateAction<IUnitState>>
+  index: number
+  units: IUnitState[]
+  setUnits: React.Dispatch<React.SetStateAction<IUnitState[]>>
 }
 
 export interface ISettingsState {
