@@ -9,6 +9,7 @@ import {
   IonGrid,
   IonHeader,
   IonIcon,
+  IonLabel,
   IonPage,
   IonProgressBar,
   IonRow,
@@ -19,105 +20,90 @@ import {
 import { settingsOutline } from 'ionicons/icons'
 import './Home.css'
 import { useEffect, useState } from 'react'
-import { IUnitState } from '../interfaces'
+import { ISettingsProps, IUnitState } from '../interfaces'
 import Log from '../components/Log'
 import Settings from '../components/Settings'
 import unitService from '../services/units'
 
+const unitSampleData = [
+  {
+    id: 'Unit 1',
+    name: 'Plant name',
+    status: 'OK',
+    moistLevel: 0.5,
+    moistLimit: 15000,
+    waterTime: 10,
+    moistMeasureIntervall: 10,
+    logs: [
+      '12.12.2023 12:00',
+      '18.12.2023 12:00',
+      '25.12.2023 12:00',
+      '29.12.2023 12:00',
+    ],
+  },
+  {
+    id: 'Unit 2',
+    name: 'Plant name',
+    status: 'ERROR',
+    moistLevel: 0.1,
+    moistLimit: 15000,
+    waterTime: 15,
+    moistMeasureIntervall: 4,
+    logs: [
+      '12.12.2023 12:00',
+      '17.12.2023 12:00',
+      '24.12.2023 12:00',
+      '29.12.2023 12:00',
+    ],
+  },
+  {
+    id: 'Unit 3',
+    name: 'Plant name',
+    status: 'OK',
+    moistLevel: 0.3,
+    moistLimit: 15000,
+    waterTime: 20,
+    moistMeasureIntervall: 7,
+    logs: [
+      '12.12.2023 12:00',
+      '19.12.2023 12:00',
+      '28.12.2023 12:00',
+      '29.12.2023 12:00',
+    ],
+  },
+  {
+    id: 'Unit 4',
+    name: 'Plant name',
+    status: 'OK',
+    moistLevel: 0.9,
+    moistLimit: 15000,
+    waterTime: 25,
+    moistMeasureIntervall: 5,
+    logs: [
+      '12.12.2023 12:00',
+      '16.12.2023 12:00',
+      '20.12.2023 12:00',
+      '25.12.2023 12:00',
+    ],
+  },
+]
+
 const Home: React.FC = () => {
-  const [units, setUnits] = useState<IUnitState[]>([
-    {
-      id: 'Unit 1',
-      name: 'Plant name',
-      status: 'OK',
-      moistLevel: 0.5,
-      moistLimit: 15000,
-      waterTime: 10,
-      moistMeasureIntervall: 10,
-      logs: [
-        '12.12.2023 12:00',
-        '18.12.2023 12:00',
-        '25.12.2023 12:00',
-        '29.12.2023 12:00',
-      ],
-    },
-    {
-      id: 'Unit 2',
-      name: 'Plant name',
-      status: 'ERROR',
-      moistLevel: 0.1,
-      moistLimit: 15000,
-      waterTime: 15,
-      moistMeasureIntervall: 4,
-      logs: [
-        '12.12.2023 12:00',
-        '17.12.2023 12:00',
-        '24.12.2023 12:00',
-        '29.12.2023 12:00',
-      ],
-    },
-    {
-      id: 'Unit 3',
-      name: 'Plant name',
-      status: 'OK',
-      moistLevel: 0.3,
-      moistLimit: 15000,
-      waterTime: 20,
-      moistMeasureIntervall: 7,
-      logs: [
-        '12.12.2023 12:00',
-        '19.12.2023 12:00',
-        '28.12.2023 12:00',
-        '29.12.2023 12:00',
-      ],
-    },
-    {
-      id: 'Unit 4',
-      name: 'Plant name',
-      status: 'OK',
-      moistLevel: 0.9,
-      moistLimit: 15000,
-      waterTime: 25,
-      moistMeasureIntervall: 5,
-      logs: [
-        '12.12.2023 12:00',
-        '16.12.2023 12:00',
-        '20.12.2023 12:00',
-        '25.12.2023 12:00',
-      ],
-    },
-  ])
-  /* const units = [
-    { unit: unit1, setUnit: setUnit1 },
-    { unit: unit2, setUnit: setUnit2 },
-    { unit: unit3, setUnit: setUnit3 },
-    { unit: unit4, setUnit: setUnit4 },
-  ] */
+  const [units, setUnits] = useState<IUnitState[]>(unitSampleData)
+  const [backendStatus, setBackendStatus] = useState<boolean>(false)
 
   useEffect(() => {
     refresh()
   }, [])
 
   const refresh = () => {
-    unitService.getAll().then((data) => {
-      setUnits(data)
-      console.log(units)
-      /* data.forEach((element: any) => {
-        console.log('element.id: ', element.id)
-        units.forEach((unit: any) => {
-          console.log('unit.id: ', unit.id)
-          if (unit.id === element.id) {
-            setUnits({ ...units, [unit.moistLevel]: element.moistLevel })
-            console.log(
-              'unitId: ',
-              e.unit.id,
-              'elementMoistLevel: ',
-              element.moistLevel
-            )
-            console.log('elemenId: ', element.id)
-          }
-        })
-      }) */
+    unitService.getAll().then((response) => {
+      if (response?.status === 200) {
+        setBackendStatus(true)
+        setUnits(response.data)
+      } else {
+        setBackendStatus(false)
+      }
     })
   }
 
@@ -138,11 +124,29 @@ const Home: React.FC = () => {
     return <></>
   }
 
+  const handleUnitChange = async (
+    event: React.MouseEvent,
+    unitSettings: ISettingsProps,
+    id: IUnitState['id']
+  ) => {
+    event.preventDefault()
+    const returnedUnit = await unitService.changeSettigs(unitSettings, id)
+    setUnits(
+      units.map((unit) => (unit.id !== returnedUnit.id ? unit : returnedUnit))
+    )
+  }
+
   return (
     <IonApp>
       <IonPage>
         <IonHeader>
           <IonToolbar>
+            <IonLabel>Status: </IonLabel>
+            {backendStatus ? (
+              <IonLabel color={'success'}>Connected </IonLabel>
+            ) : (
+              <IonLabel color={'danger'}>Disconnected </IonLabel>
+            )}
             <IonTitle slot="secondary">My plants</IonTitle>
             <IonButtons slot="end">
               <IonButton color={'primary'} onClick={refresh}>
@@ -172,7 +176,7 @@ const Home: React.FC = () => {
                       unit={unit}
                       index={index}
                       units={units}
-                      setUnits={setUnits}
+                      handleUnitChange={handleUnitChange}
                     />
                   </IonCol>
                 </IonRow>
