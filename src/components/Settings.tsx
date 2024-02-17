@@ -17,7 +17,7 @@ const Settings: React.FC<ISettingsProps> = ({
   unit,
   index,
   units,
-  setUnits,
+  handleUnitChange,
 }) => {
   const [settings, setSettings] = useState<ISettingsState>({
     name: '',
@@ -36,24 +36,10 @@ const Settings: React.FC<ISettingsProps> = ({
     })
   }, [unit.moistLimit, unit.moistMeasureIntervall, unit.name, unit.waterTime])
 
-  const confirm = () => {
-    const changedUnit = units.map((unit, i) => {
-      if (i === index) {
-        return {
-          ...unit,
-          name: settings.name,
-          moistLimit: settings.moistLimit,
-          waterTime: settings.waterTime,
-          moistMeasureIntervall: settings.moistMeasureIntervall,
-        }
-      } else {
-        return {
-          ...unit,
-        }
-      }
-    })
-    setUnits(changedUnit)
-
+  const confirm = (
+    event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>
+  ) => {
+    handleUnitChange(event, settings, unit.id)
     modal.current?.dismiss()
   }
 
@@ -73,7 +59,7 @@ const Settings: React.FC<ISettingsProps> = ({
             </IonButtons>
             <IonTitle slot="secondary">Settings</IonTitle>
             <IonButtons slot="end">
-              <IonButton onClick={confirm}>Confirm</IonButton>
+              <IonButton onClick={(event) => confirm(event)}>Confirm</IonButton>
             </IonButtons>
           </IonToolbar>
         </IonHeader>

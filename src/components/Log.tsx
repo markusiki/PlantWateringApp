@@ -23,7 +23,10 @@ const Log: React.FC<ILogProps> = ({ unit }) => {
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
-              <IonButton onClick={() => modal.current?.dismiss()}>
+              <IonButton
+                color={'primary'}
+                onClick={() => modal.current?.dismiss()}
+              >
                 <IonIcon icon={arrowBackOutline}></IonIcon>
               </IonButton>
             </IonButtons>
@@ -32,6 +35,7 @@ const Log: React.FC<ILogProps> = ({ unit }) => {
         </IonHeader>
         <IonContent className="ion-padding">
           <IonList>
+            Last time watered:
             {unit.logs.map((log, index) => (
               <IonItem key={index}>
                 <IonLabel>{log}</IonLabel>

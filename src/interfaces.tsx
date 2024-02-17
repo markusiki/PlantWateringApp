@@ -17,7 +17,7 @@ export interface ISettingsProps {
   unit: IUnitState
   index: number
   units: IUnitState[]
-  setUnits: React.Dispatch<React.SetStateAction<IUnitState[]>>
+  handleUnitChange: any
 }
 
 export interface ISettingsState {
