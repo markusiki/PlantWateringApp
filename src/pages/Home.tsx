@@ -20,83 +20,37 @@ import {
 import { settingsOutline } from 'ionicons/icons'
 import './Home.css'
 import { useEffect, useState } from 'react'
-import { ISettingsProps, IUnitState } from '../interfaces'
+import {
+  IUnitSettingsProps,
+  IUnitState,
+  IDeviceSettingsState,
+} from '../interfaces'
 import Log from '../components/Log'
-import Settings from '../components/Settings'
+import UnitSettings from '../components/UnitSettings'
 import unitService from '../services/units'
-
-const unitSampleData = [
-  {
-    id: 'Unit 1',
-    name: 'Plant name',
-    status: 'OK',
-    moistLevel: 0.5,
-    moistLimit: 15000,
-    waterTime: 10,
-    moistMeasureIntervall: 10,
-    logs: [
-      '12.12.2023 12:00',
-      '18.12.2023 12:00',
-      '25.12.2023 12:00',
-      '29.12.2023 12:00',
-    ],
-  },
-  {
-    id: 'Unit 2',
-    name: 'Plant name',
-    status: 'ERROR',
-    moistLevel: 0.1,
-    moistLimit: 15000,
-    waterTime: 15,
-    moistMeasureIntervall: 4,
-    logs: [
-      '12.12.2023 12:00',
-      '17.12.2023 12:00',
-      '24.12.2023 12:00',
-      '29.12.2023 12:00',
-    ],
-  },
-  {
-    id: 'Unit 3',
-    name: 'Plant name',
-    status: 'OK',
-    moistLevel: 0.3,
-    moistLimit: 15000,
-    waterTime: 20,
-    moistMeasureIntervall: 7,
-    logs: [
-      '12.12.2023 12:00',
-      '19.12.2023 12:00',
-      '28.12.2023 12:00',
-      '29.12.2023 12:00',
-    ],
-  },
-  {
-    id: 'Unit 4',
-    name: 'Plant name',
-    status: 'OK',
-    moistLevel: 0.9,
-    moistLimit: 15000,
-    waterTime: 25,
-    moistMeasureIntervall: 5,
-    logs: [
-      '12.12.2023 12:00',
-      '16.12.2023 12:00',
-      '20.12.2023 12:00',
-      '25.12.2023 12:00',
-    ],
-  },
-]
+import Settings from '../components/DeviceSettings'
+import deviceServices from '../services/device'
 
 const Home: React.FC = () => {
-  const [units, setUnits] = useState<IUnitState[]>(unitSampleData)
+  const [units, setUnits] = useState<IUnitState[]>([])
   const [backendStatus, setBackendStatus] = useState<boolean>(false)
+  const [deviceSettings, setDeviceSettings] = useState<IDeviceSettingsState>({
+    moistMeasureIntervall: 0,
+  })
 
   useEffect(() => {
     refresh()
   }, [])
 
   const refresh = () => {
+    deviceServices.getAll().then((response) => {
+      if (response?.status === 200) {
+        setBackendStatus(true)
+        setDeviceSettings(response.data)
+      } else {
+        setBackendStatus(false)
+      }
+    })
     unitService.getAll().then((response) => {
       if (response?.status === 200) {
         setBackendStatus(true)
@@ -119,14 +73,20 @@ const Home: React.FC = () => {
   }
 
   const waterNow = (unit: IUnitState) => {
-    /* code to water */
-    console.log(unit.id)
-    return <></>
+    unitService.waterPlant(unit.id)
+  }
+
+  const handleDeciveSettingsChange = (
+    event: React.MouseEvent,
+    settings: IDeviceSettingsState
+  ) => {
+    event.preventDefault()
+    setDeviceSettings(settings)
   }
 
   const handleUnitChange = async (
     event: React.MouseEvent,
-    unitSettings: ISettingsProps,
+    unitSettings: IUnitSettingsProps,
     id: IUnitState['id']
   ) => {
     event.preventDefault()
@@ -141,13 +101,24 @@ const Home: React.FC = () => {
       <IonPage>
         <IonHeader>
           <IonToolbar>
+            <IonButtons>
+              <IonButton id="settings">
+                <IonIcon icon={settingsOutline}></IonIcon>
+              </IonButton>
+              <Settings
+                deviceSettings={deviceSettings}
+                handleDeciveSettingsChange={handleDeciveSettingsChange}
+              ></Settings>
+            </IonButtons>
             <IonLabel>Status: </IonLabel>
             {backendStatus ? (
               <IonLabel color={'success'}>Connected </IonLabel>
             ) : (
               <IonLabel color={'danger'}>Disconnected </IonLabel>
             )}
+
             <IonTitle slot="secondary">My plants</IonTitle>
+
             <IonButtons slot="end">
               <IonButton color={'primary'} onClick={refresh}>
                 REFRESH
@@ -172,7 +143,7 @@ const Home: React.FC = () => {
                         <IonIcon icon={settingsOutline}></IonIcon>
                       </IonButton>
                     </IonButtons>
-                    <Settings
+                    <UnitSettings
                       unit={unit}
                       index={index}
                       units={units}

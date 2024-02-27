@@ -10,20 +10,19 @@ import {
   IonItem,
   IonInput,
 } from '@ionic/react'
-import { ISettingsProps, ISettingsState } from '../interfaces'
+import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 
-const Settings: React.FC<ISettingsProps> = ({
+const Settings: React.FC<IUnitSettingsProps> = ({
   unit,
   index,
   units,
   handleUnitChange,
 }) => {
-  const [settings, setSettings] = useState<ISettingsState>({
+  const [settings, setSettings] = useState<IUnitSettingsState>({
     name: '',
     moistLimit: 0,
     waterTime: 0,
-    moistMeasureIntervall: 0,
   })
   const modal = useRef<HTMLIonModalElement>(null)
 
@@ -32,9 +31,8 @@ const Settings: React.FC<ISettingsProps> = ({
       name: unit.name,
       moistLimit: unit.moistLimit,
       waterTime: unit.waterTime,
-      moistMeasureIntervall: unit.moistMeasureIntervall,
     })
-  }, [unit.moistLimit, unit.moistMeasureIntervall, unit.name, unit.waterTime])
+  }, [unit.moistLimit, unit.name, unit.waterTime])
 
   const confirm = (
     event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>
@@ -52,7 +50,7 @@ const Settings: React.FC<ISettingsProps> = ({
       <IonModal trigger={`${unit.id}-settings`} ref={modal}>
         <IonHeader>
           <IonToolbar>
-            <IonButtons slot="start">
+            <IonButtons>
               <IonButton onClick={() => modal.current?.dismiss()}>
                 Cancel
               </IonButton>
@@ -71,7 +69,7 @@ const Settings: React.FC<ISettingsProps> = ({
                 value={settings.name}
                 name="name"
                 labelPlacement="stacked"
-                onIonChange={handleChange}
+                onInput={handleChange}
                 type="text"
               />
             </IonItem>
@@ -81,7 +79,7 @@ const Settings: React.FC<ISettingsProps> = ({
                 value={settings.moistLimit}
                 name="moistLimit"
                 labelPlacement="stacked"
-                onIonChange={handleChange}
+                onInput={handleChange}
                 type="number"
               />
             </IonItem>
@@ -91,17 +89,7 @@ const Settings: React.FC<ISettingsProps> = ({
                 value={settings.waterTime}
                 name="waterTime"
                 labelPlacement="stacked"
-                onIonChange={handleChange}
-                type="number"
-              />
-            </IonItem>
-            <IonItem>
-              <IonInput
-                label="Set moisture measure intervall (days)"
-                value={settings.moistMeasureIntervall}
-                name="moistMeasureIntervall"
-                labelPlacement="stacked"
-                onIonChange={handleChange}
+                onInput={handleChange}
                 type="number"
               />
             </IonItem>
