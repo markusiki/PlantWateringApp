@@ -26,6 +26,7 @@ export interface IUnitSettingsState {
 }
 
 export interface IDeviceSettingsState {
+  autoWatering: boolean
   moistMeasureIntervall: number
 }
 export interface IDeviceSettingsProps {

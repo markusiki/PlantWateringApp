@@ -29,12 +29,13 @@ import Log from '../components/Log'
 import UnitSettings from '../components/UnitSettings'
 import unitService from '../services/units'
 import Settings from '../components/DeviceSettings'
-import deviceServices from '../services/device'
+import deviceService from '../services/device'
 
 const Home: React.FC = () => {
   const [units, setUnits] = useState<IUnitState[]>([])
   const [backendStatus, setBackendStatus] = useState<boolean>(false)
   const [deviceSettings, setDeviceSettings] = useState<IDeviceSettingsState>({
+    autoWatering: true,
     moistMeasureIntervall: 0,
   })
 
@@ -43,7 +44,7 @@ const Home: React.FC = () => {
   }, [])
 
   const refresh = () => {
-    deviceServices.getAll().then((response) => {
+    deviceService.getAll().then((response) => {
       if (response?.status === 200) {
         setBackendStatus(true)
         setDeviceSettings(response.data)
@@ -76,12 +77,13 @@ const Home: React.FC = () => {
     unitService.waterPlant(unit.id)
   }
 
-  const handleDeciveSettingsChange = (
+  const handleDeciveSettingsChange = async (
     event: React.MouseEvent,
     settings: IDeviceSettingsState
   ) => {
     event.preventDefault()
-    setDeviceSettings(settings)
+    const returnedDeviceSettings = await deviceService.updateSettings(settings)
+    setDeviceSettings(returnedDeviceSettings)
   }
 
   const handleUnitChange = async (

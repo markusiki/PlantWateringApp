@@ -17,13 +17,13 @@ const updateSettings = async (deviceSettings: IDeviceSettingsState) => {
   try {
     const request = axios.put(baseUrl, deviceSettings)
     const response = await request
-    return response
+    return response.data
   }
   catch (error) {
     console.log(error)
   }
 }
 
-const deviceServices = { getAll, updateSettings }
+const deviceService = { getAll, updateSettings }
 
-export default deviceServices
+export default deviceService

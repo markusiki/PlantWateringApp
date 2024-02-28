@@ -13,9 +13,9 @@ const getAll = async () => {
   }
 }
 
-const changeSettigs = async (newUnits: IUnitSettingsProps, id: string) => {
+const changeSettigs = async (newUnit: IUnitSettingsProps, id: string) => {
   try {
-    const request = await axios.put(`${baseUrl}/${id}`, newUnits)
+    const request = await axios.put(`${baseUrl}/${id}`, newUnit)
     const response = request
     return response.data
   }

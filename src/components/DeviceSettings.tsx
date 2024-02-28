@@ -9,6 +9,7 @@ import {
   IonList,
   IonItem,
   IonInput,
+  IonCheckbox,
 } from '@ionic/react'
 import { IDeviceSettingsProps, IDeviceSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
@@ -17,18 +18,34 @@ const Settings: React.FC<IDeviceSettingsProps> = ({
   deviceSettings,
   handleDeciveSettingsChange,
 }) => {
-  const [settings, setSettings] = useState<IDeviceSettingsState>()
-  const modal = useRef<HTMLIonModalElement>(null)
+  const [settings, setSettings] = useState<IDeviceSettingsState>({
+    autoWatering: false,
+    moistMeasureIntervall: 1,
+  })
 
   useEffect(() => {
-    setSettings({ moistMeasureIntervall: settings!.moistMeasureIntervall })
-  }, [settings])
+    setSettings(deviceSettings)
+  }, [])
+
+  const modal = useRef<HTMLIonModalElement>(null)
 
   const confirm = (
     event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>
   ) => {
     handleDeciveSettingsChange(event, settings)
     modal.current?.dismiss()
+  }
+
+  const handleChange = (event: any) => {
+    if (event.target.localName === 'ion-checkbox') {
+      setSettings({ ...settings, [event.target.name]: event.detail.checked })
+    } else {
+      setSettings({
+        ...settings,
+        [event.target.name]: parseInt(event.target.value),
+      })
+    }
+    console.log(event.target.localName)
   }
 
   return (
@@ -50,20 +67,27 @@ const Settings: React.FC<IDeviceSettingsProps> = ({
         <IonContent className="ion-padding">
           <IonList>
             <IonItem>
+              <IonCheckbox
+                justify="space-between"
+                checked={settings.autoWatering}
+                name="autoWatering"
+                onIonChange={handleChange}
+              >
+                Automatic Watering
+              </IonCheckbox>
+            </IonItem>
+
+            <IonItem>
               <IonInput
                 label="Soil moisture measure intervall:"
                 labelPlacement="stacked"
-                value={settings?.moistMeasureIntervall}
+                value={settings.moistMeasureIntervall}
                 name="moistMeasureIntervall"
                 type="number"
                 inputMode="numeric"
                 max={30}
                 min={1}
-                onInput={(event: any) =>
-                  setSettings({
-                    moistMeasureIntervall: parseInt(event.target.value),
-                  })
-                }
+                onInput={handleChange}
               />
             </IonItem>
           </IonList>
