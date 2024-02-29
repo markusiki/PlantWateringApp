@@ -172,7 +172,7 @@ cython_debug/
 /coverage
 
 # production
-/build
+
 
 # misc
 .DS_Store
