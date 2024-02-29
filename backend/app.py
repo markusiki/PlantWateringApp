@@ -5,7 +5,7 @@ import services.deviceSettings as deviceSettings
 import services.db as dbService
 import plant_watering_app as raspi
 
-app = Flask(__name__, static_folder='./build', static_url_path='/')
+app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
 #app = Flask(__name__)
 
 
