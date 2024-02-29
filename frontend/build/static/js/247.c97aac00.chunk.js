@@ -1,0 +1,3 @@
+/*! For license information please see 247.c97aac00.chunk.js.LICENSE.txt */
+"use strict";(self.webpackChunkplant_watering_app_frontend=self.webpackChunkplant_watering_app_frontend||[]).push([[247],{247:(e,t,n)=>{n.r(t),n.d(t,{startStatusTap:()=>o});var r=n(108),s=n(721),a=n(384);const o=()=>{const e=window;e.addEventListener("statusTap",(()=>{(0,r.gv)((()=>{const t=e.innerWidth,n=e.innerHeight,o=document.elementFromPoint(t/2,n/2);if(!o)return;const i=(0,s.a)(o);i&&new Promise((e=>(0,a.c)(i,e))).then((()=>{(0,r.bN)((async()=>{i.style.setProperty("--overflow","hidden"),await(0,s.s)(i,300),i.style.removeProperty("--overflow")}))}))}))}))}}}]);
+//# sourceMappingURL=247.c97aac00.chunk.js.map
