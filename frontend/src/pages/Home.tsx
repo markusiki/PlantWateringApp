@@ -20,11 +20,7 @@ import {
 import { settingsOutline } from 'ionicons/icons'
 import './Home.css'
 import { useEffect, useState } from 'react'
-import {
-  IUnitSettingsProps,
-  IUnitState,
-  IDeviceSettingsState,
-} from '../interfaces'
+import { IUnitSettingsProps, IUnitState, IDeviceSettingsState } from '../interfaces'
 import Log from '../components/Log'
 import UnitSettings from '../components/UnitSettings'
 import unitService from '../services/units'
@@ -62,11 +58,11 @@ const Home: React.FC = () => {
     })
   }
 
-  const setColor = (unit: IUnitState) => {
-    if (unit.moistLevel < 0.33) {
+  const setColor = (moistLevel: IUnitState['moistLevel']) => {
+    if (moistLevel < 0.33) {
       return 'danger'
     }
-    if (unit.moistLevel >= 0.33 && unit.moistLevel < 0.66) {
+    if (moistLevel >= 0.33 && moistLevel < 0.66) {
       return 'success'
     } else {
       return 'primary'
@@ -93,9 +89,26 @@ const Home: React.FC = () => {
   ) => {
     event.preventDefault()
     const returnedUnit = await unitService.changeSettigs(unitSettings, id)
-    setUnits(
-      units.map((unit) => (unit.id !== returnedUnit.id ? unit : returnedUnit))
-    )
+    setUnits(units.map((unit) => (unit.id !== returnedUnit.id ? unit : returnedUnit)))
+  }
+
+  const getAbsoluteValue = (moistLevel: IUnitState['moistLevel']) => {
+    const minValue = 10000
+    const maxValue = 18000
+    const absoluteValue =
+      Math.round((1 - (moistLevel - minValue) / (maxValue - minValue)) * 100) / 100
+    return absoluteValue
+  }
+
+  const getRelativeValue = (unit: IUnitState) => {
+    const minValue = unit.moistLimit
+    const maxValue = 18000
+    const relativeValue =
+      Math.round((1 - (unit.moistLevel - minValue) / (maxValue - minValue)) * 100) / 100
+    if (relativeValue > 1) {
+      return 1.0
+    }
+    return relativeValue
   }
 
   return (
@@ -110,7 +123,7 @@ const Home: React.FC = () => {
               <Settings
                 deviceSettings={deviceSettings}
                 handleDeciveSettingsChange={handleDeciveSettingsChange}
-              ></Settings>
+              />
             </IonButtons>
             <IonLabel>Status: </IonLabel>
             {backendStatus ? (
@@ -171,14 +184,28 @@ const Home: React.FC = () => {
                 <IonRow class="ion-justify-content-center">
                   <IonCol class="ion-align-self-end" size="auto">
                     <IonText>
-                      <p style={{ textAlign: 'end' }}>Moist level:</p>
+                      <p style={{ textAlign: 'end' }}>Absolute moist level:</p>
                     </IonText>
                   </IonCol>
                   <IonCol size="6">
-                    <p className="moist-percent">{unit.moistLevel * 100}%</p>
+                    <p className="moist-percent">{getAbsoluteValue(unit.moistLevel) * 100}%</p>
                     <IonProgressBar
-                      value={unit.moistLevel}
-                      color={setColor(unit)}
+                      value={getAbsoluteValue(unit.moistLevel)}
+                      color={setColor(getAbsoluteValue(unit.moistLevel))}
+                    ></IonProgressBar>
+                  </IonCol>
+                </IonRow>
+                <IonRow class="ion-justify-content-center">
+                  <IonCol class="ion-align-self-end" size="auto">
+                    <IonText>
+                      <p style={{ textAlign: 'end' }}>Relative moist level:</p>
+                    </IonText>
+                  </IonCol>
+                  <IonCol size="6">
+                    <p className="moist-percent">{getRelativeValue(unit) * 100}%</p>
+                    <IonProgressBar
+                      value={getRelativeValue(unit)}
+                      color={setColor(getRelativeValue(unit))}
                     ></IonProgressBar>
                   </IonCol>
                 </IonRow>
@@ -193,12 +220,7 @@ const Home: React.FC = () => {
                 </IonRow>
                 <IonRow class="ion-align-items-center">
                   <IonCol class="ion-text-center">
-                    <IonButton
-                      id={`${unit.id}-log`}
-                      shape="round"
-                      expand="block"
-                      color="danger"
-                    >
+                    <IonButton id={`${unit.id}-log`} shape="round" expand="block" color="danger">
                       Log
                     </IonButton>
                     <Log unit={unit}></Log>
