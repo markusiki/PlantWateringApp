@@ -45,23 +45,38 @@ def changeUnit(unitToChange, index):
 #For raspi use ony
 
 def updateMoistLevels(moistLevels):
+  minValue: int = 10000 #totally wet soil
+  maxValue: int = 18000 #totally dry soil
   file = open(db, 'r')
   units = json.load(file)
-  for moistLevel in moistLevels:
-    for unit in units:
+  for unit in units:
+    for moistLevel in moistLevels:
       if unit["id"] == moistLevel["id"]:
-        
-        unit["moistLevel"] = round((1 - moistLevel["value"]/20000), 2)
+        print(moistLevel["value"])
+        if moistLevel["value"] > maxValue:
+          if moistLevel["value"] > (maxValue + 1000):
+            unit["status"] = "ERROR"
+            unit["moistLevel"] = maxValue
+          else:
+            unit["status"] = "OK"
+            unit["moistLevel"] = maxValue
+        elif moistLevel["value"] < minValue:
+          if moistLevel["value"] < (minValue - 1000):
+            unit["status"] = "ERROR"
+            unit["moistLevel"] = minValue
+            continue
+          else:
+            unit["status"] =  "OK"
+            unit["moistLevel"] = minValue
+        else:
+          unit["status"] =  "OK"
+          unit["moistLevel"] = round(moistLevel["value"] / 100) * 100
+
   saveToDb(units)
 
 
 def getSprinklerUnits():
   file = open(db)
   units = json.load(file)
-  for unit in units:
-    unit.pop('name')
-    unit.pop('status')
-    unit.pop('moistLimit')
-    unit.pop('logs')
   file.close()
   return units
