@@ -18,30 +18,33 @@ class Pump:
         self.pwm = gpiozero.PWMOutputDevice(pin=pwm, frequency=100)
 
 class Sprinkler_unit:
-  def __init__(self, id, valve, sensor, moisture_value, water_time):
+  def __init__(self, id, valve, sensor, moistValue, moistLimit, waterTime):
     self.id = id
     self.valve = gpiozero.OutputDevice(valve, active_high=False, initial_value=False)
     self.sensor = AnalogIn(ads, eval(sensor))
-    self.moisture_value = moisture_value
-    self.water_time = water_time
+    self.moistValue = moistValue
+    self.moistLimit = moistLimit
+    self.waterTime = waterTime
 
-  def update(self, moisture_value, water_time):
-    self.moisture_value = moisture_value
-    self.water_time = water_time
+  def update(self, moistValue, moistLimit, waterTime):
+    self.moistValue = moistValue
+    self.moistLimit = moistLimit
+    self.waterTime = waterTime
     return
 
 pump = Pump(4, 17)
 sprinkler_unit_objects = []
 units = dbService.getSprinklerUnits()
 for unit in units:
-  sprinkler_unit_objects.append(Sprinkler_unit(unit["id"], unit["valve"], unit["sensor"], unit["moistLevel"], unit["waterTime"]))
+  print(unit)
+  sprinkler_unit_objects.append(Sprinkler_unit(unit["id"], unit["valve"], unit["sensor"], unit["moistLevel"], unit["moistLimit"], unit["waterTime"]))
 
 def updateSprinklerUnitObject(id, index):
   units = dbService.getSprinklerUnits()
   updatedUnit = units[index]
   for unit in sprinkler_unit_objects:
     if unit.id == id:
-      result = unit.update(updatedUnit["moistLevel"], updatedUnit["waterTime"])
+      result = unit.update(updatedUnit["moistLevel"], updatedUnit["moistLimit"], updatedUnit["waterTime"])
   return {"message": "saved"}
 
 def updateMoistLevels():
@@ -53,27 +56,26 @@ def updateMoistLevels():
 def waterNow(id):
     index = dbService.findById(id)
     unit = sprinkler_unit_objects[index]
-    result = water(unit.valve, unit.id, unit.water_time)
+    result = water(unit.valve, unit.id, unit.waterTime)
     return result
 
 def measureSoil(sensor, id):
-    value = sensor.value
-    return {"id": id, "value": value}
+    #FIX!!
+    valueSum = 0
+    for i in range(5):
+      valueSum += sensor.value
+      sleep(0.1)
+    valueMean = valueSum / 5
 
-def water(valve, id, water_time):
+    return {"id": id, "value": valueMean}
+
+def water(valve, id, waterTime):
     valve.on()
-    sleep(water_time)
+    sleep(waterTime)
     valve.off()
     return {"message": f"Watered unit {id}"}
 
-""" def main():
-    while True:
-        for sprinkler_unit in sprinkler_units:
-            value = measureSoil(sprinkler_unit.sensor, sprinkler_unit.id)
-            if value > sprinkler_unit.moisture_value:
-                water(sprinkler_unit.valve, sprinkler_unit.id)
-        sleep(5)
-                
-        
-if __name__ == "__main__":
-  main() """
+def getObjects():
+   return sprinkler_unit_objects
+
+

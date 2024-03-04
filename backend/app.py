@@ -1,20 +1,23 @@
-
 from flask import Flask, request, make_response
 import json
 import services.deviceSettings as deviceSettings
 import services.db as dbService
-import plant_watering_app as raspi
+import deviceFunctions as raspi
+from timeProgram import setTimeProgram
+import threading
 
-app = Flask(__name__, static_folder='./build', static_url_path='/')
-#app = Flask(__name__)
 
+app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
+
+deviceRoute: str = '/api/device'
+unitsRoute: str = '/api/units'
 
 @app.route('/')
 def index():
   return app.send_static_file('index.html')
 
 #Device settings APIs
-@app.get('/api/device')
+@app.get(deviceRoute)
 def getAllDevice():
   try:
     response = deviceSettings.getAll()
@@ -23,13 +26,14 @@ def getAllDevice():
     print(error)
     return 503
 
-@app.put('/api/device')
+@app.put(deviceRoute)
 def changeDeciveSettings():
   try:
     body = request.get_json()
     print(body)
     response = deviceSettings.changeSettings(body)
-    print(response)
+    setTimeProgram()
+    print('response:', response)
     return response
   except Exception as error:
     print('error', error)
@@ -37,19 +41,19 @@ def changeDeciveSettings():
 
 
 #Unit settings APIs
-@app.get("/api/units")
+@app.get(unitsRoute)
 def getAll():
   try:
     moistLevels = raspi.updateMoistLevels()
     dbService.updateMoistLevels(moistLevels)
     response = dbService.getUnits()
     return response
-  except Execption as error:
+  except Exception as error:
     print(error)
     return 503
 
 
-@app.put('/api/units/<string:unit_id>')
+@app.put(f'{unitsRoute}/<string:unit_id>')
 def changeUnit(unit_id):
   try:
     body = request.get_json()
@@ -61,9 +65,9 @@ def changeUnit(unit_id):
     print(error)
     return 'Error', 500
 
-@app.post('/api/units/<string:unit_id>')
+@app.post(f'{unitsRoute}/<string:unit_id>')
 def waterNow(unit_id):
   result = raspi.waterNow(unit_id)
   if result["message"]:
     return result
-  
+
