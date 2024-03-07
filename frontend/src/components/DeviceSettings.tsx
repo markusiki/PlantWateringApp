@@ -25,7 +25,7 @@ const Settings: React.FC<IDeviceSettingsProps> = ({
 
   useEffect(() => {
     setSettings(deviceSettings)
-  }, [])
+  }, [deviceSettings])
 
   const modal = useRef<HTMLIonModalElement>(null)
 
@@ -79,7 +79,7 @@ const Settings: React.FC<IDeviceSettingsProps> = ({
 
             <IonItem>
               <IonInput
-                label="Soil moisture measure intervall:"
+                label="Soil moisture measure intervall (days):"
                 labelPlacement="stacked"
                 value={settings.moistMeasureIntervall}
                 name="moistMeasureIntervall"

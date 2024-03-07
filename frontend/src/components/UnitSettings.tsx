@@ -9,6 +9,7 @@ import {
   IonList,
   IonItem,
   IonInput,
+  useIonAlert,
 } from '@ionic/react'
 import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
@@ -24,7 +25,9 @@ const Settings: React.FC<IUnitSettingsProps> = ({
     moistLimit: 0,
     waterTime: 0,
   })
+
   const modal = useRef<HTMLIonModalElement>(null)
+  const [presentAlert] = useIonAlert()
 
   useEffect(() => {
     setSettings({
@@ -34,11 +37,43 @@ const Settings: React.FC<IUnitSettingsProps> = ({
     })
   }, [unit.moistLimit, unit.name, unit.waterTime])
 
+  const validateInputs = () => {
+    if (settings.name.length > 100) {
+      presentAlert({
+        header: 'Invalid input',
+        message: 'Plant name must be under 50 characters.',
+        buttons: ['Dismiss'],
+      })
+      return false
+    }
+    if (settings.moistLimit < 8000 || settings.moistLimit > 20000) {
+      presentAlert({
+        header: 'Invalid input',
+        message: 'Moisture level limit must be between 8000 and 20000.',
+        buttons: ['Dismiss'],
+      })
+      return false
+    }
+    if (settings.waterTime < 0 || settings.waterTime > 180) {
+      presentAlert({
+        header: 'Invalid input',
+        message: 'Water time must be between 0 and 180.',
+        buttons: ['Dismiss'],
+      })
+      return false
+    } else {
+      return true
+    }
+  }
+
   const confirm = (
     event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>
   ) => {
-    handleUnitChange(event, settings, unit.id)
-    modal.current?.dismiss()
+    const validInputs = validateInputs()
+    if (validInputs) {
+      handleUnitChange(event, settings, unit.id)
+      modal.current?.dismiss()
+    }
   }
 
   const handleChange = (event: any) => {
@@ -71,26 +106,32 @@ const Settings: React.FC<IUnitSettingsProps> = ({
                 labelPlacement="stacked"
                 onInput={handleChange}
                 type="text"
+                minlength={2}
+                maxlength={100}
               />
             </IonItem>
             <IonItem>
               <IonInput
-                label="Set moisture level limit"
+                label="Set moisture level limit value between 10000 (wet) and 18000 (dry)."
                 value={settings.moistLimit}
                 name="moistLimit"
                 labelPlacement="stacked"
-                onInput={handleChange}
                 type="number"
+                min={10000}
+                max={18000}
+                onInput={handleChange}
               />
             </IonItem>
             <IonItem>
               <IonInput
-                label="Set watering time in seconds"
+                label="Set watering time in seconds (0 - 180)"
                 value={settings.waterTime}
                 name="waterTime"
                 labelPlacement="stacked"
                 onInput={handleChange}
                 type="number"
+                min={0}
+                max={180}
               />
             </IonItem>
           </IonList>
