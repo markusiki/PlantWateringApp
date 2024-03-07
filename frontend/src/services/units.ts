@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IUnitSettingsProps } from "../interfaces";
+import { IUnitToUpdate } from "../interfaces";
 const baseUrl = '/api/units'
 
 const getAll = async () => {
@@ -13,11 +13,11 @@ const getAll = async () => {
   }
 }
 
-const changeSettigs = async (newUnit: IUnitSettingsProps, id: string) => {
+const changeSettigs = async (unit: IUnitToUpdate) => {
   try {
-    const request = await axios.put(`${baseUrl}/${id}`, newUnit)
+    const request = await axios.put(baseUrl, unit)
     const response = request
-    return response.data
+    return response
   }
   catch (error) {
     console.log(error)
