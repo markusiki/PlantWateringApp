@@ -33,3 +33,10 @@ export interface IDeviceSettingsProps {
   deviceSettings: IDeviceSettingsState
   handleDeciveSettingsChange: any
 }
+
+export interface IUnitToUpdate {
+  name: string
+  moistLimit: number
+  waterTime: number
+  id: IUnitState['id']
+}
