@@ -20,7 +20,7 @@ import {
 import { settingsOutline } from 'ionicons/icons'
 import './Home.css'
 import { useEffect, useState } from 'react'
-import { IUnitSettingsProps, IUnitState, IDeviceSettingsState } from '../interfaces'
+import { IUnitState, IDeviceSettingsState, IUnitSettingsState } from '../interfaces'
 import Log from '../components/Log'
 import UnitSettings from '../components/UnitSettings'
 import unitService from '../services/units'
@@ -79,17 +79,22 @@ const Home: React.FC = () => {
   ) => {
     event.preventDefault()
     const returnedDeviceSettings = await deviceService.updateSettings(settings)
-    setDeviceSettings(returnedDeviceSettings)
+    if (returnedDeviceSettings?.status === 200) {
+      setDeviceSettings(returnedDeviceSettings.data)
+    }
   }
 
   const handleUnitChange = async (
     event: React.MouseEvent,
-    unitSettings: IUnitSettingsProps,
+    unitSettings: IUnitSettingsState,
     id: IUnitState['id']
   ) => {
     event.preventDefault()
-    const returnedUnit = await unitService.changeSettigs(unitSettings, id)
-    setUnits(units.map((unit) => (unit.id !== returnedUnit.id ? unit : returnedUnit)))
+    const unitToUpdate = { ...unitSettings, id: id }
+    const returnedUnit = await unitService.changeSettigs(unitToUpdate)
+    if (returnedUnit?.status === 200) {
+      setUnits(units.map((unit) => (unit.id !== returnedUnit.data.id ? unit : returnedUnit.data)))
+    }
   }
 
   const getAbsoluteValue = (moistLevel: IUnitState['moistLevel']) => {

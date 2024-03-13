@@ -14,12 +14,7 @@ import {
 import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 
-const Settings: React.FC<IUnitSettingsProps> = ({
-  unit,
-  index,
-  units,
-  handleUnitChange,
-}) => {
+const Settings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handleUnitChange }) => {
   const [settings, setSettings] = useState<IUnitSettingsState>({
     name: '',
     moistLimit: 0,
@@ -38,10 +33,10 @@ const Settings: React.FC<IUnitSettingsProps> = ({
   }, [unit.moistLimit, unit.name, unit.waterTime])
 
   const validateInputs = () => {
-    if (settings.name.length > 100) {
+    if (settings.name.length > 100 || settings.name.length < 1) {
       presentAlert({
         header: 'Invalid input',
-        message: 'Plant name must be under 50 characters.',
+        message: 'Plant name must be between 1 and 100 characters.',
         buttons: ['Dismiss'],
       })
       return false
@@ -66,9 +61,7 @@ const Settings: React.FC<IUnitSettingsProps> = ({
     }
   }
 
-  const confirm = (
-    event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>
-  ) => {
+  const confirm = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
     const validInputs = validateInputs()
     if (validInputs) {
       handleUnitChange(event, settings, unit.id)
@@ -86,9 +79,7 @@ const Settings: React.FC<IUnitSettingsProps> = ({
         <IonHeader>
           <IonToolbar>
             <IonButtons>
-              <IonButton onClick={() => modal.current?.dismiss()}>
-                Cancel
-              </IonButton>
+              <IonButton onClick={() => modal.current?.dismiss()}>Cancel</IonButton>
             </IonButtons>
             <IonTitle slot="secondary">Settings</IonTitle>
             <IonButtons slot="end">

@@ -17,7 +17,7 @@ const updateSettings = async (deviceSettings: IDeviceSettingsState) => {
   try {
     const request = axios.put(baseUrl, deviceSettings)
     const response = await request
-    return response.data
+    return response
   }
   catch (error) {
     console.log(error)
