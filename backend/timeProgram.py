@@ -1,5 +1,6 @@
 from time import sleep
 import services.deviceSettings as deviceSettings
+from services.db import updateLog
 import deviceFunctions as device
 import threading
 
@@ -29,10 +30,14 @@ def timeProgram():
             for unit in units:
                 sensor = device.measureSoil(unit.sensor, unit.id)
                 print((unit.id, unit.moistLimit, sensor))
-                if sensor["value"] > unit.moistLimit:
+                if sensor["moistValue"] > unit.moistLimit:
                     device.water(unit.valve, unit.id, unit.waterTime)
+                    updateLog(**sensor, watered=True, waterMethod="auto: moistLevel")
                     print(f"Watering unit {unit.id}")
-            sleep(measureIntervall)
+                else:
+                    updateLog(**sensor)
+
+            sleep(5)
         else:
             break
 
