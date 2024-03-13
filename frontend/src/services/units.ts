@@ -28,7 +28,7 @@ const waterPlant = async (id: string) => {
   try {
     const request = axios.post(`${baseUrl}/${id}`)
     const response = await request
-    return response.status
+    return response
   }
   catch (error) {
     console.log(error)

@@ -10,6 +10,10 @@ import {
   IonItem,
   IonLabel,
   IonIcon,
+  IonRow,
+  IonCol,
+  IonGrid,
+  IonListHeader,
 } from '@ionic/react'
 import { ILogProps } from '../interfaces'
 import { useRef } from 'react'
@@ -23,10 +27,7 @@ const Log: React.FC<ILogProps> = ({ unit }) => {
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
-              <IonButton
-                color={'primary'}
-                onClick={() => modal.current?.dismiss()}
-              >
+              <IonButton color={'primary'} onClick={() => modal.current?.dismiss()}>
                 <IonIcon icon={arrowBackOutline}></IonIcon>
               </IonButton>
             </IonButtons>
@@ -35,12 +36,74 @@ const Log: React.FC<ILogProps> = ({ unit }) => {
         </IonHeader>
         <IonContent className="ion-padding">
           <IonList>
-            Last time watered:
-            {unit.logs.map((log, index) => (
-              <IonItem key={index}>
-                <IonLabel>{log}</IonLabel>
-              </IonItem>
-            ))}
+            <IonGrid>
+              <IonRow>
+                <IonCol size="3">
+                  <IonListHeader>
+                    <IonLabel>Date</IonLabel>
+                  </IonListHeader>
+                </IonCol>
+                <IonCol size="2">
+                  <IonListHeader>
+                    <IonLabel>Moist Value</IonLabel>
+                  </IonListHeader>
+                </IonCol>
+                <IonCol size="2">
+                  <IonListHeader>
+                    <IonLabel>Status</IonLabel>
+                  </IonListHeader>
+                </IonCol>
+                <IonCol size="2">
+                  <IonListHeader>
+                    <IonLabel>Watered</IonLabel>
+                  </IonListHeader>
+                </IonCol>
+                <IonCol size="3">
+                  <IonListHeader>
+                    <IonLabel>Watering Method</IonLabel>
+                  </IonListHeader>
+                </IonCol>
+              </IonRow>
+              {unit.logs.map((log, index) => (
+                <IonRow>
+                  <IonCol size="3">
+                    <IonItem key={index}>
+                      <IonLabel>{log.date}</IonLabel>
+                    </IonItem>
+                  </IonCol>
+                  <IonCol size="2">
+                    <IonItem key={index}>
+                      <IonLabel>{log.moistValue}</IonLabel>
+                    </IonItem>
+                  </IonCol>
+                  <IonCol size="2">
+                    <IonItem key={index}>
+                      <IonLabel>{log.status}</IonLabel>
+                    </IonItem>
+                  </IonCol>
+                  {log.watered ? (
+                    <>
+                      <IonCol size="2">
+                        <IonItem key={index}>
+                          <IonLabel>Yes</IonLabel>
+                        </IonItem>
+                      </IonCol>
+                      <IonCol size="3">
+                        <IonItem key={index}>
+                          <IonLabel>{log.waterMethod}</IonLabel>
+                        </IonItem>
+                      </IonCol>
+                    </>
+                  ) : (
+                    <IonCol>
+                      <IonItem key={index}>
+                        <IonLabel>No</IonLabel>
+                      </IonItem>
+                    </IonCol>
+                  )}
+                </IonRow>
+              ))}
+            </IonGrid>
           </IonList>
         </IonContent>
       </IonModal>

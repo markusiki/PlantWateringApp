@@ -2,10 +2,18 @@ export interface IUnitState {
   id: string
   name: string
   status: string
-  moistLevel: number
+  moistValue: number
   moistLimit: number
   waterTime: number
-  logs: string[]
+  logs: log[]
+}
+
+export interface log {
+  date: string
+  status: string
+  moistValue: number
+  watered: boolean
+  waterMethod: string
 }
 
 export interface ILogProps {
