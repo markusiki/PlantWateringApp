@@ -16,18 +16,14 @@ ads = ADS.ADS1115(i2c)
 
 class Pump:
     def __init__(self, power, pwm):
-        self.power = gpiozero.OutputDevice(
-            power, active_high=False, initial_value=False
-        )
+        self.power = gpiozero.OutputDevice(power, active_high=False, initial_value=False)
         self.pwm = gpiozero.PWMOutputDevice(pin=pwm, frequency=100)
 
 
 class Sprinkler_unit:
     def __init__(self, id, valve, sensor, moistValue, moistLimit, waterTime):
         self.id = id
-        self.valve = gpiozero.OutputDevice(
-            valve, active_high=False, initial_value=False
-        )
+        self.valve = gpiozero.OutputDevice(valve, active_high=False, initial_value=False)
         self.sensor = AnalogIn(ads, eval(sensor))
         self.moistValue = moistValue
         self.moistLimit = moistLimit
@@ -49,7 +45,7 @@ for unit in units:
             unit["id"],
             unit["valve"],
             unit["sensor"],
-            unit["moistLevel"],
+            unit["moistValue"],
             unit["moistLimit"],
             unit["waterTime"],
         )
@@ -62,25 +58,27 @@ def updateSprinklerUnitObject(id, index):
     for unit in sprinkler_unit_objects:
         if unit.id == id:
             result = unit.update(
-                updatedUnit["moistLevel"],
+                updatedUnit["moistValue"],
                 updatedUnit["moistLimit"],
                 updatedUnit["waterTime"],
             )
     return {"message": "saved"}
 
 
-def updateMoistLevels():
-    moistLevels = []
+def updateMoistValues():
+    moistValues = []
     for unit in sprinkler_unit_objects:
-        moistLevels.append(measureSoil(unit.sensor, unit.id))
-    return moistLevels
+        moistValues.append(measureSoil(unit.id))
+    return moistValues
 
 
 def waterNow(id):
     index = dbService.findById(id)
     unit = sprinkler_unit_objects[index]
-    result = water(unit.valve, unit.id, unit.waterTime)
-    return result
+    moistValue = measureSoil(id)
+    water(unit.valve, unit.id, unit.waterTime)
+    newLog = dbService.updateLog(**moistValue, watered=True, waterMethod="manual")
+    return newLog
 
 
 def calculateStandardDeviation(values):
@@ -90,25 +88,26 @@ def calculateStandardDeviation(values):
     return "OK"
 
 
-def measureSoil(sensor, id):
+def measureSoil(id):
     values = []
     valueSum = 0
-    for i in range(5):
-        value = sensor.value
-        values.append(value)
-        valueSum += value
-        sleep(0.1)
-    pstdev = calculateStandardDeviation(values)
-    valueMean = valueSum / 5
+    for unit in sprinkler_unit_objects:
+        if unit.id == id:
+            for i in range(5):
+                value = unit.sensor.value
+                values.append(value)
+                valueSum += value
+                sleep(0.1)
+            pstdev = calculateStandardDeviation(values)
+            valueMean = valueSum / 5
 
-    return {"id": id, "status": pstdev, "value": valueMean}
+    return {"id": id, "status": pstdev, "moistValue": valueMean}
 
 
 def water(valve, id, waterTime):
     valve.on()
     sleep(waterTime)
     valve.off()
-    return {"message": f"Watered unit {id}"}
 
 
 def getObjects():

@@ -47,8 +47,8 @@ def changeDeciveSettings():
 @app.get(unitsRoute)
 def getAll():
     try:
-        moistLevels = raspi.updateMoistLevels()
-        dbService.updateMoistLevels(moistLevels)
+        moistValues = raspi.updateMoistValues()
+        dbService.updateMoistValues(moistValues)
         response = dbService.getUnits()
         return response
     except Exception as error:
@@ -70,8 +70,17 @@ def changeUnit():
         return "Error", 500
 
 
-@app.post(f"{unitsRoute}/<string:unit_id>")
-def waterNow(unit_id):
-    result = raspi.waterNow(unit_id)
-    if result["message"]:
-        return result
+@app.post(f"{unitsRoute}/<string:unitId>")
+def waterNow(unitId):
+    raspi.waterNow(unitId)
+    index = dbService.findById(unitId)
+    units = dbService.getUnits()
+    unit = units[index]
+    return unit
+
+
+@app.delete(f"{unitsRoute}/logs/<string:unitId>")
+def deleteLogs(unitId):
+    dbService.deleteLog(unitId)
+    unit = dbService.getById(unitId)
+    return unit
