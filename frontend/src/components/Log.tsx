@@ -14,13 +14,40 @@ import {
   IonCol,
   IonGrid,
   IonListHeader,
+  useIonAlert,
 } from '@ionic/react'
 import { ILogProps } from '../interfaces'
 import { useRef } from 'react'
-import { arrowBackOutline } from 'ionicons/icons'
+import { arrowBackOutline, trashOutline } from 'ionicons/icons'
 
-const Log: React.FC<ILogProps> = ({ unit }) => {
+const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
   const modal = useRef<HTMLIonModalElement>(null)
+  const [presentAlert] = useIonAlert()
+
+  const handleDelete = (event: React.MouseEvent) => {
+    presentAlert({
+      header: 'Confirm',
+      message: `Are you sure that you want to delete all ${unit.name} logs?`,
+      buttons: [
+        {
+          text: 'CANCEL',
+          role: 'cancel',
+          handler: () => {
+            modal.current?.dismiss()
+          },
+        },
+        {
+          text: 'CONFIRM',
+          role: 'confirm',
+          handler: () => {
+            deleteLogs(event, unit.id)
+            modal.current?.dismiss()
+          },
+        },
+      ],
+    })
+    modal.current?.dismiss()
+  }
   return (
     <>
       <IonModal trigger={`${unit.id}-log`} ref={modal}>
@@ -31,7 +58,12 @@ const Log: React.FC<ILogProps> = ({ unit }) => {
                 <IonIcon icon={arrowBackOutline}></IonIcon>
               </IonButton>
             </IonButtons>
-            <IonTitle>{unit.name} log</IonTitle>
+            <IonTitle class="ion-text-center">{unit.name} logs</IonTitle>
+            <IonButtons slot="end">
+              <IonButton color={'danger'} onClick={handleDelete}>
+                <IonIcon icon={trashOutline}></IonIcon>
+              </IonButton>
+            </IonButtons>
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding">

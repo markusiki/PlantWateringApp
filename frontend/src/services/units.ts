@@ -35,7 +35,17 @@ const waterPlant = async (id: string) => {
   }
 }
 
+const deleteLogs = async (id: string) => {
+  try {
+    const response = await axios.delete(`${baseUrl}/logs/${id}`)
+    return response
+  }
+  catch (error) {
+    console.log(error)
+  }
+}
 
-const unitServices = { getAll, changeSettigs, waterPlant }
+
+const unitServices = { getAll, changeSettigs, waterPlant, deleteLogs }
 
 export default unitServices

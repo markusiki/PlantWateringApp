@@ -69,9 +69,15 @@ const Home: React.FC = () => {
     }
   }
 
-  const waterNow = async (unitToWater: IUnitState) => {
-    const returnedUnit = await unitService.waterPlant(unitToWater.id)
-    setUnits(units.map((unit) => (unit.id !== unitToWater.id ? unit : returnedUnit?.data)))
+  const deleteLogs = async (event: React.MouseEvent, id: string) => {
+    event.preventDefault()
+    const returnedUnit = await unitService.deleteLogs(id)
+    setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
+  }
+
+  const waterNow = async (id: string) => {
+    const returnedUnit = await unitService.waterPlant(id)
+    setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
   }
 
   const handleDeciveSettingsChange = async (
@@ -231,7 +237,7 @@ const Home: React.FC = () => {
                     <IonButton id={`${unit.id}-log`} shape="round" expand="block" color="danger">
                       Log
                     </IonButton>
-                    <Log unit={unit}></Log>
+                    <Log unit={unit} deleteLogs={deleteLogs}></Log>
                   </IonCol>
                   <IonCol class="ion-text-center">
                     <IonButton
@@ -258,7 +264,7 @@ const Home: React.FC = () => {
                           text: 'WATER NOW',
                           role: 'confirm',
                           handler: () => {
-                            waterNow(unit)
+                            waterNow(unit.id)
                             console.log('Watering confirmed ' + unit.id)
                           },
                         },

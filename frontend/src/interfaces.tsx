@@ -18,6 +18,7 @@ export interface log {
 
 export interface ILogProps {
   unit: IUnitState
+  deleteLogs: (event: React.MouseEvent, id: string) => Promise<void>
 }
 
 export interface IUnitSettingsProps {
