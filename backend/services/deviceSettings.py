@@ -13,7 +13,7 @@ def getAll():
 def changeSettings(body):
     settings = getAll()
     settings["autoWatering"] = body["autoWatering"]
-    settings["moistMeasureIntervall"] = body["moistMeasureIntervall"]
+    settings["moistMeasureInterval"] = body["moistMeasureInterval"]
     file = open(db, "w")
     json.dump(settings, file)
     file.close()

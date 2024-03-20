@@ -72,7 +72,8 @@ def changeUnit():
 
 @app.post(f"{unitsRoute}/<string:unitId>")
 def waterNow(unitId):
-    raspi.waterNow(unitId)
+    moistValue = raspi.waterNow(unitId)
+    dbService.updateLog(**moistValue, watered=True, waterMethod="manual")
     index = dbService.findById(unitId)
     units = dbService.getUnits()
     unit = units[index]

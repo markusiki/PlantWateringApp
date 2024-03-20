@@ -77,8 +77,8 @@ def waterNow(id):
     unit = sprinkler_unit_objects[index]
     moistValue = measureSoil(id)
     water(unit.valve, unit.id, unit.waterTime)
-    newLog = dbService.updateLog(**moistValue, watered=True, waterMethod="manual")
-    return newLog
+
+    return moistValue
 
 
 def calculateStandardDeviation(values):

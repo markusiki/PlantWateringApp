@@ -47,6 +47,10 @@ def changeUnit(unitToChange, index):
     unit["name"] = unitToChange["name"]
     unit["moistLimit"] = int(unitToChange["moistLimit"])
     unit["waterTime"] = int(unitToChange["waterTime"])
+    unit["enableMaxWaterInterval"] = unitToChange["enableMaxWaterInterval"]
+    unit["enableMinWaterInterval"] = unitToChange["enableMinWaterInterval"]
+    unit["maxWaterInterval"] = unitToChange["maxWaterInterval"]
+    unit["minWaterInterval"] = unitToChange["minWaterInterval"]
     saveToDb(units)
     file = open(db, "r")
     changedUnits = json.load(file)
@@ -70,7 +74,6 @@ def updateLog(id="", status="", moistValue=0, watered=False, waterMethod=""):
     }
     logs.insert(0, newLog)
     saveToDb(units)
-    return newLog
 
 
 def deleteLog(id):
