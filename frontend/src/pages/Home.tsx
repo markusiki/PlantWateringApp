@@ -32,7 +32,7 @@ const Home: React.FC = () => {
   const [backendStatus, setBackendStatus] = useState<boolean>(false)
   const [deviceSettings, setDeviceSettings] = useState<IDeviceSettingsState>({
     autoWatering: true,
-    moistMeasureIntervall: 0,
+    moistMeasureInterval: 0,
   })
 
   useEffect(() => {
