@@ -14,13 +14,13 @@ import {
 import { IDeviceSettingsProps, IDeviceSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 
-const Settings: React.FC<IDeviceSettingsProps> = ({
+const DeviceSettings: React.FC<IDeviceSettingsProps> = ({
   deviceSettings,
   handleDeciveSettingsChange,
 }) => {
   const [settings, setSettings] = useState<IDeviceSettingsState>({
     autoWatering: false,
-    moistMeasureIntervall: 1,
+    moistMeasureInterval: 1,
   })
 
   useEffect(() => {
@@ -29,9 +29,7 @@ const Settings: React.FC<IDeviceSettingsProps> = ({
 
   const modal = useRef<HTMLIonModalElement>(null)
 
-  const confirm = (
-    event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>
-  ) => {
+  const confirm = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
     handleDeciveSettingsChange(event, settings)
     modal.current?.dismiss()
   }
@@ -54,9 +52,7 @@ const Settings: React.FC<IDeviceSettingsProps> = ({
         <IonHeader>
           <IonToolbar>
             <IonButtons>
-              <IonButton onClick={() => modal.current?.dismiss()}>
-                Cancel
-              </IonButton>
+              <IonButton onClick={() => modal.current?.dismiss()}>Cancel</IonButton>
             </IonButtons>
             <IonTitle slot="secondary">Device Settings</IonTitle>
             <IonButtons slot="end">
@@ -76,13 +72,12 @@ const Settings: React.FC<IDeviceSettingsProps> = ({
                 Automatic Watering
               </IonCheckbox>
             </IonItem>
-
             <IonItem>
               <IonInput
                 label="Soil moisture measure intervall (days):"
                 labelPlacement="stacked"
-                value={settings.moistMeasureIntervall}
-                name="moistMeasureIntervall"
+                value={settings.moistMeasureInterval}
+                name="moistMeasureInterval"
                 type="number"
                 inputMode="numeric"
                 max={30}
@@ -97,4 +92,4 @@ const Settings: React.FC<IDeviceSettingsProps> = ({
   )
 }
 
-export default Settings
+export default DeviceSettings

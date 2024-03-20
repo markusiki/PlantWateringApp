@@ -20,7 +20,7 @@ import {
 import { settingsOutline } from 'ionicons/icons'
 import './Home.css'
 import { useEffect, useState } from 'react'
-import { IUnitState, IDeviceSettingsState, IUnitSettingsState } from '../interfaces'
+import { IUnitState, IDeviceSettingsState, IUnitSettingsState, log } from '../interfaces'
 import Log from '../components/Log'
 import UnitSettings from '../components/UnitSettings'
 import unitService from '../services/units'
@@ -32,7 +32,7 @@ const Home: React.FC = () => {
   const [backendStatus, setBackendStatus] = useState<boolean>(false)
   const [deviceSettings, setDeviceSettings] = useState<IDeviceSettingsState>({
     autoWatering: true,
-    moistMeasureIntervall: 0,
+    moistMeasureInterval: 0,
   })
 
   useEffect(() => {
@@ -58,19 +58,26 @@ const Home: React.FC = () => {
     })
   }
 
-  const setColor = (moistLevel: IUnitState['moistLevel']) => {
-    if (moistLevel < 0.33) {
+  const setColor = (moistValue: IUnitState['moistValue']) => {
+    if (moistValue < 0.33) {
       return 'danger'
     }
-    if (moistLevel >= 0.33 && moistLevel < 0.66) {
+    if (moistValue >= 0.33 && moistValue < 0.66) {
       return 'success'
     } else {
       return 'primary'
     }
   }
 
-  const waterNow = (unit: IUnitState) => {
-    unitService.waterPlant(unit.id)
+  const deleteLogs = async (event: React.MouseEvent, id: string) => {
+    event.preventDefault()
+    const returnedUnit = await unitService.deleteLogs(id)
+    setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
+  }
+
+  const waterNow = async (id: string) => {
+    const returnedUnit = await unitService.waterPlant(id)
+    setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
   }
 
   const handleDeciveSettingsChange = async (
@@ -97,11 +104,11 @@ const Home: React.FC = () => {
     }
   }
 
-  const getAbsoluteValue = (moistLevel: IUnitState['moistLevel']) => {
+  const getAbsoluteValue = (moistValue: IUnitState['moistValue']) => {
     const minValue = 10000
     const maxValue = 18000
     const absoluteValue =
-      Math.round((1 - (moistLevel - minValue) / (maxValue - minValue)) * 100) / 100
+      Math.round((1 - (moistValue - minValue) / (maxValue - minValue)) * 100) / 100
     return absoluteValue
   }
 
@@ -109,7 +116,7 @@ const Home: React.FC = () => {
     const minValue = unit.moistLimit
     const maxValue = 18000
     const relativeValue =
-      Math.round((1 - (unit.moistLevel - minValue) / (maxValue - minValue)) * 100) / 100
+      Math.round((1 - (unit.moistValue - minValue) / (maxValue - minValue)) * 100) / 100
     if (relativeValue > 1) {
       return 1.0
     }
@@ -193,10 +200,10 @@ const Home: React.FC = () => {
                     </IonText>
                   </IonCol>
                   <IonCol size="6">
-                    <p className="moist-percent">{getAbsoluteValue(unit.moistLevel) * 100}%</p>
+                    <p className="moist-percent">{getAbsoluteValue(unit.moistValue) * 100}%</p>
                     <IonProgressBar
-                      value={getAbsoluteValue(unit.moistLevel)}
-                      color={setColor(getAbsoluteValue(unit.moistLevel))}
+                      value={getAbsoluteValue(unit.moistValue)}
+                      color={setColor(getAbsoluteValue(unit.moistValue))}
                     ></IonProgressBar>
                   </IonCol>
                 </IonRow>
@@ -218,7 +225,9 @@ const Home: React.FC = () => {
                   <IonCol>
                     <IonText>
                       <p className="last-time-watered">
-                        Last time watered: <br /> {unit.logs[0]}{' '}
+                        Last time watered:
+                        <br />
+                        {unit.logs.find((log) => log.watered === true)?.date}
                       </p>
                     </IonText>
                   </IonCol>
@@ -228,7 +237,7 @@ const Home: React.FC = () => {
                     <IonButton id={`${unit.id}-log`} shape="round" expand="block" color="danger">
                       Log
                     </IonButton>
-                    <Log unit={unit}></Log>
+                    <Log unit={unit} deleteLogs={deleteLogs}></Log>
                   </IonCol>
                   <IonCol class="ion-text-center">
                     <IonButton
@@ -255,7 +264,7 @@ const Home: React.FC = () => {
                           text: 'WATER NOW',
                           role: 'confirm',
                           handler: () => {
-                            waterNow(unit)
+                            waterNow(unit.id)
                             console.log('Watering confirmed ' + unit.id)
                           },
                         },

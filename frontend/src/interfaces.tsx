@@ -2,14 +2,27 @@ export interface IUnitState {
   id: string
   name: string
   status: string
-  moistLevel: number
+  moistValue: number
   moistLimit: number
   waterTime: number
-  logs: string[]
+  enableMaxWaterInterval: boolean
+  enableMinWaterInterval: boolean
+  maxWaterInterval: number
+  minWaterInterval: number
+  logs: log[]
+}
+
+export interface log {
+  date: string
+  status: string
+  moistValue: number
+  watered: boolean
+  waterMethod: string
 }
 
 export interface ILogProps {
   unit: IUnitState
+  deleteLogs: (event: React.MouseEvent, id: string) => Promise<void>
 }
 
 export interface IUnitSettingsProps {
@@ -23,11 +36,15 @@ export interface IUnitSettingsState {
   name: string
   moistLimit: number
   waterTime: number
+  enableMaxWaterInterval: boolean
+  enableMinWaterInterval: boolean
+  maxWaterInterval: number
+  minWaterInterval: number
 }
 
 export interface IDeviceSettingsState {
   autoWatering: boolean
-  moistMeasureIntervall: number
+  moistMeasureInterval: number
 }
 export interface IDeviceSettingsProps {
   deviceSettings: IDeviceSettingsState
