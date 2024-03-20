@@ -19,6 +19,7 @@ import {
 import { ILogProps } from '../interfaces'
 import { useRef } from 'react'
 import { arrowBackOutline, trashOutline } from 'ionicons/icons'
+import './Log.css'
 
 const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
   const modal = useRef<HTMLIonModalElement>(null)
@@ -69,13 +70,13 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
         <IonContent className="ion-padding">
           <IonList>
             <IonGrid>
-              <IonRow>
-                <IonCol size="3">
+              <IonRow className="log">
+                <IonCol size="3.1">
                   <IonListHeader>
                     <IonLabel>Date</IonLabel>
                   </IonListHeader>
                 </IonCol>
-                <IonCol size="2">
+                <IonCol size="1.9">
                   <IonListHeader>
                     <IonLabel>Moist Value</IonLabel>
                   </IonListHeader>
@@ -85,50 +86,50 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
                     <IonLabel>Status</IonLabel>
                   </IonListHeader>
                 </IonCol>
-                <IonCol size="2">
+                <IonCol size="1.5">
                   <IonListHeader>
                     <IonLabel>Watered</IonLabel>
                   </IonListHeader>
                 </IonCol>
-                <IonCol size="3">
+                <IonCol size="3.5">
                   <IonListHeader>
                     <IonLabel>Watering Method</IonLabel>
                   </IonListHeader>
                 </IonCol>
               </IonRow>
               {unit.logs.map((log, index) => (
-                <IonRow>
-                  <IonCol size="3">
-                    <IonItem key={index}>
+                <IonRow key={index} className="log">
+                  <IonCol size="3.1">
+                    <IonItem lines="none">
                       <IonLabel>{log.date}</IonLabel>
                     </IonItem>
                   </IonCol>
-                  <IonCol size="2">
-                    <IonItem key={index}>
+                  <IonCol size="1.9">
+                    <IonItem lines="none">
                       <IonLabel>{log.moistValue}</IonLabel>
                     </IonItem>
                   </IonCol>
                   <IonCol size="2">
-                    <IonItem key={index}>
+                    <IonItem lines="none">
                       <IonLabel>{log.status}</IonLabel>
                     </IonItem>
                   </IonCol>
                   {log.watered ? (
                     <>
-                      <IonCol size="2">
-                        <IonItem key={index}>
+                      <IonCol size="1.5">
+                        <IonItem lines="none">
                           <IonLabel>Yes</IonLabel>
                         </IonItem>
                       </IonCol>
-                      <IonCol size="3">
-                        <IonItem key={index}>
+                      <IonCol size="3.5">
+                        <IonItem lines="none">
                           <IonLabel>{log.waterMethod}</IonLabel>
                         </IonItem>
                       </IonCol>
                     </>
                   ) : (
-                    <IonCol>
-                      <IonItem key={index}>
+                    <IonCol size="1.5">
+                      <IonItem lines="none">
                         <IonLabel>No</IonLabel>
                       </IonItem>
                     </IonCol>
