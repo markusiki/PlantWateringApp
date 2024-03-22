@@ -9,10 +9,10 @@ export interface IUnitState {
   enableMinWaterInterval: boolean
   maxWaterInterval: number
   minWaterInterval: number
-  logs: log[]
+  logs: ILog[]
 }
 
-export interface log {
+export interface ILog {
   date: string
   status: string
   moistValue: number
@@ -55,5 +55,5 @@ export interface IUnitToUpdate {
   name: string
   moistLimit: number
   waterTime: number
-  id: IUnitState['id']
+  id: string
 }

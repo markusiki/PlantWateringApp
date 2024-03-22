@@ -110,12 +110,13 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
 
   const handleChange = (event: any) => {
     if (event.target.name === 'name') {
+      console.log('!!')
       setSettings({ ...settings, [event.target.name]: event.target.value })
-    }
-    if (event.target.localName === 'ion-checkbox') {
+    } else if (event.target.localName === 'ion-checkbox') {
       setSettings({ ...settings, [event.target.name]: event.detail.checked })
     } else {
       setSettings({ ...settings, [event.target.name]: parseInt(event.target.value) })
+      console.log('??')
     }
   }
 
@@ -189,6 +190,8 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
                   name="minWaterInterval"
                   labelPlacement="stacked"
                   type="number"
+                  helperText="For how many days the plant will be not watered,
+                  even if the moisture level drops under the moisture level limit."
                   min={1}
                   max={180}
                   onInput={handleChange}
@@ -214,6 +217,8 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
                   labelPlacement="stacked"
                   onInput={handleChange}
                   type="number"
+                  helperText="After how many days the plant will be watered,
+                  even if the moisture level has not dropped under the moisture level limit."
                   min={1}
                   max={180}
                 />
