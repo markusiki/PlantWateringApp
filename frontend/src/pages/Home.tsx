@@ -20,7 +20,7 @@ import {
 import { settingsOutline } from 'ionicons/icons'
 import './Home.css'
 import { useEffect, useState } from 'react'
-import { IUnitState, IDeviceSettingsState, IUnitSettingsState, log } from '../interfaces'
+import { IUnitState, IDeviceSettingsState, IUnitSettingsState } from '../interfaces'
 import Log from '../components/Log'
 import UnitSettings from '../components/UnitSettings'
 import unitService from '../services/units'
