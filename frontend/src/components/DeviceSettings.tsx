@@ -34,18 +34,6 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({
     modal.current?.dismiss()
   }
 
-  const handleChange = (event: any) => {
-    if (event.target.localName === 'ion-checkbox') {
-      setSettings({ ...settings, [event.target.name]: event.detail.checked })
-    } else {
-      setSettings({
-        ...settings,
-        [event.target.name]: parseInt(event.target.value),
-      })
-    }
-    console.log(event.target.localName)
-  }
-
   return (
     <>
       <IonModal trigger={'settings'} ref={modal}>
@@ -67,9 +55,11 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({
                 justify="space-between"
                 checked={settings.autoWatering}
                 name="autoWatering"
-                onIonChange={handleChange}
+                onIonChange={(event) =>
+                  setSettings({ ...settings, autoWatering: event.detail.checked })
+                }
               >
-                Automatic Watering
+                Enable Automatic Watering
               </IonCheckbox>
             </IonItem>
             <IonItem>
@@ -82,7 +72,12 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({
                 inputMode="numeric"
                 max={30}
                 min={1}
-                onInput={handleChange}
+                onInput={(event) =>
+                  setSettings({
+                    ...settings,
+                    moistMeasureInterval: parseInt((event.target as HTMLInputElement).value),
+                  })
+                }
               />
             </IonItem>
           </IonList>
