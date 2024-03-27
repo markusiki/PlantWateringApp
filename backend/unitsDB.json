@@ -1,0 +1,62 @@
+[
+  {
+    "id": "Unit1",
+    "name": "",
+    "status": "OK",
+    "moistValue": 18000,
+    "moistLimit": 15000,
+    "waterTime": 2,
+    "logs": []
+    "sensor": "ADS.P0",
+    "valve": 27,
+    "enableMaxWaterInterval": true,
+    "enableMinWaterInterval": true,
+    "maxWaterInterval": 7,
+    "minWaterInterval": 4
+  },
+  {
+    "id": "Unit2",
+    "name": "",
+    "status": "OK",
+    "moistValue": 18000,
+    "moistLimit": 15000,
+    "waterTime": 2,
+    "logs": [],
+    "sensor": "ADS.P1",
+    "valve": 22,
+    "enableMaxWaterInterval": true,
+    "enableMinWaterInterval": true,
+    "maxWaterInterval": 7,
+    "minWaterInterval": 4
+  },
+  {
+    "id": "Unit3",
+    "name": "Dry plant",
+    "status": "OK",
+    "moistValue": 18000,
+    "moistLimit": 15000,
+    "waterTime": 2,
+    "logs": [],
+    "sensor": "ADS.P2",
+    "valve": 10,
+    "enableMaxWaterInterval": true,
+    "enableMinWaterInterval": true,
+    "maxWaterInterval": 7,
+    "minWaterInterval": 4
+  },
+  {
+    "id": "Unit4",
+    "name": "Avocado",
+    "status": "ERROR",
+    "moistValue": 18000,
+    "moistLimit": 15000,
+    "waterTime": 2,
+    "logs": [],
+    "sensor": "ADS.P3",
+    "valve": 9,
+    "enableMaxWaterInterval": true,
+    "enableMinWaterInterval": true,
+    "maxWaterInterval": 7,
+    "minWaterInterval": 4
+  }
+]
