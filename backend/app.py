@@ -1,11 +1,22 @@
 from flask import Flask
-from routes.device import deviceRouter
-from routes.units import unitsRouter
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__, static_folder="../frontend/build", static_url_path="/")
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
-app.register_blueprint(deviceRouter, url_prefix="/api/device")
-app.register_blueprint(unitsRouter, url_prefix="/api/units")
+
+from controllers import device, units, login
+
+app.register_blueprint(login.loginRouter, url_prefix="/login")
+app.register_blueprint(device.deviceRouter, url_prefix="/api/device")
+app.register_blueprint(units.unitsRouter, url_prefix="/api/units")
 
 
 @app.route("/")
