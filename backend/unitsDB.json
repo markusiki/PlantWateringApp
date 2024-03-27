@@ -6,7 +6,7 @@
     "moistValue": 18000,
     "moistLimit": 15000,
     "waterTime": 2,
-    "logs": []
+    "logs": [],
     "sensor": "ADS.P0",
     "valve": 27,
     "enableMaxWaterInterval": true,
