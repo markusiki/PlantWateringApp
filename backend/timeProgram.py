@@ -25,15 +25,17 @@ def setTimeProgram():
 
 def lastTimeWatered(unit):
     dateNow = datetime.now()
-    lastTimeWateredDate: str
+    lastTimeWateredDate = False
     for log in unit["logs"]:
         if log["watered"] == True:
             lastTimeWateredDate = log["date"]
             break
+    if lastTimeWateredDate:
+        lastWateredDate = datetime.strptime(lastTimeWateredDate, "%d.%m.%y %H:%M")
+        print(abs((dateNow - lastWateredDate).days))
+        return abs((dateNow - lastWateredDate).days)
 
-    lastWateredDate = datetime.strptime(lastTimeWateredDate, "%d.%m.%y %H:%M")
-    print(abs((dateNow - lastWateredDate).days))
-    return abs((dateNow - lastWateredDate).days)
+    return float("inf")
 
 
 def timeProgram():
@@ -45,25 +47,27 @@ def timeProgram():
             for unit in units:
                 moistValues = device.updateMoistValues()
                 dbService.updateMoistValues(moistValues)
-                print(unit["id"], unit["moistLimit"])
                 unitLog = {
                     "id": unit["id"],
                     "status": unit["status"],
                     "moistValue": unit["moistValue"],
                 }
-                if unit["status"] == "ERROR":
-                    if unit["enableMaxWaterInterval"] == True and unit[
-                        "maxWaterInterval"
-                    ] <= lastTimeWatered(unit):
+                if unit["status"] == "OK":
+                    wateredLastTime = lastTimeWatered(unit)
+                    if (
+                        unit["enableMaxWaterInterval"] == True
+                        and unit["maxWaterInterval"] <= wateredLastTime
+                    ):
                         device.waterNow(unit["id"])
                         dbService.updateLog(
                             **unitLog, watered=True, waterMethod="auto: maxWaterInterval"
                         )
                         print(f'Watering unit {unit["id"]}')
                     elif unit["moistValue"] > unit["moistLimit"]:
-                        if unit["enableMinWaterInterval"] == True and unit[
-                            "minWaterInterval"
-                        ] >= lastTimeWatered(unit):
+                        if (
+                            unit["enableMinWaterInterval"] == True
+                            and unit["minWaterInterval"] >= wateredLastTime
+                        ):
                             dbService.updateLog(**unitLog)
                             continue
                         device.waterNow(unit["id"])

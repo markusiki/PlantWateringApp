@@ -97,7 +97,7 @@ def measureSoil(id):
                 value = unit.sensor.value
                 values.append(value)
                 valueSum += value
-                sleep(0.1)
+                sleep(0.05)
             pstdev = calculateStandardDeviation(values)
             valueMean = valueSum / 5
 

@@ -1,5 +1,7 @@
 # Databases
 deviceSettings.json
+unitsDB.json
+users.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

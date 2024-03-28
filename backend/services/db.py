@@ -4,11 +4,17 @@ from datetime import datetime
 db = "unitsDB.json"
 
 
-def getUnits():
+def getUnits(innerUse=True):
     file = open(db, "r")
     units = json.load(file)
     file.close()
-    return units
+    if innerUse:
+        return units
+    else:
+        for unit in units:
+            unit.pop("sensor")
+            unit.pop("valve")
+        return units
 
 
 def findById(id):
@@ -77,10 +83,8 @@ def updateLog(id="", status="", moistValue=0, watered=False, waterMethod=""):
 
 
 def deleteLog(id):
-    print(id)
     units = getUnits()
     index = findById(id)
-    print(index)
     unit = units[index]
     unit["logs"] = []
     saveToDb(units)
