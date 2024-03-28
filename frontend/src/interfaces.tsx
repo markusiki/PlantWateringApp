@@ -12,6 +12,24 @@ export interface IUnitState {
   logs: ILog[]
 }
 
+export interface IUserState {
+  username: string | null
+  token: string | null
+}
+
+export interface ILoginProps {
+  username: string
+  password: string
+  setUsername: React.Dispatch<React.SetStateAction<string>>
+  setPassword: React.Dispatch<React.SetStateAction<string>>
+  handleLogin: (event: React.MouseEvent) => Promise<void>
+}
+
+export interface ILoginCredentials {
+  username: string
+  password: string
+}
+
 export interface ILog {
   date: string
   status: string

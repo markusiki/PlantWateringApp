@@ -20,14 +20,19 @@ import {
 import { settingsOutline } from 'ionicons/icons'
 import './Home.css'
 import { useEffect, useState } from 'react'
-import { IUnitState, IDeviceSettingsState, IUnitSettingsState } from '../interfaces'
+import { IUnitState, IDeviceSettingsState, IUnitSettingsState, IUserState } from '../interfaces'
 import Log from '../components/Log'
 import UnitSettings from '../components/UnitSettings'
+import loginService from '../services/login'
 import unitService from '../services/units'
 import Settings from '../components/DeviceSettings'
 import deviceService from '../services/device'
+import Login from '../components/Login'
 
 const Home: React.FC = () => {
+  const [username, setUsername] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [user, setUser] = useState<IUserState>({ username: null, token: null })
   const [units, setUnits] = useState<IUnitState[]>([])
   const [backendStatus, setBackendStatus] = useState<boolean>(false)
   const [deviceSettings, setDeviceSettings] = useState<IDeviceSettingsState>({
@@ -38,6 +43,17 @@ const Home: React.FC = () => {
   useEffect(() => {
     refresh()
   }, [])
+
+  const handleLogin = async (event: React.MouseEvent) => {
+    event.preventDefault()
+    try {
+      const user = await loginService.login({ username, password })
+      window.localStorage.setItem('loggedUser', JSON.stringify(user))
+      setUser({ username: user?.data.username, token: user?.data.token })
+      setUsername('')
+      setPassword('')
+    } catch (exeption) {}
+  }
 
   const refresh = () => {
     deviceService.getAll().then((response) => {
@@ -121,6 +137,18 @@ const Home: React.FC = () => {
       return 1.0
     }
     return relativeValue
+  }
+
+  if (user.username === null) {
+    return (
+      <Login
+        username={username}
+        setUsername={setUsername}
+        password={password}
+        setPassword={setPassword}
+        handleLogin={handleLogin}
+      ></Login>
+    )
   }
 
   return (
