@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_jwt_extended import jwt_required
 import services.deviceSettings as deviceSettings
 from schemas import DeviceSchema
 from timeProgram import setTimeProgram
@@ -17,6 +18,7 @@ def getAllDevice():
 
 
 @deviceRouter.put("")
+@jwt_required()
 def changeDeciveSettings():
     try:
         body = request.get_json()

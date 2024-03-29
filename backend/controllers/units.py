@@ -1,4 +1,5 @@
 from flask import request, Blueprint
+from flask_jwt_extended import jwt_required
 import services.db as dbService
 import deviceFunctions as raspi
 from schemas import UnitsSchema
@@ -20,6 +21,7 @@ def getAll():
 
 
 @unitsRouter.put("")
+@jwt_required()
 def changeUnit():
     try:
         body = request.get_json()
@@ -34,6 +36,7 @@ def changeUnit():
 
 
 @unitsRouter.post("/<string:unitId>")
+@jwt_required()
 def waterNow(unitId):
     moistValue = raspi.waterNow(unitId)
     dbService.updateLog(**moistValue, watered=True, waterMethod="manual")
@@ -44,6 +47,7 @@ def waterNow(unitId):
 
 
 @unitsRouter.delete("/logs/<string:unitId>")
+@jwt_required()
 def deleteLogs(unitId):
     dbService.deleteLog(unitId)
     unit = dbService.getById(unitId)
