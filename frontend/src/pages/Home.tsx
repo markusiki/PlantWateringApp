@@ -44,12 +44,24 @@ const Home: React.FC = () => {
     refresh()
   }, [])
 
+  useEffect(() => {
+    const loggedUser = window.localStorage.getItem('loggedUser')
+    if (loggedUser) {
+      const user = JSON.parse(loggedUser)
+      setUser(user.data.username)
+      unitService.setToken(user?.data.token)
+      deviceService.setToken(user?.data.token)
+    }
+  }, [])
+
   const handleLogin = async (event: React.MouseEvent) => {
     event.preventDefault()
     try {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
       setUser({ username: user?.data.username, token: user?.data.token })
+      unitService.setToken(user?.data.token)
+      deviceService.setToken(user?.data.token)
       setUsername('')
       setPassword('')
     } catch (exeption) {}
@@ -114,7 +126,7 @@ const Home: React.FC = () => {
   ) => {
     event.preventDefault()
     const unitToUpdate = { ...unitSettings, id: id }
-    const returnedUnit = await unitService.changeSettigs(unitToUpdate)
+    const returnedUnit = await unitService.changeSettings(unitToUpdate)
     if (returnedUnit?.status === 200) {
       setUnits(units.map((unit) => (unit.id !== returnedUnit.data.id ? unit : returnedUnit.data)))
     }

@@ -1,6 +1,12 @@
 import axios from "axios";
-import { IDeviceSettingsState } from "../interfaces";
+import { IDeviceSettingsState, IUserState } from "../interfaces";
 const baseUrl = '/api/device'
+
+let token: IUserState["token"] = null
+
+const setToken = (newtoken: string) => {
+  token = `Bearer ${newtoken}`
+}
 
 const getAll = async () => {
   try {
@@ -15,7 +21,10 @@ const getAll = async () => {
 
 const updateSettings = async (deviceSettings: IDeviceSettingsState) => {
   try {
-    const request = axios.put(baseUrl, deviceSettings)
+    const config = {
+      headers: { Authorization: token }
+    }
+    const request = axios.put(baseUrl, deviceSettings, config)
     const response = await request
     return response
   }
@@ -24,6 +33,6 @@ const updateSettings = async (deviceSettings: IDeviceSettingsState) => {
   }
 }
 
-const deviceService = { getAll, updateSettings }
+const deviceService = { setToken, getAll, updateSettings }
 
 export default deviceService

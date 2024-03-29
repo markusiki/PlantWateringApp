@@ -1,6 +1,13 @@
 import axios from "axios";
-import { IUnitToUpdate } from "../interfaces";
+import { IUnitToUpdate, IUserState } from "../interfaces";
 const baseUrl = '/api/units'
+
+let token: IUserState["token"] = null
+
+const setToken = (newtoken: string) => {
+  token = `Bearer ${newtoken}`
+}
+
 
 const getAll = async () => {
   try {
@@ -13,9 +20,12 @@ const getAll = async () => {
   }
 }
 
-const changeSettigs = async (unit: IUnitToUpdate) => {
+const changeSettings = async (unit: IUnitToUpdate) => {
   try {
-    const request = await axios.put(baseUrl, unit)
+    const config = {
+      headers: { Authorization: token }
+    }
+    const request = await axios.put(baseUrl, unit, config)
     const response = request
     return response
   }
@@ -46,6 +56,6 @@ const deleteLogs = async (id: string) => {
 }
 
 
-const unitServices = { getAll, changeSettigs, waterPlant, deleteLogs }
+const unitServices = {setToken, getAll, changeSettings, waterPlant, deleteLogs }
 
 export default unitServices
