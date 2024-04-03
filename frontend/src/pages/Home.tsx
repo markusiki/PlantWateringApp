@@ -16,11 +16,12 @@ import {
   IonText,
   IonTitle,
   IonToolbar,
+  useIonToast,
 } from '@ionic/react'
 import { settingsOutline } from 'ionicons/icons'
 import './Home.css'
 import { useEffect, useState } from 'react'
-import { IUnitState, IDeviceSettingsState, IUnitSettingsState, IUserState } from '../interfaces'
+import { IUnitState, IDeviceSettingsState, IUnitSettingsState } from '../interfaces'
 import Log from '../components/Log'
 import UnitSettings from '../components/UnitSettings'
 import loginService from '../services/login'
@@ -32,7 +33,7 @@ import Login from '../components/Login'
 const Home: React.FC = () => {
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
-  const [user, setUser] = useState<IUserState>({ username: null, token: null })
+  const [user, setUser] = useState<string | null>(null)
   const [units, setUnits] = useState<IUnitState[]>([])
   const [backendStatus, setBackendStatus] = useState<boolean>(false)
   const [deviceSettings, setDeviceSettings] = useState<IDeviceSettingsState>({
@@ -40,31 +41,41 @@ const Home: React.FC = () => {
     moistMeasureInterval: 0,
   })
 
+  const [toast] = useIonToast()
+
   useEffect(() => {
     refresh()
   }, [])
 
   useEffect(() => {
     const loggedUser = window.localStorage.getItem('loggedUser')
+    console.log(user)
     if (loggedUser) {
       const user = JSON.parse(loggedUser)
-      setUser(user.data.username)
-      unitService.setToken(user?.data.token)
-      deviceService.setToken(user?.data.token)
+      console.log(user)
+      setUser(user.username)
     }
   }, [])
 
   const handleLogin = async (event: React.MouseEvent) => {
     event.preventDefault()
     try {
-      const user = await loginService.login({ username, password })
-      window.localStorage.setItem('loggedUser', JSON.stringify(user))
-      setUser({ username: user?.data.username, token: user?.data.token })
-      unitService.setToken(user?.data.token)
-      deviceService.setToken(user?.data.token)
-      setUsername('')
-      setPassword('')
-    } catch (exeption) {}
+      const response = await loginService.login({ username, password })
+      if (response?.status === 200) {
+        const user = response.data
+        window.localStorage.setItem('loggedUser', JSON.stringify(user))
+        setUser(user.username)
+        setUsername('')
+        setPassword('')
+        refresh()
+      }
+    } catch (error: any) {
+      toast({
+        message: error?.response.data.message,
+        duration: 1500,
+        position: 'middle',
+      })
+    }
   }
 
   const refresh = () => {
@@ -151,7 +162,7 @@ const Home: React.FC = () => {
     return relativeValue
   }
 
-  if (user.username === null) {
+  if (user === null) {
     return (
       <Login
         username={username}

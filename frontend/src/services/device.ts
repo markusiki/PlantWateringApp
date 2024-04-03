@@ -1,16 +1,17 @@
 import axios from "axios";
-import { IDeviceSettingsState, IUserState } from "../interfaces";
+import { IDeviceSettingsState } from "../interfaces";
+import { getAccessCookie } from './login'
 const baseUrl = '/api/device'
 
-let token: IUserState["token"] = null
-
-const setToken = (newtoken: string) => {
-  token = `Bearer ${newtoken}`
+const getConfig = () => {
+  return {
+    headers: { 'X-CSRF-TOKEN': getAccessCookie() }
+  }
 }
 
 const getAll = async () => {
   try {
-    const request = axios.get(baseUrl)
+    const request = axios.get(baseUrl, getConfig())
     const response = await request
     return response
   }
@@ -21,10 +22,8 @@ const getAll = async () => {
 
 const updateSettings = async (deviceSettings: IDeviceSettingsState) => {
   try {
-    const config = {
-      headers: { Authorization: token }
-    }
-    const request = axios.put(baseUrl, deviceSettings, config)
+
+    const request = axios.put(baseUrl, deviceSettings, getConfig())
     const response = await request
     return response
   }
@@ -33,6 +32,6 @@ const updateSettings = async (deviceSettings: IDeviceSettingsState) => {
   }
 }
 
-const deviceService = { setToken, getAll, updateSettings }
+const deviceService = { getAll, updateSettings }
 
 export default deviceService
