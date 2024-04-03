@@ -9,6 +9,7 @@ unitsRouter = Blueprint("unitsRouter", __name__)
 
 
 @unitsRouter.get("")
+@jwt_required()
 def getAll():
     try:
         moistValues = raspi.updateMoistValues()

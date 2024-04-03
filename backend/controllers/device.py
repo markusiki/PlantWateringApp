@@ -8,6 +8,7 @@ deviceRouter = Blueprint("deviceRouter", __name__)
 
 
 @deviceRouter.get("")
+@jwt_required()
 def getAllDevice():
     try:
         response = deviceSettings.getAll()
