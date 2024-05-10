@@ -73,27 +73,37 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
               <IonRow className="log">
                 <IonCol size="3.1">
                   <IonListHeader>
-                    <IonLabel>Date</IonLabel>
+                    <IonLabel>
+                      <h3>Date</h3>
+                    </IonLabel>
                   </IonListHeader>
                 </IonCol>
                 <IonCol size="1.9">
                   <IonListHeader>
-                    <IonLabel>Moist Value</IonLabel>
+                    <IonLabel>
+                      <h3>Moist Value</h3>
+                    </IonLabel>
                   </IonListHeader>
                 </IonCol>
                 <IonCol size="2">
                   <IonListHeader>
-                    <IonLabel>Status</IonLabel>
+                    <IonLabel>
+                      <h3>Status</h3>
+                    </IonLabel>
                   </IonListHeader>
                 </IonCol>
                 <IonCol size="1.5">
                   <IonListHeader>
-                    <IonLabel>Watered</IonLabel>
+                    <IonLabel>
+                      <h3>Watered</h3>
+                    </IonLabel>
                   </IonListHeader>
                 </IonCol>
                 <IonCol size="3.5">
                   <IonListHeader>
-                    <IonLabel>Watering Method</IonLabel>
+                    <IonLabel>
+                      <h3>Watering Method</h3>
+                    </IonLabel>
                   </IonListHeader>
                 </IonCol>
               </IonRow>
@@ -101,36 +111,48 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
                 <IonRow key={index} className="log">
                   <IonCol size="3.1">
                     <IonItem lines="none">
-                      <IonLabel>{log.date}</IonLabel>
+                      <IonLabel>
+                        <p>{log.date}</p>
+                      </IonLabel>
                     </IonItem>
                   </IonCol>
                   <IonCol size="1.9">
                     <IonItem lines="none">
-                      <IonLabel>{log.moistValue}</IonLabel>
+                      <IonLabel>
+                        <p>{log.moistValue}</p>
+                      </IonLabel>
                     </IonItem>
                   </IonCol>
                   <IonCol size="2">
                     <IonItem lines="none">
-                      <IonLabel>{log.status}</IonLabel>
+                      <IonLabel>
+                        <p>{log.status}</p>
+                      </IonLabel>
                     </IonItem>
                   </IonCol>
                   {log.watered ? (
                     <>
                       <IonCol size="1.5">
                         <IonItem lines="none">
-                          <IonLabel>Yes</IonLabel>
+                          <IonLabel>
+                            <p>Yes</p>
+                          </IonLabel>
                         </IonItem>
                       </IonCol>
                       <IonCol size="3.5">
                         <IonItem lines="none">
-                          <IonLabel>{log.waterMethod}</IonLabel>
+                          <IonLabel>
+                            <p>{log.waterMethod}</p>
+                          </IonLabel>
                         </IonItem>
                       </IonCol>
                     </>
                   ) : (
                     <IonCol size="1.5">
                       <IonItem lines="none">
-                        <IonLabel>No</IonLabel>
+                        <IonLabel>
+                          <p>No</p>
+                        </IonLabel>
                       </IonItem>
                     </IonCol>
                   )}
