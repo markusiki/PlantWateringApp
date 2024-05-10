@@ -66,7 +66,7 @@ def changeUnit(unitToChange, index):
 
 
 def updateLog(id="", status="", moistValue=0, watered=False, waterMethod=""):
-    timeStamp = datetime.now().strftime("%d.%m.%y %H:%M")
+    timeStamp = datetime.now().strftime("%d.%m.%Y %H:%M")
     units = getUnits()
     index = findById(id)
     unit = units[index]
