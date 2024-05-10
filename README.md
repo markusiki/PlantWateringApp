@@ -11,3 +11,6 @@ The app consists of the following main functionalities:
 4. Device settings - Settings for soil measure interval and to enable automatic watering.
 
 THE PROJECT IS STILL UNDER DEVELOPMENT
+
+Home page view:
+![image](https://github.com/markusiki/PlantWateringApp/assets/110092345/c86a7ca4-dcef-4b7b-8042-5cf24921d38d)
