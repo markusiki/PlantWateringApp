@@ -33,7 +33,6 @@ import Login from '../components/Login'
 const Home: React.FC = () => {
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
-  const [user, setUser] = useState<string | null>(null)
   const [units, setUnits] = useState<IUnitState[]>([])
   const [backendStatus, setBackendStatus] = useState<boolean>(false)
   const [deviceSettings, setDeviceSettings] = useState<IDeviceSettingsState>({
@@ -47,24 +46,11 @@ const Home: React.FC = () => {
     refresh()
   }, [])
 
-  useEffect(() => {
-    const loggedUser = window.localStorage.getItem('loggedUser')
-    console.log(user)
-    if (loggedUser) {
-      const user = JSON.parse(loggedUser)
-      console.log(user)
-      setUser(user.username)
-    }
-  }, [])
-
   const handleLogin = async (event: React.MouseEvent) => {
     event.preventDefault()
     try {
       const response = await loginService.login({ username, password })
       if (response?.status === 200) {
-        const user = response.data
-        window.localStorage.setItem('loggedUser', JSON.stringify(user))
-        setUser(user.username)
         setUsername('')
         setPassword('')
         refresh()
@@ -162,7 +148,7 @@ const Home: React.FC = () => {
     return relativeValue
   }
 
-  if (user === null) {
+  if (document.cookie === '') {
     return (
       <Login
         username={username}
