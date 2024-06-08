@@ -1,7 +1,7 @@
 import axios from "axios";
 import { IDeviceSettingsState } from "../interfaces";
 import { getAccessCookie } from './login'
-const baseUrl = '/api/device'
+const baseUrl = `/api/device`
 
 const getConfig = () => {
   return {
@@ -10,26 +10,13 @@ const getConfig = () => {
 }
 
 const getAll = async () => {
-  try {
-    const request = axios.get(baseUrl, getConfig())
-    const response = await request
-    return response
-  }
-  catch (error) {
-    console.log(error)
-  }
+  const response = await axios.get(baseUrl, getConfig())
+  return response
 }
 
 const updateSettings = async (deviceSettings: IDeviceSettingsState) => {
-  try {
-
-    const request = axios.put(baseUrl, deviceSettings, getConfig())
-    const response = await request
-    return response
-  }
-  catch (error) {
-    console.log(error)
-  }
+  const response = await axios.put(baseUrl, deviceSettings, getConfig())
+  return response
 }
 
 const deviceService = { getAll, updateSettings }

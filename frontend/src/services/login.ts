@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ILoginCredentials } from "../interfaces";
-const baseUrl = '/login'
+const baseUrl = `/login`
 
 export const getAccessCookie = () => {
   const value = `; ${document.cookie}`
