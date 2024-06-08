@@ -16,8 +16,14 @@ ads = ADS.ADS1115(i2c)
 
 class Pump:
     def __init__(self, power, pwm):
-        self.power = gpiozero.OutputDevice(power, active_high=False, initial_value=False)
+        self.power = gpiozero.OutputDevice(power, active_high=True, initial_value=False)
         self.pwm = gpiozero.PWMOutputDevice(pin=pwm, frequency=100)
+
+    def pumpOn(self):
+        self.power.on()
+
+    def pumpOff(self):
+        self.power.off()
 
 
 class Sprinkler_unit:
@@ -106,7 +112,9 @@ def measureSoil(id):
 
 def water(valve, id, waterTime):
     valve.on()
+    pump.pumpOn()
     sleep(waterTime)
+    pump.pumpOff()
     valve.off()
 
 
