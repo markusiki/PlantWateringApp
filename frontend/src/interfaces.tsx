@@ -10,6 +10,7 @@ export interface IUnitState {
   maxWaterInterval: number
   minWaterInterval: number
   logs: ILog[]
+  counter?: number
 }
 
 export interface IUserState {
