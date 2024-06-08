@@ -9,7 +9,6 @@ import {
   IonGrid,
   IonHeader,
   IonIcon,
-  IonLabel,
   IonPage,
   IonProgressBar,
   IonRow,
@@ -31,6 +30,7 @@ import deviceService from '../services/device'
 import Login from '../components/Login'
 
 const Home: React.FC = () => {
+  const [, setUser] = useState('')
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [units, setUnits] = useState<IUnitState[]>([])
@@ -39,12 +39,40 @@ const Home: React.FC = () => {
     autoWatering: true,
     moistMeasureInterval: 0,
   })
+  const [waterNowDisabeled, setWaterNowDisabled] = useState(false)
 
   const [toast] = useIonToast()
 
   useEffect(() => {
     refresh()
   }, [])
+
+  /*   const addCounters = () => {
+    setUnits((prevUnits) =>
+      prevUnits.map((unit: IUnitState) =>
+        !unit.counter ? { ...unit, counter: unit.waterTime } : unit
+      )
+    )
+  } */
+
+  const setCounter = async (unitToCount: IUnitState) => {
+    setUnits((prevUnits) =>
+      prevUnits.map((unit: IUnitState) =>
+        unit.id !== unitToCount.id ? unit : { ...unit, counter: unit.waterTime }
+      )
+    )
+    let counter = unitToCount.waterTime
+    while (counter! > 0) {
+      setUnits((prevUnits) =>
+        prevUnits.map((unit) =>
+          unit.id !== unitToCount.id ? unit : { ...unit, counter: unit.counter! - 1 }
+        )
+      )
+      counter--
+      console.log('counter: ', counter)
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    }
+  }
 
   const handleLogin = async (event: React.MouseEvent) => {
     event.preventDefault()
@@ -53,7 +81,7 @@ const Home: React.FC = () => {
       if (response?.status === 200) {
         setUsername('')
         setPassword('')
-        refresh()
+        setUser(response.data.username)
       }
     } catch (error: any) {
       toast({
@@ -64,23 +92,25 @@ const Home: React.FC = () => {
     }
   }
 
-  const refresh = () => {
-    deviceService.getAll().then((response) => {
-      if (response?.status === 200) {
+  const refresh = async () => {
+    try {
+      const deviceResponse = await deviceService.getAll()
+      if (deviceResponse?.status === 200) {
         setBackendStatus(true)
-        setDeviceSettings(response.data)
-      } else {
-        setBackendStatus(false)
+        setDeviceSettings(deviceResponse.data)
       }
-    })
-    unitService.getAll().then((response) => {
-      if (response?.status === 200) {
+
+      const unitsResponse = await unitService.getAll()
+      if (unitsResponse?.status === 200) {
         setBackendStatus(true)
-        setUnits(response.data)
-      } else {
-        setBackendStatus(false)
+        setUnits(unitsResponse.data)
       }
-    })
+    } catch (error: any) {
+      setBackendStatus(false)
+      if (error.response.status === 401) {
+        setUser('')
+      }
+    }
   }
 
   const setColor = (moistValue: IUnitState['moistValue']) => {
@@ -96,13 +126,30 @@ const Home: React.FC = () => {
 
   const deleteLogs = async (event: React.MouseEvent, id: string) => {
     event.preventDefault()
-    const returnedUnit = await unitService.deleteLogs(id)
-    setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
+    try {
+      const returnedUnit = await unitService.deleteLogs(id)
+      setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        setUser('')
+      }
+    }
   }
 
   const waterNow = async (id: string) => {
-    const returnedUnit = await unitService.waterPlant(id)
-    setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
+    setWaterNowDisabled(true)
+    try {
+      const returnedUnit = await unitService.waterPlant(id)
+      console.log('status: ', returnedUnit?.status)
+      setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        setUser('')
+      }
+      setBackendStatus(false)
+    } finally {
+      setWaterNowDisabled(false)
+    }
   }
 
   const handleDeciveSettingsChange = async (
@@ -110,9 +157,15 @@ const Home: React.FC = () => {
     settings: IDeviceSettingsState
   ) => {
     event.preventDefault()
-    const returnedDeviceSettings = await deviceService.updateSettings(settings)
-    if (returnedDeviceSettings?.status === 200) {
-      setDeviceSettings(returnedDeviceSettings.data)
+    try {
+      const returnedDeviceSettings = await deviceService.updateSettings(settings)
+      if (returnedDeviceSettings?.status === 200) {
+        setDeviceSettings(returnedDeviceSettings.data)
+      }
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        setUser('')
+      }
     }
   }
 
@@ -122,10 +175,16 @@ const Home: React.FC = () => {
     id: IUnitState['id']
   ) => {
     event.preventDefault()
-    const unitToUpdate = { ...unitSettings, id: id }
-    const returnedUnit = await unitService.changeSettings(unitToUpdate)
-    if (returnedUnit?.status === 200) {
-      setUnits(units.map((unit) => (unit.id !== returnedUnit.data.id ? unit : returnedUnit.data)))
+    try {
+      const unitToUpdate = { ...unitSettings, id: id }
+      const returnedUnit = await unitService.changeSettings(unitToUpdate)
+      if (returnedUnit?.status === 200) {
+        setUnits(units.map((unit) => (unit.id !== returnedUnit.data.id ? unit : returnedUnit.data)))
+      }
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        setUser('')
+      }
     }
   }
 
@@ -146,6 +205,18 @@ const Home: React.FC = () => {
       return 1.0
     }
     return relativeValue
+  }
+
+  const buttonEffect = (unit: IUnitState) => {
+    if (!unit.counter) {
+      return 'Water now'
+    } else {
+      return (
+        <p style={{ textTransform: 'capitalize' }}>
+          Watering... {unit.counter} seconds to complete
+        </p>
+      )
+    }
   }
 
   if (document.cookie === '') {
@@ -174,11 +245,12 @@ const Home: React.FC = () => {
                 handleDeciveSettingsChange={handleDeciveSettingsChange}
               />
             </IonButtons>
-            <IonLabel>Status: </IonLabel>
+
+            <IonText>Status: </IonText>
             {backendStatus ? (
-              <IonLabel color={'success'}>Connected </IonLabel>
+              <IonText color={'success'}>Connected</IonText>
             ) : (
-              <IonLabel color={'danger'}>Disconnected </IonLabel>
+              <IonText color={'danger'}>Disconnected</IonText>
             )}
 
             <IonTitle slot="secondary">My plants</IonTitle>
@@ -282,8 +354,9 @@ const Home: React.FC = () => {
                       shape="round"
                       expand="block"
                       color="primary"
+                      disabled={waterNowDisabeled}
                     >
-                      Water now
+                      {buttonEffect(unit)}
                     </IonButton>
                     <IonAlert
                       header="Confirm"
@@ -302,6 +375,7 @@ const Home: React.FC = () => {
                           role: 'confirm',
                           handler: () => {
                             waterNow(unit.id)
+                            setCounter(unit)
                             console.log('Watering confirmed ' + unit.id)
                           },
                         },
