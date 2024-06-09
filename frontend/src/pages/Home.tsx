@@ -50,7 +50,7 @@ const Home: React.FC = () => {
   const setCounter = async (unitToCount: IUnitState) => {
     setUnits((prevUnits) =>
       prevUnits.map((unit: IUnitState) =>
-        unit.id !== unitToCount.id ? unit : { ...unit, counter: unit.waterTime }
+        unit.id !== unitToCount.id ? unit : { ...unit, counter: unit.waterTime + 1 }
       )
     )
     let counter = unitToCount.waterTime
@@ -61,7 +61,6 @@ const Home: React.FC = () => {
         )
       )
       counter--
-      console.log('counter: ', counter)
       await new Promise((resolve) => setTimeout(resolve, 1000))
     }
   }
