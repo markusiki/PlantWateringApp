@@ -179,7 +179,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
                 name="enableMinWaterInterval"
                 onIonChange={handleChange}
               >
-                Enable minimun watering Interval
+                Enable minimun watering interval
               </IonCheckbox>
             </IonItem>
             <li hidden={!settings.enableMinWaterInterval}>
@@ -190,7 +190,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
                   name="minWaterInterval"
                   labelPlacement="stacked"
                   type="number"
-                  helperText="For how many days the plant will be not watered,
+                  helperText="For how many days the plant will not be watered,
                   even if the moisture level drops under the moisture level limit."
                   min={1}
                   max={180}
@@ -205,7 +205,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
                 name="enableMaxWaterInterval"
                 onIonChange={handleChange}
               >
-                Enable maximum watering Interval
+                Enable maximum watering interval
               </IonCheckbox>
             </IonItem>
             <li hidden={!settings.enableMaxWaterInterval}>
