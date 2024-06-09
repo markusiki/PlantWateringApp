@@ -5,3 +5,13 @@ ion-grid {
 .log {
   border-bottom: 1px groove;
 }
+
+.logLabel {
+  font-size: 2.5vw;
+  font-weight: bold;
+}
+
+.logItem {
+  font-size: 2.2vw;
+  opacity: 0.8;
+}
