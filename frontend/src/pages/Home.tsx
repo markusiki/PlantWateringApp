@@ -30,7 +30,7 @@ import deviceService from '../services/device'
 import Login from '../components/Login'
 
 const Home: React.FC = () => {
-  const [, setUser] = useState('')
+  const [user, setUser] = useState('')
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [units, setUnits] = useState<IUnitState[]>([])
@@ -45,15 +45,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     refresh()
-  }, [])
-
-  /*   const addCounters = () => {
-    setUnits((prevUnits) =>
-      prevUnits.map((unit: IUnitState) =>
-        !unit.counter ? { ...unit, counter: unit.waterTime } : unit
-      )
-    )
-  } */
+  }, [user])
 
   const setCounter = async (unitToCount: IUnitState) => {
     setUnits((prevUnits) =>
@@ -141,7 +133,7 @@ const Home: React.FC = () => {
     try {
       const returnedUnit = await unitService.waterPlant(id)
       console.log('status: ', returnedUnit?.status)
-      setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
+      setUnits((prevUnits) => prevUnits.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
     } catch (error: any) {
       if (error.response.status === 401) {
         setUser('')
