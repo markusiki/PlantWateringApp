@@ -1,5 +1,5 @@
 from datetime import timedelta, timezone, datetime
-from flask import Flask
+from flask import Flask, jsonify
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import (
     JWTManager,
@@ -7,6 +7,7 @@ from flask_jwt_extended import (
     get_jwt,
     get_jwt_identity,
     set_access_cookies,
+    unset_jwt_cookies,
 )
 from dotenv import load_dotenv
 import os
@@ -30,6 +31,13 @@ app.register_blueprint(login.loginRouter, url_prefix="/login")
 app.register_blueprint(logout.logoutRouter, url_prefix="/logout")
 app.register_blueprint(device.deviceRouter, url_prefix="/api/device")
 app.register_blueprint(units.unitsRouter, url_prefix="/api/units")
+
+
+@jwt.expired_token_loader
+def expired_token_callback(header, data):
+    response = jsonify({"status": 401, "msg": "logout successful"})
+    unset_jwt_cookies(response)
+    return response, 401
 
 
 @app.after_request
