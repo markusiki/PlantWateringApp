@@ -9,6 +9,7 @@ import {
   IonGrid,
   IonHeader,
   IonIcon,
+  IonMenuButton,
   IonPage,
   IonProgressBar,
   IonRow,
@@ -23,11 +24,12 @@ import { useEffect, useState } from 'react'
 import { IUnitState, IDeviceSettingsState, IUnitSettingsState } from '../interfaces'
 import Log from '../components/Log'
 import UnitSettings from '../components/UnitSettings'
-import loginService from '../services/login'
+import userService from '../services/user'
 import unitService from '../services/units'
 import Settings from '../components/DeviceSettings'
 import deviceService from '../services/device'
 import Login from '../components/Login'
+import Menu from '../components/Menu'
 
 const Home: React.FC = () => {
   const [user, setUser] = useState('')
@@ -43,9 +45,7 @@ const Home: React.FC = () => {
 
   const [toast] = useIonToast()
 
-  useEffect(() => {
-    refresh()
-  }, [user])
+  useEffect(() => {}, [user])
 
   const setCounter = async (unitToCount: IUnitState) => {
     setUnits((prevUnits) =>
@@ -68,11 +68,12 @@ const Home: React.FC = () => {
   const handleLogin = async (event: React.MouseEvent) => {
     event.preventDefault()
     try {
-      const response = await loginService.login({ username, password })
+      const response = await userService.login({ username, password })
       if (response?.status === 200) {
         setUsername('')
         setPassword('')
         setUser(response.data.username)
+        refresh()
       }
     } catch (error: any) {
       toast({
@@ -80,6 +81,20 @@ const Home: React.FC = () => {
         duration: 1500,
         position: 'middle',
       })
+    }
+  }
+
+  const handleLogout = async (event: React.MouseEvent) => {
+    event.preventDefault()
+    try {
+      const response = await userService.logout()
+      toast({ message: response.data.message, duration: 1500, position: 'middle' })
+
+      console.log(response.data.message)
+    } catch (error) {
+    } finally {
+      setUnits([])
+      setUser('')
     }
   }
 
@@ -210,7 +225,7 @@ const Home: React.FC = () => {
     }
   }
 
-  if (document.cookie === '') {
+  if (user === '') {
     return (
       <Login
         username={username}
@@ -224,19 +239,17 @@ const Home: React.FC = () => {
 
   return (
     <IonApp>
-      <IonPage>
+      <Menu
+        deviceSettings={deviceSettings}
+        handleDeciveSettingsChange={handleDeciveSettingsChange}
+        handleLogout={handleLogout}
+      />
+      <IonPage id="main-content">
         <IonHeader>
           <IonToolbar>
-            <IonButtons>
-              <IonButton id="settings">
-                <IonIcon icon={settingsOutline}></IonIcon>
-              </IonButton>
-              <Settings
-                deviceSettings={deviceSettings}
-                handleDeciveSettingsChange={handleDeciveSettingsChange}
-              />
+            <IonButtons slot="start">
+              <IonMenuButton></IonMenuButton>
             </IonButtons>
-
             <IonText>Status: </IonText>
             {backendStatus ? (
               <IonText color={'success'}>Connected</IonText>

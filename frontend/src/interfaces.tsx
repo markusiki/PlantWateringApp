@@ -31,6 +31,10 @@ export interface ILoginCredentials {
   password: string
 }
 
+export interface IMenuProps extends IDeviceSettingsProps {
+  handleLogout: (event: React.MouseEvent) => Promise<void>
+}
+
 export interface ILog {
   date: string
   status: string
