@@ -15,7 +15,7 @@ app.use(morgan('combined'))
 const proxy = createProxyMiddleware({
   target: process.env.API_SERVER_URI, 
   changeOrigin: true,
-  pathFilter: ['/login', '/api']
+  pathFilter: '/api'
 })
 
 
