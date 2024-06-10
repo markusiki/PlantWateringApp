@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ILoginCredentials } from "../interfaces";
-const baseUrl = `/login`
+const baseUrl = `/api`
 
 export const getAccessCookie = () => {
   const value = `; ${document.cookie}`
@@ -9,12 +9,16 @@ export const getAccessCookie = () => {
 }
 
 const login = async (credentials: ILoginCredentials) => {
-  const request = axios.post(baseUrl, credentials)
-  const response = await request
+  const response = await axios.post(`${baseUrl}/login`, credentials)
+  return response
+}
+
+const logout = async () => {
+  const response = await axios.post(`${baseUrl}/logout`)
   return response
 }
 
 
-const loginService = { login }
+const userService = { login, logout }
 
-export default loginService
+export default userService

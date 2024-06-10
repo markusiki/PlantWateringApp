@@ -9,6 +9,7 @@ import {
   IonGrid,
   IonHeader,
   IonIcon,
+  IonMenuButton,
   IonPage,
   IonProgressBar,
   IonRow,
@@ -23,14 +24,14 @@ import { useEffect, useState } from 'react'
 import { IUnitState, IDeviceSettingsState, IUnitSettingsState } from '../interfaces'
 import Log from '../components/Log'
 import UnitSettings from '../components/UnitSettings'
-import loginService from '../services/login'
+import userService from '../services/user'
 import unitService from '../services/units'
-import Settings from '../components/DeviceSettings'
 import deviceService from '../services/device'
 import Login from '../components/Login'
+import Menu from '../components/Menu'
 
 const Home: React.FC = () => {
-  const [, setUser] = useState('')
+  const [user, setUser] = useState('')
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [units, setUnits] = useState<IUnitState[]>([])
@@ -43,22 +44,12 @@ const Home: React.FC = () => {
 
   const [toast] = useIonToast()
 
-  useEffect(() => {
-    refresh()
-  }, [])
-
-  /*   const addCounters = () => {
-    setUnits((prevUnits) =>
-      prevUnits.map((unit: IUnitState) =>
-        !unit.counter ? { ...unit, counter: unit.waterTime } : unit
-      )
-    )
-  } */
+  useEffect(() => {}, [user])
 
   const setCounter = async (unitToCount: IUnitState) => {
     setUnits((prevUnits) =>
       prevUnits.map((unit: IUnitState) =>
-        unit.id !== unitToCount.id ? unit : { ...unit, counter: unit.waterTime }
+        unit.id !== unitToCount.id ? unit : { ...unit, counter: unit.waterTime + 1 }
       )
     )
     let counter = unitToCount.waterTime
@@ -69,7 +60,6 @@ const Home: React.FC = () => {
         )
       )
       counter--
-      console.log('counter: ', counter)
       await new Promise((resolve) => setTimeout(resolve, 1000))
     }
   }
@@ -77,11 +67,12 @@ const Home: React.FC = () => {
   const handleLogin = async (event: React.MouseEvent) => {
     event.preventDefault()
     try {
-      const response = await loginService.login({ username, password })
+      const response = await userService.login({ username, password })
       if (response?.status === 200) {
         setUsername('')
         setPassword('')
         setUser(response.data.username)
+        refresh()
       }
     } catch (error: any) {
       toast({
@@ -89,6 +80,20 @@ const Home: React.FC = () => {
         duration: 1500,
         position: 'middle',
       })
+    }
+  }
+
+  const handleLogout = async (event: React.MouseEvent) => {
+    event.preventDefault()
+    try {
+      const response = await userService.logout()
+      toast({ message: response.data.message, duration: 1500, position: 'middle' })
+
+      console.log(response.data.message)
+    } catch (error) {
+    } finally {
+      setUnits([])
+      setUser('')
     }
   }
 
@@ -141,7 +146,7 @@ const Home: React.FC = () => {
     try {
       const returnedUnit = await unitService.waterPlant(id)
       console.log('status: ', returnedUnit?.status)
-      setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
+      setUnits((prevUnits) => prevUnits.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
     } catch (error: any) {
       if (error.response.status === 401) {
         setUser('')
@@ -219,7 +224,7 @@ const Home: React.FC = () => {
     }
   }
 
-  if (document.cookie === '') {
+  if (user === '') {
     return (
       <Login
         username={username}
@@ -233,19 +238,17 @@ const Home: React.FC = () => {
 
   return (
     <IonApp>
-      <IonPage>
+      <Menu
+        deviceSettings={deviceSettings}
+        handleDeciveSettingsChange={handleDeciveSettingsChange}
+        handleLogout={handleLogout}
+      />
+      <IonPage id="main-content">
         <IonHeader>
           <IonToolbar>
-            <IonButtons>
-              <IonButton id="settings">
-                <IonIcon icon={settingsOutline}></IonIcon>
-              </IonButton>
-              <Settings
-                deviceSettings={deviceSettings}
-                handleDeciveSettingsChange={handleDeciveSettingsChange}
-              />
+            <IonButtons slot="start">
+              <IonMenuButton></IonMenuButton>
             </IonButtons>
-
             <IonText>Status: </IonText>
             {backendStatus ? (
               <IonText color={'success'}>Connected</IonText>

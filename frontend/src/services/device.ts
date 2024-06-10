@@ -1,6 +1,6 @@
 import axios from "axios";
 import { IDeviceSettingsState } from "../interfaces";
-import { getAccessCookie } from './login'
+import { getAccessCookie } from './user'
 const baseUrl = `/api/device`
 
 const getConfig = () => {

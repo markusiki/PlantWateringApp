@@ -1,7 +1,20 @@
 ion-grid {
   --ion-grid-column-padding: 0px;
+  --ion-grid-padding: 0px;
 }
 
 .log {
   border-bottom: 1px groove;
+}
+
+.logLabel {
+  font-size: 0.9em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.logItem {
+  font-size: 0.65em;
+  opacity: 0.8;
+  text-align: start;
 }
