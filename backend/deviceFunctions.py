@@ -16,7 +16,7 @@ ads = ADS.ADS1115(i2c)
 
 class Pump:
     def __init__(self, power, pwm):
-        self.power = gpiozero.OutputDevice(power, active_high=True, initial_value=False)
+        self.power = gpiozero.OutputDevice(power, active_high=False, initial_value=False)
         self.pwm = gpiozero.PWMOutputDevice(pin=pwm, frequency=100)
 
     def pumpOn(self):
@@ -42,7 +42,7 @@ class Sprinkler_unit:
         return
 
 
-pump = Pump(4, 17)
+pump = Pump(17, 4)
 sprinkler_unit_objects = []
 units = dbService.getSprinklerUnits()
 for unit in units:
