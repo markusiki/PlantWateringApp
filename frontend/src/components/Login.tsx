@@ -11,7 +11,6 @@ import {
   IonInput,
   IonItem,
   IonList,
-  IonPage,
   IonRow,
 } from '@ionic/react'
 import { ILoginProps } from '../interfaces'
