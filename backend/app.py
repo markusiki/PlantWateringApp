@@ -27,15 +27,15 @@ jwt = JWTManager(app)
 
 from controllers import device, units, login, logout
 
-app.register_blueprint(login.loginRouter, url_prefix="/login")
-app.register_blueprint(logout.logoutRouter, url_prefix="/logout")
+app.register_blueprint(login.loginRouter, url_prefix="/api/login")
+app.register_blueprint(logout.logoutRouter, url_prefix="/api/logout")
 app.register_blueprint(device.deviceRouter, url_prefix="/api/device")
 app.register_blueprint(units.unitsRouter, url_prefix="/api/units")
 
 
 @jwt.expired_token_loader
 def expired_token_callback(header, data):
-    response = jsonify({"status": 401, "msg": "logout successful"})
+    response = jsonify({"status": 401, "message": "logout successful"})
     unset_jwt_cookies(response)
     return response, 401
 
