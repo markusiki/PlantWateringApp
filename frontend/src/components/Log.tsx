@@ -69,37 +69,37 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
         </IonHeader>
         <IonContent className="ion-padding">
           <IonList>
-            <IonGrid>
-              <IonRow className="log">
-                <IonCol size="3.1">
+            <IonGrid fixed={true}>
+              <IonRow class="ion-justify-content-center" className="log">
+                <IonCol>
                   <IonListHeader>
                     <IonText>
                       <p className="logLabel">Date</p>
                     </IonText>
                   </IonListHeader>
                 </IonCol>
-                <IonCol size="1.9">
+                <IonCol>
                   <IonListHeader>
                     <IonText>
                       <p className="logLabel">Moist Value</p>
                     </IonText>
                   </IonListHeader>
                 </IonCol>
-                <IonCol size="2">
+                <IonCol>
                   <IonListHeader>
                     <IonText>
                       <p className="logLabel">Status</p>
                     </IonText>
                   </IonListHeader>
                 </IonCol>
-                <IonCol size="1.9">
+                <IonCol>
                   <IonListHeader>
                     <IonText>
                       <p className="logLabel">Watered</p>
                     </IonText>
                   </IonListHeader>
                 </IonCol>
-                <IonCol size="3.1">
+                <IonCol>
                   <IonListHeader>
                     <IonText>
                       <p className="logLabel">Watering Method</p>
@@ -108,54 +108,46 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
                 </IonCol>
               </IonRow>
               {unit.logs.map((log, index) => (
-                <IonRow key={index} className="log">
-                  <IonCol size="3.1">
+                <IonRow key={index} class="ion-justify-content-start" className="log">
+                  <IonCol>
                     <IonItem lines="none">
                       <IonText>
                         <p className="logItem">{log.date}</p>
                       </IonText>
                     </IonItem>
                   </IonCol>
-                  <IonCol size="1.9">
+                  <IonCol>
                     <IonItem lines="none">
                       <IonText>
                         <p className="logItem">{log.moistValue}</p>
                       </IonText>
                     </IonItem>
                   </IonCol>
-                  <IonCol size="2">
+                  <IonCol>
                     <IonItem lines="none">
                       <IonText>
                         <p className="logItem">{log.status}</p>
                       </IonText>
                     </IonItem>
                   </IonCol>
-                  {log.watered ? (
-                    <>
-                      <IonCol size="1.9">
-                        <IonItem lines="none">
-                          <IonText>
-                            <p className="logItem">Yes</p>
-                          </IonText>
-                        </IonItem>
-                      </IonCol>
-                      <IonCol size="3.1">
-                        <IonItem lines="none">
-                          <IonText>
-                            <p className="logItem">{log.waterMethod}</p>
-                          </IonText>
-                        </IonItem>
-                      </IonCol>
-                    </>
-                  ) : (
-                    <IonCol size="1.9">
-                      <IonItem lines="none">
-                        <IonText>
+                  <IonCol>
+                    <IonItem lines="none">
+                      <IonText>
+                        {log.watered ? (
+                          <p className="logItem">Yes</p>
+                        ) : (
                           <p className="logItem">No</p>
-                        </IonText>
-                      </IonItem>
-                    </IonCol>
-                  )}
+                        )}
+                      </IonText>
+                    </IonItem>
+                  </IonCol>
+                  <IonCol>
+                    <IonItem lines="none">
+                      <IonText>
+                        <p className="logItem">{log.waterMethod}</p>
+                      </IonText>
+                    </IonItem>
+                  </IonCol>
                 </IonRow>
               ))}
             </IonGrid>
