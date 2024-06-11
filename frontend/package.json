@@ -44,6 +44,6 @@
   },
   "proxy": "http://192.168.1.107:80",
   "devDependencies": {
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.5"
   }
 }
