@@ -17,7 +17,8 @@ app.use(morgan('combined'))
 /** @type {import('http-proxy-middleware/dist/types').RequestHandler<express.Request, express.Response>} */
 const proxy = createProxyMiddleware({
   target: process.env.API_SERVER_URI,
-  changeOrigin: true,
+  changeOrigin: false,
+  secure: false,
   pathFilter: '/api'
 })
 
