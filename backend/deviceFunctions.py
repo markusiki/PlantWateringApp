@@ -16,8 +16,7 @@ ads = ADS.ADS1115(i2c)
 
 class Pump:
     def __init__(self, power, pwm):
-        self.power = gpiozero.OutputDevice(power, active_high=False, initial_value=False)
-        self.pwm = gpiozero.PWMOutputDevice(pin=pwm, frequency=100)
+        self.power = gpiozero.OutputDevice(pin=power, active_high=False, initial_value=False)
 
     def pumpOn(self):
         self.power.on()
@@ -106,6 +105,7 @@ def measureSoil(id):
                 sleep(0.05)
             pstdev = calculateStandardDeviation(values)
             valueMean = valueSum / 5
+            print(id, valueMean)
 
     return {"id": id, "status": pstdev, "moistValue": valueMean}
 
