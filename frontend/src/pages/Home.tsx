@@ -194,20 +194,30 @@ const Home: React.FC = () => {
   }
 
   const getAbsoluteValue = (moistValue: IUnitState['moistValue']) => {
-    const minValue = 10000
-    const maxValue = 18000
+    const minValue = 8000
+    const maxValue = 20000
     const absoluteValue =
       Math.round((1 - (moistValue - minValue) / (maxValue - minValue)) * 100) / 100
+
+    if (absoluteValue > 1) {
+      return 1.0
+    }
+    if (absoluteValue < 0) {
+      return 0
+    }
     return absoluteValue
   }
 
   const getRelativeValue = (unit: IUnitState) => {
-    const minValue = unit.moistLimit
-    const maxValue = 18000
+    const minValue = 10000
+    const maxValue = unit.moistLimit
     const relativeValue =
       Math.round((1 - (unit.moistValue - minValue) / (maxValue - minValue)) * 100) / 100
     if (relativeValue > 1) {
       return 1.0
+    }
+    if (relativeValue < 0) {
+      return 0
     }
     return relativeValue
   }
@@ -305,31 +315,42 @@ const Home: React.FC = () => {
                     </IonCol>
                   )}
                 </IonRow>
+                <IonRow>
+                  <IonCol>
+                    <p className="align-center">Moist Value:{unit.moistValue}</p>
+                  </IonCol>
+                </IonRow>
                 <IonRow class="ion-justify-content-center">
                   <IonCol class="ion-align-self-end" size="auto">
                     <IonText>
-                      <p style={{ textAlign: 'end' }}>Absolute moist level:</p>
+                      <p>Relative moist level:</p>
                     </IonText>
                   </IonCol>
                   <IonCol size="6">
-                    <p className="moist-percent">{getAbsoluteValue(unit.moistValue) * 100}%</p>
+                    <div className="moistValueDisplay">
+                      <p className="moist-percent">{getRelativeValue(unit) * 100}%</p>
+                    </div>
                     <IonProgressBar
-                      value={getAbsoluteValue(unit.moistValue)}
-                      color={setColor(getAbsoluteValue(unit.moistValue))}
+                      value={getRelativeValue(unit)}
+                      color={setColor(getRelativeValue(unit))}
                     ></IonProgressBar>
                   </IonCol>
                 </IonRow>
                 <IonRow class="ion-justify-content-center">
                   <IonCol class="ion-align-self-end" size="auto">
                     <IonText>
-                      <p style={{ textAlign: 'end' }}>Relative moist level:</p>
+                      <p>Absolute moist level:</p>
                     </IonText>
                   </IonCol>
                   <IonCol size="6">
-                    <p className="moist-percent">{getRelativeValue(unit) * 100}%</p>
+                    <div className="absMoistValueDisplay">
+                      <p>air</p>
+                      <p className="moist-percent">{getAbsoluteValue(unit.moistValue) * 100}%</p>
+                      <p>water</p>
+                    </div>
                     <IonProgressBar
-                      value={getRelativeValue(unit)}
-                      color={setColor(getRelativeValue(unit))}
+                      value={getAbsoluteValue(unit.moistValue)}
+                      color={setColor(getAbsoluteValue(unit.moistValue))}
                     ></IonProgressBar>
                   </IonCol>
                 </IonRow>
