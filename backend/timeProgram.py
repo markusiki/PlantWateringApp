@@ -1,3 +1,4 @@
+
 from datetime import datetime, date
 from time import sleep
 import services.deviceSettings as deviceSettings
@@ -31,7 +32,7 @@ def lastTimeWatered(unit):
             lastTimeWateredDate = log["date"]
             break
     if lastTimeWateredDate:
-        lastWateredDate = datetime.strptime(lastTimeWateredDate, "%d.%m.%y %H:%M")
+        lastWateredDate = datetime.strptime(lastTimeWateredDate, "%d.%m.%Y %H:%M")
         print(abs((dateNow - lastWateredDate).days))
         return abs((dateNow - lastWateredDate).days)
 
