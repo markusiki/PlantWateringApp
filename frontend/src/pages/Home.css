@@ -24,11 +24,6 @@ ion-card {
   justify-content: center;
 }
 
-.absMoistValueDisplay {
-  display: flex;
-  justify-content: space-between;
-}
-
 .last-time-watered {
   margin-top: 20px;
   margin-bottom: 20px;
