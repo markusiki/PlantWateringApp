@@ -1,11 +1,10 @@
 # Create user for the app and saves the created user to the users.json database.
 # If database does not exist, it will be creted and initialised
 
-from flask_bcrypt import Bcrypt
+from flask_bcrypt import generate_password_hash
 import json
 
 db = "users.json"
-bcrypt = Bcrypt()
 
 
 while True:
@@ -19,7 +18,7 @@ while True:
                 break
         else:
             password = input("Enter password: ")
-            hash = bcrypt.generate_password_hash("password", 10).decode("utf-8")
+            hash = generate_password_hash(password, 10).decode("utf-8")
             print(hash)
             user = {"username": username, "passwordHash": hash}
             users.append(user)

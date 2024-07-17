@@ -1,6 +1,5 @@
 from datetime import timedelta, timezone, datetime
 from flask import Flask, jsonify
-from flask_bcrypt import Bcrypt
 from flask_jwt_extended import (
     JWTManager,
     create_access_token,
@@ -15,13 +14,12 @@ import os
 
 load_dotenv()
 
-app = Flask(__name__, static_folder="../frontend/build", static_url_path="/")
+app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
 app.config["JWT_COOKIE_CSRF_PROTECT"] = True
 app.config["JWT_CSRF_METHODS"] = ["POST", "PUT", "PATCH", "DELETE", "GET"]
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
-bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
 
