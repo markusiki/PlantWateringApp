@@ -53,32 +53,30 @@ def timeProgram():
                     "status": unit["status"],
                     "moistValue": unit["moistValue"],
                 }
-                if unit["status"] == "OK":
-                    wateredLastTime = lastTimeWatered(unit)
+                wateredLastTime = lastTimeWatered(unit)
+                if (
+                    unit["enableMaxWaterInterval"] == True
+                    and unit["maxWaterInterval"] <= wateredLastTime
+                ):
+                    device.waterNow(unit["id"])
+                    dbService.updateLog(
+                        **unitLog, watered=True, waterMethod="auto: max watering interval"
+                    )
+                    print(f'Watering unit {unit["id"]}')
+                elif unit["moistValue"] > unit["moistLimit"]:
                     if (
-                        unit["enableMaxWaterInterval"] == True
-                        and unit["maxWaterInterval"] <= wateredLastTime
+                        unit["enableMinWaterInterval"] == True
+                        and unit["minWaterInterval"] >= wateredLastTime
                     ):
-                        device.waterNow(unit["id"])
-                        dbService.updateLog(
-                            **unitLog, watered=True, waterMethod="auto: maxWaterInterval"
-                        )
-                        print(f'Watering unit {unit["id"]}')
-                    elif unit["moistValue"] > unit["moistLimit"]:
-                        if (
-                            unit["enableMinWaterInterval"] == True
-                            and unit["minWaterInterval"] >= wateredLastTime
-                        ):
-                            dbService.updateLog(**unitLog)
-                            continue
-                        device.waterNow(unit["id"])
-                        dbService.updateLog(**unitLog, watered=True, waterMethod="auto: moistLevel")
-                        print(f'Watering unit {unit["id"]}')
-                    else:
                         dbService.updateLog(**unitLog)
+                        continue
+                    device.waterNow(unit["id"])
+                    dbService.updateLog(**unitLog, watered=True, waterMethod="auto: moist level")
+                    print(f'Watering unit {unit["id"]}')
                 else:
                     dbService.updateLog(**unitLog)
-            sleep(measureInterval * 3600)  # days converted to seconds
+
+            sleep(measureInterval * 86400)  # days converted to seconds
         else:
             break
 
