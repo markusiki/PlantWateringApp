@@ -12,10 +12,13 @@ import {
   IonMenuButton,
   IonPage,
   IonProgressBar,
+  IonRefresher,
+  IonRefresherContent,
   IonRow,
   IonText,
   IonTitle,
   IonToolbar,
+  RefresherEventDetail,
   useIonToast,
 } from '@ionic/react'
 import { settingsOutline } from 'ionicons/icons'
@@ -116,6 +119,13 @@ const Home: React.FC = () => {
         setUser('')
       }
     }
+  }
+
+  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
+    setTimeout(() => {
+      refresh()
+      event.detail.complete()
+    }, 1000)
   }
 
   const setColor = (moistValue: IUnitState['moistValue']) => {
@@ -277,6 +287,9 @@ const Home: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonContent>
+          <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+            <IonRefresherContent></IonRefresherContent>
+          </IonRefresher>
           {units.map((unit, index) => (
             <IonCard key={unit.id}>
               <IonGrid>
