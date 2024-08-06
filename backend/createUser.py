@@ -3,6 +3,7 @@
 
 from flask_bcrypt import generate_password_hash
 import json
+from getpass import getpass
 
 db = "users.json"
 
@@ -17,9 +18,8 @@ while True:
                 print("Username already exists.")
                 break
         else:
-            password = input("Enter password: ")
+            password = getpass("Enter password: ")
             hash = generate_password_hash(password, 10).decode("utf-8")
-            print(hash)
             user = {"username": username, "passwordHash": hash}
             users.append(user)
             file.seek(0)
