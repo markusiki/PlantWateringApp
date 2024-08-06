@@ -12,10 +12,13 @@ import {
   IonMenuButton,
   IonPage,
   IonProgressBar,
+  IonRefresher,
+  IonRefresherContent,
   IonRow,
   IonText,
   IonTitle,
   IonToolbar,
+  RefresherEventDetail,
   useIonToast,
 } from '@ionic/react'
 import { settingsOutline } from 'ionicons/icons'
@@ -118,6 +121,13 @@ const Home: React.FC = () => {
     }
   }
 
+  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
+    setTimeout(() => {
+      refresh()
+      event.detail.complete()
+    }, 1000)
+  }
+
   const setColor = (moistValue: IUnitState['moistValue']) => {
     if (moistValue < 0.33) {
       return 'danger'
@@ -213,6 +223,7 @@ const Home: React.FC = () => {
     const maxValue = unit.moistLimit
     const relativeValue =
       Math.round((1 - (unit.moistValue - minValue) / (maxValue - minValue)) * 100) / 100
+
     if (relativeValue > 1) {
       return 1.0
     }
@@ -276,6 +287,9 @@ const Home: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonContent>
+          <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+            <IonRefresherContent></IonRefresherContent>
+          </IonRefresher>
           {units.map((unit, index) => (
             <IonCard key={unit.id}>
               <IonGrid>
@@ -328,7 +342,7 @@ const Home: React.FC = () => {
                   </IonCol>
                   <IonCol size="6">
                     <div className="moistValueDisplay">
-                      <p className="moist-percent">{getRelativeValue(unit) * 100}%</p>
+                      <p className="moist-percent">{(getRelativeValue(unit) * 100).toFixed(0)}%</p>
                     </div>
                     <IonProgressBar
                       value={getRelativeValue(unit)}
@@ -337,21 +351,25 @@ const Home: React.FC = () => {
                   </IonCol>
                 </IonRow>
                 <IonRow class="ion-justify-content-center">
-                  <IonCol class="ion-align-self-end" size="auto">
+                  <IonCol class="ion-align-self-center" size="auto">
                     <IonText>
                       <p>Absolute moist level:</p>
                     </IonText>
                   </IonCol>
                   <IonCol size="6">
-                    <div className="absMoistValueDisplay">
-                      <p>air</p>
-                      <p className="moist-percent">{getAbsoluteValue(unit.moistValue) * 100}%</p>
-                      <p>water</p>
+                    <div className="align-center">
+                      <p className="moist-percent">
+                        {(getAbsoluteValue(unit.moistValue) * 100).toFixed(0)}%
+                      </p>
                     </div>
                     <IonProgressBar
                       value={getAbsoluteValue(unit.moistValue)}
                       color={setColor(getAbsoluteValue(unit.moistValue))}
                     ></IonProgressBar>
+                    <IonRow class="ion-justify-content-between">
+                      <p>air</p>
+                      <p>water</p>
+                    </IonRow>
                   </IonCol>
                 </IonRow>
                 <IonRow>
