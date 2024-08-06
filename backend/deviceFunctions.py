@@ -81,7 +81,7 @@ def waterNow(id):
     index = dbService.findById(id)
     unit = sprinkler_unit_objects[index]
     moistValue = measureSoil(id)
-    water(unit.valve, unit.id, unit.waterTime)
+    water(unit.valve, unit.waterTime)
 
     return moistValue
 
@@ -105,12 +105,11 @@ def measureSoil(id):
                 sleep(0.05)
             pstdev = calculateStandardDeviation(values)
             valueMean = valueSum / 5
-            print(id, valueMean)
 
     return {"id": id, "status": pstdev, "moistValue": valueMean}
 
 
-def water(valve, id, waterTime):
+def water(valve, waterTime):
     valve.on()
     pump.pumpOn()
     sleep(waterTime)
