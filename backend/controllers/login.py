@@ -11,17 +11,10 @@ def login():
     try:
         username = request.json.get("username", None)
         password = request.json.get("password", None)
-        print("username", username)
-        print("password", password)
         user = users.findUser(username)
-        print("user", user)
-        print('user["passwordHash"]', user["passwordHash"])
         passwordCorrect = (
             False if user == None else check_password_hash(user["passwordHash"], password)
         )
-        print("passwordCorrect", passwordCorrect)
-        chekPass = check_password_hash(user["passwordHash"], password)
-        print("chekcPass", chekPass)
         if user is None or passwordCorrect is False:
             return jsonify({"message": "Invalid username or password"}), 401
 
@@ -31,5 +24,4 @@ def login():
         return response
     except Exception as error:
         print(error)
-
         return 500
