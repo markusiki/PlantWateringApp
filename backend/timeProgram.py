@@ -1,10 +1,10 @@
-
 from datetime import datetime, date
-from time import sleep
+from time import monotonic
 import services.deviceSettings as deviceSettings
 import services.db as dbService
 import deviceFunctions as device
 import threading
+import concurrent.futures
 
 runTimeProgram = False
 measureInterval: int
@@ -14,11 +14,11 @@ def setTimeProgram():
     settings = deviceSettings.getAll()
     global runTimeProgram
     global measureInterval
+
     measureInterval = settings["moistMeasureInterval"]
+
     if settings["autoWatering"] is True and runTimeProgram is False:
         runTimeProgram = True
-        timeProgramThread = threading.Thread(target=timeProgram)
-        timeProgramThread.start()
 
     if settings["autoWatering"] is False and runTimeProgram:
         runTimeProgram = False
@@ -33,21 +33,31 @@ def lastTimeWatered(unit):
             break
     if lastTimeWateredDate:
         lastWateredDate = datetime.strptime(lastTimeWateredDate, "%d.%m.%Y %H:%M")
-        print(abs((dateNow - lastWateredDate).days))
+
         return abs((dateNow - lastWateredDate).days)
 
     return float("inf")
 
 
+def timer():
+    start_time = monotonic()
+
+    while True:
+        delay = measureInterval * 86400  # days converted to seconds (86400)
+        current_time = monotonic()
+        epsaled_time = current_time - start_time
+        if epsaled_time >= delay:
+            break
+
+
 def timeProgram():
     while True:
-        global runTimeProgram
-
-        if runTimeProgram == True:
+        if runTimeProgram:
             units = dbService.getUnits()
+            moistValues = device.updateMoistValues()
+            dbService.updateMoistValues(moistValues)
+
             for unit in units:
-                moistValues = device.updateMoistValues()
-                dbService.updateMoistValues(moistValues)
                 unitLog = {
                     "id": unit["id"],
                     "status": unit["status"],
@@ -62,7 +72,7 @@ def timeProgram():
                     dbService.updateLog(
                         **unitLog, watered=True, waterMethod="auto: max watering interval"
                     )
-                    print(f'Watering unit {unit["id"]}')
+
                 elif unit["moistValue"] > unit["moistLimit"]:
                     if (
                         unit["enableMinWaterInterval"] == True
@@ -72,13 +82,13 @@ def timeProgram():
                         continue
                     device.waterNow(unit["id"])
                     dbService.updateLog(**unitLog, watered=True, waterMethod="auto: moist level")
-                    print(f'Watering unit {unit["id"]}')
+
                 else:
                     dbService.updateLog(**unitLog)
+            timer()
 
-            sleep(measureInterval * 86400)  # days converted to seconds
-        else:
-            break
 
+time_program = threading.Thread(target=timeProgram, daemon=True)
+time_program.start()
 
 setTimeProgram()
