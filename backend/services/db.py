@@ -91,8 +91,8 @@ def deleteLog(id):
 
 
 def updateMoistValues(moistValues):
-    minValue: int = 10000  # totally wet soil
-    maxValue: int = 18000  # totally dry soil
+    minValue: int = 8000  # totally wet soil
+    maxValue: int = 18200  # totally dry soil
     units = getUnits()
     for unit in units:
         for moistValue in moistValues:
@@ -101,7 +101,7 @@ def updateMoistValues(moistValues):
                     if moistValue["moistValue"] > maxValue:
                         if moistValue["moistValue"] > (maxValue + 1000):
                             unit["status"] = "ERROR"
-                            unit["moistValue"] = maxValue
+                            unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
                         else:
                             unit["status"] = "OK"
                             unit["moistValue"] = maxValue
@@ -109,7 +109,7 @@ def updateMoistValues(moistValues):
                     elif moistValue["moistValue"] < minValue:
                         if moistValue["moistValue"] < (minValue - 1000):
                             unit["status"] = "ERROR"
-                            unit["moistValue"] = minValue
+                            unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
                         else:
                             unit["status"] = "OK"
                             unit["moistValue"] = minValue
