@@ -14,7 +14,6 @@ def getAllDevice():
         response = deviceSettings.getAll()
         return response
     except Exception as error:
-        print(error)
         return 503
 
 
@@ -26,8 +25,6 @@ def changeDeciveSettings():
         DeviceSchema().load(body)
         response = deviceSettings.changeSettings(body)
         setTimeProgram()
-        print("response:", response)
         return response
     except Exception as error:
-        print("error", error)
         return 503

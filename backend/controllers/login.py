@@ -23,5 +23,4 @@ def login():
         set_access_cookies(response, acces_token)
         return response
     except Exception as error:
-        print(error)
         return 500

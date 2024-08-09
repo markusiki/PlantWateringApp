@@ -17,7 +17,6 @@ def getAll():
         response = dbService.getUnits(innerUse=False)
         return response
     except Exception as error:
-        print(error)
         return 503
 
 
@@ -32,7 +31,6 @@ def changeUnit():
         raspi.updateSprinklerUnitObject(body["id"], index)
         return response
     except ValidationError as error:
-        print(error)
         return "Error", 500
 
 
