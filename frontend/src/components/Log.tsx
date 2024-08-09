@@ -69,8 +69,8 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
         </IonHeader>
         <IonContent className="ion-padding">
           <IonList>
-            <IonGrid fixed={true}>
-              <IonRow class="ion-justify-content-center" className="log">
+            <IonGrid>
+              <IonRow className="log">
                 <IonCol>
                   <IonListHeader>
                     <IonText>

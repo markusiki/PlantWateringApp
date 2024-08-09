@@ -10,11 +10,16 @@ ion-grid {
 .logLabel {
   font-size: 0.9em;
   font-weight: bold;
-  text-align: center;
+  text-align: start;
 }
 
 .logItem {
   font-size: 0.65em;
   opacity: 0.8;
   text-align: start;
+}
+
+ion-item {
+  --inner-padding-start: 0px;
+  --inner-padding-end: 0px;
 }
