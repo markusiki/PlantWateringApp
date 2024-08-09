@@ -43,7 +43,7 @@ class Sprinkler_unit:
 
 pump = Pump(17, 4)
 sprinkler_unit_objects = []
-units = dbService.getSprinklerUnits()
+units = dbService.getUnits()
 for unit in units:
     sprinkler_unit_objects.append(
         Sprinkler_unit(
@@ -58,11 +58,11 @@ for unit in units:
 
 
 def updateSprinklerUnitObject(id, index):
-    units = dbService.getSprinklerUnits()
+    units = dbService.getUnits()
     updatedUnit = units[index]
     for unit in sprinkler_unit_objects:
         if unit.id == id:
-            result = unit.update(
+            unit.update(
                 updatedUnit["moistValue"],
                 updatedUnit["moistLimit"],
                 updatedUnit["waterTime"],
@@ -81,7 +81,7 @@ def waterNow(id):
     index = dbService.findById(id)
     unit = sprinkler_unit_objects[index]
     moistValue = measureSoil(id)
-    water(unit.valve, unit.id, unit.waterTime)
+    water(unit.valve, unit.waterTime)
 
     return moistValue
 
@@ -105,12 +105,11 @@ def measureSoil(id):
                 sleep(0.05)
             pstdev = calculateStandardDeviation(values)
             valueMean = valueSum / 5
-            print(id, valueMean)
 
     return {"id": id, "status": pstdev, "moistValue": valueMean}
 
 
-def water(valve, id, waterTime):
+def water(valve, waterTime):
     valve.on()
     pump.pumpOn()
     sleep(waterTime)
