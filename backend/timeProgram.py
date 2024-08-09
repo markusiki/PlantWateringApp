@@ -1,10 +1,9 @@
-from datetime import datetime, date
+from datetime import datetime
 from time import monotonic
 import services.deviceSettings as deviceSettings
 import services.db as dbService
 import deviceFunctions as device
 import threading
-import concurrent.futures
 
 runTimeProgram = False
 measureInterval: int
