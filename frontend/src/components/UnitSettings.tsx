@@ -150,11 +150,12 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
             </IonItem>
             <IonItem>
               <IonInput
-                label="Set moisture level limit value between 10000 (wet) and 18000 (dry)."
+                label="Moisture level limit"
                 value={settings.moistLimit}
                 name="moistLimit"
                 labelPlacement="stacked"
                 type="number"
+                helperText="Set moisture level limit value between 10000 (wet) and 18000 (dry)."
                 min={10000}
                 max={18000}
                 onInput={handleChange}
@@ -162,11 +163,12 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
             </IonItem>
             <IonItem>
               <IonInput
-                label="Set watering time in seconds (0 - 180)"
+                label="Watering time"
                 value={settings.waterTime}
                 name="waterTime"
                 labelPlacement="stacked"
                 type="number"
+                helperText="Set watering time in seconds (0 - 180)"
                 min={0}
                 max={180}
                 onInput={handleChange}
