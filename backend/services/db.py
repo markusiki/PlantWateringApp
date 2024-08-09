@@ -18,9 +18,7 @@ def getUnits(innerUse=True):
 
 
 def findById(id):
-    file = open(db, "r")
-    units = json.load(file)
-    file.close()
+    units = getUnits()
     index = -1
     for i, unit in enumerate(units):
         if unit["id"] == id:
@@ -31,12 +29,10 @@ def findById(id):
 
 
 def getById(id):
-    file = open(db, "r")
-    units = json.load(file)
-    file.close()
-    for element in units:
-        if element["id"] == id:
-            return element
+    units = getUnits()
+    for unit in units:
+        if unit["id"] == id:
+            return unit
 
 
 def saveToDb(units):
@@ -46,9 +42,7 @@ def saveToDb(units):
 
 
 def changeUnit(unitToChange, index):
-    file = open(db, "r")
-    units = json.load(file)
-    file.close()
+    units = getUnits()
     unit = units[index]
     unit["name"] = unitToChange["name"]
     unit["moistLimit"] = int(unitToChange["moistLimit"])
@@ -58,9 +52,7 @@ def changeUnit(unitToChange, index):
     unit["maxWaterInterval"] = unitToChange["maxWaterInterval"]
     unit["minWaterInterval"] = unitToChange["minWaterInterval"]
     saveToDb(units)
-    file = open(db, "r")
-    changedUnits = json.load(file)
-    file.close()
+    changedUnits = getUnits()
     changedUnit = changedUnits[index]
     return changedUnit
 
@@ -121,10 +113,3 @@ def updateMoistValues(moistValues):
                     unit["status"] = "ERROR"
                     unit["moistValue"] = maxValue
     saveToDb(units)
-
-
-def getSprinklerUnits():
-    file = open(db)
-    units = json.load(file)
-    file.close()
-    return units
