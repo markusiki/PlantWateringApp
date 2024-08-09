@@ -43,7 +43,7 @@ class Sprinkler_unit:
 
 pump = Pump(17, 4)
 sprinkler_unit_objects = []
-units = dbService.getSprinklerUnits()
+units = dbService.getUnits()
 for unit in units:
     sprinkler_unit_objects.append(
         Sprinkler_unit(
@@ -58,11 +58,11 @@ for unit in units:
 
 
 def updateSprinklerUnitObject(id, index):
-    units = dbService.getSprinklerUnits()
+    units = dbService.getUnits()
     updatedUnit = units[index]
     for unit in sprinkler_unit_objects:
         if unit.id == id:
-            result = unit.update(
+            unit.update(
                 updatedUnit["moistValue"],
                 updatedUnit["moistLimit"],
                 updatedUnit["waterTime"],
