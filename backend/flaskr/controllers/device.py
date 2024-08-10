@@ -1,8 +1,8 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
-import services.deviceSettings as deviceSettings
-from schemas import DeviceSchema
-from timeProgram import setTimeProgram
+from ..services.deviceSettings import getAll, changeSettings
+from ..schemas import DeviceSchema
+from ..timeProgram import setTimeProgram
 
 deviceRouter = Blueprint("deviceRouter", __name__)
 
@@ -11,7 +11,7 @@ deviceRouter = Blueprint("deviceRouter", __name__)
 @jwt_required()
 def getAllDevice():
     try:
-        response = deviceSettings.getAll()
+        response = getAll()
         return response
     except Exception as error:
         return 503
@@ -23,7 +23,7 @@ def changeDeciveSettings():
     try:
         body = request.get_json()
         DeviceSchema().load(body)
-        response = deviceSettings.changeSettings(body)
+        response = changeSettings(body)
         setTimeProgram()
         return response
     except Exception as error:

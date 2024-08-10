@@ -1,5 +1,5 @@
 from flask import jsonify, request, Blueprint
-from services import users
+from ..services.users import findUser
 from flask_bcrypt import check_password_hash
 from flask_jwt_extended import create_access_token, set_access_cookies
 
@@ -11,7 +11,7 @@ def login():
     try:
         username = request.json.get("username", None)
         password = request.json.get("password", None)
-        user = users.findUser(username)
+        user = findUser(username)
         passwordCorrect = (
             False if user == None else check_password_hash(user["passwordHash"], password)
         )

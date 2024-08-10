@@ -1,5 +1,6 @@
+from flaskr import create_app
 from datetime import timedelta, timezone, datetime
-from flask import Flask, jsonify
+from flask import jsonify
 from flask_jwt_extended import (
     JWTManager,
     create_access_token,
@@ -8,27 +9,10 @@ from flask_jwt_extended import (
     set_access_cookies,
     unset_jwt_cookies,
 )
-from dotenv import load_dotenv
-import os
 
 
-load_dotenv()
-
-app = Flask(__name__)
-app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
-app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-app.config["JWT_COOKIE_CSRF_PROTECT"] = True
-app.config["JWT_CSRF_METHODS"] = ["POST", "PUT", "PATCH", "DELETE", "GET"]
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
+app = create_app()
 jwt = JWTManager(app)
-
-
-from controllers import device, units, login, logout
-
-app.register_blueprint(login.loginRouter, url_prefix="/api/login")
-app.register_blueprint(logout.logoutRouter, url_prefix="/api/logout")
-app.register_blueprint(device.deviceRouter, url_prefix="/api/device")
-app.register_blueprint(units.unitsRouter, url_prefix="/api/units")
 
 
 @jwt.expired_token_loader
@@ -51,8 +35,3 @@ def refresh_expiring_jwts(response):
     except (RuntimeError, KeyError):
         # Case where there is not a valid JWT. Just return the original response
         return response
-
-
-@app.route("/")
-def index():
-    return app.send_static_file("index.html")

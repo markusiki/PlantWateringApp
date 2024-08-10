@@ -1,10 +1,13 @@
+import os
 import json
 
-db = "users.json"
+base_dir = os.path.dirname(os.path.abspath(__file__))
+db = "../users.json"
+path = os.path.join(base_dir, db)
 
 
 def findUser(username):
-    file = open(db)
+    file = open(path)
     users = json.load(file)
     file.close()
     for user in users:
