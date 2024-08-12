@@ -1,10 +1,17 @@
-import os
+from flask import current_app
 import json
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-db = "../deviceSettings.json"
-path = os.path.join(base_dir, db)
+# base_dir = os.path.dirname(os.path.abspath(__file__))
+# db = "../deviceSettings.json"
+# path = os.path.join(base_dir, db)
 
+path = ""
+
+
+def setDeviceDB(app):
+    global path
+    with app.app_context():
+        path = current_app.config["DEVICE_DB"]
 
 
 def getAll():

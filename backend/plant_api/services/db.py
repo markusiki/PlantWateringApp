@@ -1,10 +1,19 @@
-import os
+from flask import current_app
 import json
 from datetime import datetime
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-db = "../unitsDB.json"
-path = os.path.join(base_dir, db)
+path = ""
+
+
+def setUnitsDB(app):
+    global path
+    with app.app_context():
+        path = current_app.config["UNITS_DB"]
+
+
+# base_dir = os.path.dirname(os.path.abspath(__file__))
+# db = "../unitsDB.json"
+# path = os.path.join(base_dir, db)
 
 
 def getUnits(innerUse=True):

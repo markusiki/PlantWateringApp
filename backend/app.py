@@ -1,4 +1,4 @@
-from flaskr import create_app
+from plant_api import create_app
 from datetime import timedelta, timezone, datetime
 from flask import jsonify
 from flask_jwt_extended import (

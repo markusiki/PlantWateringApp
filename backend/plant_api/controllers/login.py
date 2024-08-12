@@ -23,4 +23,4 @@ def login():
         set_access_cookies(response, acces_token)
         return response
     except Exception as error:
-        return 500
+        return jsonify({"message": "Internal server error"}), 500

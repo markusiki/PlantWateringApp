@@ -5,7 +5,7 @@ from flask_bcrypt import generate_password_hash
 import json
 from getpass import getpass
 
-db = "users.json"
+db = "./datadases/users.json"
 
 
 while True:
