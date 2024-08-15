@@ -1,3 +1,4 @@
+from flask import current_app
 from time import sleep
 import gpiozero
 import board
@@ -12,6 +13,14 @@ i2c = busio.I2C(board.SCL, board.SDA)
 
 # Create an ADS1115 object
 ads = ADS.ADS1115(i2c)
+
+TESTING = False
+
+
+def setTestingMode(app):
+    global TESTING
+    with app.app_context():
+        TESTING = current_app.testing
 
 
 class Pump:
@@ -111,9 +120,11 @@ def measureSoil(id):
 
 def water(valve, waterTime):
     valve.on()
-    # pump.pumpOn()
+    if not TESTING:
+        pump.pumpOn()
     sleep(waterTime)
-    # pump.pumpOff()
+    if not TESTING:
+        pump.pumpOff()
     valve.off()
 
 

@@ -2,7 +2,7 @@ from flask import current_app
 import json
 from datetime import datetime
 
-path = ""
+path: str
 
 
 def setUnitsDB(app):

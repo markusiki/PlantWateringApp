@@ -6,16 +6,19 @@ from .services.users import setUsersDB
 from .services.db import setUnitsDB
 from .services.deviceSettings import setDeviceDB
 
+
 load_dotenv()
 
 
 def create_app(test_config=None):
+
     app = Flask(__name__, instance_relative_config=True)
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
     app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
     app.config["JWT_COOKIE_CSRF_PROTECT"] = True
     app.config["JWT_CSRF_METHODS"] = ["POST", "PUT", "PATCH", "DELETE", "GET"]
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
+    app.config["TESTING"] = False if test_config is None else test_config["TESTING"]
     app.config["USERS_DB"] = (
         os.path.join(os.path.dirname(__file__), "../databases/users.json")
         if test_config is None
@@ -31,6 +34,7 @@ def create_app(test_config=None):
         if test_config is None
         else test_config["DEVICE_DB"]
     )
+
     setUsersDB(app)
     setUnitsDB(app)
     setDeviceDB(app)
