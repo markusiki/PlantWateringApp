@@ -1,3 +1,4 @@
+from flask import current_app
 from datetime import datetime
 from time import monotonic
 from .services.deviceSettings import getAll
@@ -5,8 +6,15 @@ from .services.db import getUnits, updateMoistValuesToDB, updateLog
 from .deviceFunctions import updateMoistValues, waterNow
 import threading
 
+TESTING = False
 runTimeProgram = False
 measureInterval: int
+
+
+def setTestingMode(app):
+    global TESTING
+    with app.app_context():
+        TESTING = current_app.testing
 
 
 def setTimeProgram():
@@ -42,19 +50,23 @@ def timer():
     start_time = monotonic()
 
     while True:
-        delay = measureInterval * 86400  # days converted to seconds (86400)
+        delay = (
+            measureInterval * 86400 if not TESTING else measureInterval
+        )  # days converted to seconds if not testing (86400)
         current_time = monotonic()
         epsaled_time = current_time - start_time
         if epsaled_time >= delay:
+            break
+        if runTimeProgram is False:
             break
 
 
 def timeProgram():
     while True:
         if runTimeProgram:
-            units = getUnits()
             moistValues = updateMoistValues()
             updateMoistValuesToDB(moistValues)
+            units = getUnits()
 
             for unit in units:
                 unitLog = {
@@ -77,8 +89,9 @@ def timeProgram():
                     ):
                         updateLog(**unitLog)
                         continue
-                    waterNow(unit["id"])
-                    updateLog(**unitLog, watered=True, waterMethod="auto: moist level")
+                    elif unit["status"] != "ERROR":
+                        waterNow(unit["id"])
+                        updateLog(**unitLog, watered=True, waterMethod="auto: moist level")
 
                 else:
                     updateLog(**unitLog)
