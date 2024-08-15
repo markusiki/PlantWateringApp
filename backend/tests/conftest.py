@@ -1,18 +1,26 @@
 import os
 from flask_jwt_extended import JWTManager
 import pytest
+from flask import jsonify
 from plant_api import create_app
-from .create_db import create_test_units_db, create_test_users_db, create_test_device_db
+from .test_helpers.create_db import (
+    create_test_units_db,
+    create_test_users_db,
+    create_test_device_db,
+)
 
-unitsDB = "unitsDB.test.json"
+
+db_dir = os.path.join(os.path.dirname(__file__), "databases")
+
+if not os.path.isdir(db_dir):
+    os.makedirs(db_dir)
+
 path_to_unitsDB = os.path.join(os.path.dirname(__file__), "databases/unitsDB.test.json")
-usersDB = "users.test.json"
 path_to_usersDB = os.path.join(os.path.dirname(__file__), "databases/users.test.json")
-deviceDB = "deviceSettings.test.json"
 path_to_deviceDB = os.path.join(os.path.dirname(__file__), "databases/deviceSettings.test.json")
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def app():
     create_test_users_db(path_to_usersDB)
     create_test_units_db(path_to_unitsDB)
@@ -26,6 +34,13 @@ def app():
         }
     )
 
+    with app.app_context():
+        from plant_api.deviceFunctions import setTestingMode
+        from plant_api.timeProgram import setTestingMode as setTimeProgramTestingMode
+
+    setTestingMode(app)
+    setTimeProgramTestingMode(app)
+
     JWTManager(app)
 
     yield app
@@ -33,6 +48,31 @@ def app():
     # clean up / reset resources here
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def client(app):
     return app.test_client()
+
+
+class AuthActions(object):
+    def __init__(self, client):
+        self._client = client
+
+    def login(self, username="test", password="test"):
+        return self._client.post("/api/login", json={"username": username, "password": password})
+
+    def logout(self):
+        return self._client.post("/api/logout")
+
+    def get_headers(self):
+        return {"X-CSRF-TOKEN": self._client.get_cookie(key="csrf_access_token").value}
+
+
+@pytest.fixture(scope="module")
+def auth(client):
+    return AuthActions(client)
+
+
+""" @pytest.fixture(scope="module")
+def module_auth(client, auth):
+    response = auth.login()
+    yield client, response """
