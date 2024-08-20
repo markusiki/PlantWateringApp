@@ -36,12 +36,15 @@ def app():
 
     with app.app_context():
         from plant_api.deviceFunctions import setTestingMode
-        from plant_api.timeProgram import setTestingMode as setTimeProgramTestingMode
+        from plant_api.timeProgram import (
+            setTestingMode as setTimeProgramTestingMode,
+        )
 
-    setTestingMode(app)
-    setTimeProgramTestingMode(app)
+        setTestingMode(app)
+        setTimeProgramTestingMode(app)
 
     JWTManager(app)
+    set
 
     yield app
 
@@ -72,7 +75,9 @@ def auth(client):
     return AuthActions(client)
 
 
-""" @pytest.fixture(scope="module")
-def module_auth(client, auth):
-    response = auth.login()
-    yield client, response """
+@pytest.fixture()
+def set_time_program(app):
+    with app.app_context():
+        from plant_api.timeProgram import setTimeProgram
+
+        return setTimeProgram
