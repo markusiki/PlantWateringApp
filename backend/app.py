@@ -13,6 +13,9 @@ from flask_jwt_extended import (
 
 app = create_app()
 jwt = JWTManager(app)
+from plant_api.timeProgram import setTimeProgram
+
+setTimeProgram()
 
 
 @jwt.expired_token_loader
