@@ -21,12 +21,16 @@ def getAll():
     return settings
 
 
+def saveToDb(settings):
+    file = open(path, "w")
+    json.dump(settings, file)
+    file.close()
+
+
 def changeSettings(body):
     settings = getAll()
     settings["autoWatering"] = body["autoWatering"]
     settings["moistMeasureInterval"] = body["moistMeasureInterval"]
-    file = open(path, "w")
-    json.dump(settings, file)
-    file.close()
+    saveToDb(settings)
     changedSettings = getAll()
     return changedSettings
