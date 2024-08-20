@@ -14,13 +14,13 @@ i2c = busio.I2C(board.SCL, board.SDA)
 # Create an ADS1115 object
 ads = ADS.ADS1115(i2c)
 
-TESTING = False
+testing = False
 
 
 def setTestingMode(app):
-    global TESTING
+    global testing
     with app.app_context():
-        TESTING = current_app.testing
+        testing = current_app.testing
 
 
 class Pump:
@@ -120,10 +120,10 @@ def measureSoil(id):
 
 def water(valve, waterTime):
     valve.on()
-    if not TESTING:
+    if not testing:
         pump.pumpOn()
     sleep(waterTime)
-    if not TESTING:
+    if not testing:
         pump.pumpOff()
     valve.off()
 
