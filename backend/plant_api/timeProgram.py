@@ -6,15 +6,15 @@ from .services.db import getUnits, updateMoistValuesToDB, updateLog
 from .deviceFunctions import updateMoistValues, waterNow
 import threading
 
-TESTING = False
+testing = False
 runTimeProgram = False
 measureInterval: int
 
 
 def setTestingMode(app):
-    global TESTING
+    global testing
     with app.app_context():
-        TESTING = current_app.testing
+        testing = current_app.testing
 
 
 def setTimeProgram():
@@ -39,9 +39,13 @@ def lastTimeWatered(unit):
             lastTimeWateredDate = log["date"]
             break
     if lastTimeWateredDate:
-        lastWateredDate = datetime.strptime(lastTimeWateredDate, "%d.%m.%Y %H:%M")
+        lastWateredDate = datetime.strptime(lastTimeWateredDate, "%d.%m.%Y %H:%M:%S")
 
-        return abs((dateNow - lastWateredDate).days)
+        return (
+            abs((dateNow - lastWateredDate).days)
+            if not testing
+            else abs((dateNow - lastWateredDate).seconds)
+        )
 
     return float("inf")
 
@@ -51,7 +55,7 @@ def timer():
 
     while True:
         delay = (
-            measureInterval * 86400 if not TESTING else measureInterval
+            measureInterval * 86400 if not testing else measureInterval
         )  # days converted to seconds if not testing (86400)
         current_time = monotonic()
         epsaled_time = current_time - start_time
@@ -64,8 +68,9 @@ def timer():
 def timeProgram():
     while True:
         if runTimeProgram:
-            moistValues = updateMoistValues()
-            updateMoistValuesToDB(moistValues)
+            if not testing:
+                moistValues = updateMoistValues()
+                updateMoistValuesToDB(moistValues)
             units = getUnits()
 
             for unit in units:
@@ -83,22 +88,23 @@ def timeProgram():
                     updateLog(**unitLog, watered=True, waterMethod="auto: max watering interval")
 
                 elif unit["moistValue"] > unit["moistLimit"]:
+
                     if (
                         unit["enableMinWaterInterval"] == True
                         and unit["minWaterInterval"] >= wateredLastTime
                     ):
                         updateLog(**unitLog)
                         continue
-                    elif unit["status"] != "ERROR":
+                    if unit["status"] != "ERROR":
                         waterNow(unit["id"])
                         updateLog(**unitLog, watered=True, waterMethod="auto: moist level")
+                    else:
+                        updateLog(**unitLog)
 
                 else:
                     updateLog(**unitLog)
             timer()
 
 
-time_program = threading.Thread(target=timeProgram, daemon=True)
-time_program.start()
-
-setTimeProgram()
+timeProgramThread = threading.Thread(target=timeProgram, daemon=True)
+timeProgramThread.start()
