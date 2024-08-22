@@ -1,6 +1,6 @@
 import pytest
 from .conftest import path_to_deviceDB
-from .test_helpers.db import get_from_db
+from .test_helpers.db import get_device_settings
 
 base_url = "/api/device"
 
@@ -11,8 +11,8 @@ def login(auth):
     print(response)
 
 
-def test_get_all_device(client, auth):
-    device_settings = get_from_db(path_to_deviceDB)
+def test_get_all_device(app, client, auth):
+    device_settings = get_device_settings(app)
     response = client.get(base_url, headers=auth.get_headers())
     device_settings = response.get_json()
     assert device_settings["autoWatering"] == device_settings["autoWatering"]
