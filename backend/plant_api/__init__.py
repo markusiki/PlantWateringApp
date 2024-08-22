@@ -18,7 +18,9 @@ def create_app(test_config=None):
     app.config["JWT_COOKIE_CSRF_PROTECT"] = True
     app.config["JWT_CSRF_METHODS"] = ["POST", "PUT", "PATCH", "DELETE", "GET"]
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
-    app.config["TESTING"] = False if test_config is None else test_config["TESTING"]
+    app.config["TESTING"] = (
+        test_config is not None and test_config.get("TESTING", False)
+    ) or os.getenv("FLASK_TESTING", "False") == "True"
     app.config["USERS_DB"] = (
         os.path.join(os.path.dirname(__file__), "../databases/users.json")
         if test_config is None
@@ -38,6 +40,15 @@ def create_app(test_config=None):
     setUsersDB(app)
     setUnitsDB(app)
     setDeviceDB(app)
+
+    if app.testing:
+        from plant_api.deviceFunctions import setTestingMode
+        from plant_api.timeProgram import (
+            setTestingMode as setTimeProgramTestingMode,
+        )
+
+        setTestingMode(app)
+        setTimeProgramTestingMode(app)
 
     from .controllers.login import loginRouter
     from .controllers.logout import logoutRouter

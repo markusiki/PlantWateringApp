@@ -34,15 +34,6 @@ def app():
         }
     )
 
-    with app.app_context():
-        from plant_api.deviceFunctions import setTestingMode
-        from plant_api.timeProgram import (
-            setTestingMode as setTimeProgramTestingMode,
-        )
-
-        setTestingMode(app)
-        setTimeProgramTestingMode(app)
-
     JWTManager(app)
     set
 
