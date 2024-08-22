@@ -19,7 +19,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({
   handleDeciveSettingsChange,
 }) => {
   const [settings, setSettings] = useState<IDeviceSettingsState>({
-    autoWatering: false,
+    runTimeProgram: false,
     moistMeasureInterval: 1,
   })
 
@@ -53,18 +53,18 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({
             <IonItem>
               <IonCheckbox
                 justify="space-between"
-                checked={settings.autoWatering}
-                name="autoWatering"
+                checked={settings.runTimeProgram}
+                name="runTimeProgram"
                 onIonChange={(event) =>
-                  setSettings({ ...settings, autoWatering: event.detail.checked })
+                  setSettings({ ...settings, runTimeProgram: event.detail.checked })
                 }
               >
-                Enable Automatic Watering
+                Enable time program
               </IonCheckbox>
             </IonItem>
             <IonItem>
               <IonInput
-                label="Soil moisture measure intervall (days):"
+                label="Soil moisture measure interval (days):"
                 labelPlacement="stacked"
                 value={settings.moistMeasureInterval}
                 name="moistMeasureInterval"

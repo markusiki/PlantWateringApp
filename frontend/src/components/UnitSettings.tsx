@@ -20,6 +20,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
     name: '',
     moistLimit: 0,
     waterTime: 0,
+    enableAutoWatering: false,
     enableMaxWaterInterval: false,
     enableMinWaterInterval: false,
     maxWaterInterval: 0,
@@ -34,12 +35,14 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
       name: unit.name,
       moistLimit: unit.moistLimit,
       waterTime: unit.waterTime,
+      enableAutoWatering: unit.enableAutoWatering,
       enableMaxWaterInterval: unit.enableMaxWaterInterval,
       enableMinWaterInterval: unit.enableMinWaterInterval,
       maxWaterInterval: unit.maxWaterInterval,
       minWaterInterval: unit.minWaterInterval,
     })
   }, [
+    unit.enableAutoWatering,
     unit.enableMaxWaterInterval,
     unit.enableMinWaterInterval,
     unit.maxWaterInterval,
@@ -87,11 +90,14 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
       })
       return false
     }
-    if (settings.minWaterInterval > settings.maxWaterInterval) {
+    if (
+      settings.enableMaxWaterInterval &&
+      settings.enableMinWaterInterval &&
+      settings.minWaterInterval > settings.maxWaterInterval
+    ) {
       presentAlert({
         header: 'Invalid input',
-        message:
-          'Minimun water interwall must be longer that or equal than maximum water Interval!',
+        message: 'Minimun water interval must be shorter than maximum watering interval!',
         buttons: ['Dismiss'],
       })
       return false
@@ -177,54 +183,66 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
             <IonItem>
               <IonCheckbox
                 justify="space-between"
-                checked={settings.enableMinWaterInterval}
-                name="enableMinWaterInterval"
+                checked={settings.enableAutoWatering}
+                name="enableAutoWatering"
                 onIonChange={handleChange}
               >
-                Enable minimun watering interval
+                Enable automatic watering
               </IonCheckbox>
             </IonItem>
-            <li hidden={!settings.enableMinWaterInterval}>
+            <li hidden={!settings.enableAutoWatering}>
               <IonItem>
-                <IonInput
-                  label="Set minimum watering interval (days)"
-                  value={settings.minWaterInterval}
-                  name="minWaterInterval"
-                  labelPlacement="stacked"
-                  type="number"
-                  helperText="For how many days the plant will not be watered,
-                  even if the moisture level drops under the moisture level limit."
-                  min={1}
-                  max={180}
-                  onInput={handleChange}
-                />
+                <IonCheckbox
+                  justify="space-between"
+                  checked={settings.enableMinWaterInterval}
+                  name="enableMinWaterInterval"
+                  onIonChange={handleChange}
+                >
+                  Enable minimum watering interval
+                </IonCheckbox>
               </IonItem>
-            </li>
-            <IonItem>
-              <IonCheckbox
-                justify="space-between"
-                checked={settings.enableMaxWaterInterval}
-                name="enableMaxWaterInterval"
-                onIonChange={handleChange}
-              >
-                Enable maximum watering interval
-              </IonCheckbox>
-            </IonItem>
-            <li hidden={!settings.enableMaxWaterInterval}>
+              <li hidden={!settings.enableMinWaterInterval}>
+                <IonItem>
+                  <IonInput
+                    label="Set minimum watering interval (days)"
+                    value={settings.minWaterInterval}
+                    name="minWaterInterval"
+                    labelPlacement="stacked"
+                    type="number"
+                    helperText="For how many days the plant will not be watered,
+                    even if the moisture level drops under the moisture level limit."
+                    min={1}
+                    max={180}
+                    onInput={handleChange}
+                  />
+                </IonItem>
+              </li>
               <IonItem>
-                <IonInput
-                  label="Set maximum watering interval (days)"
-                  value={settings.maxWaterInterval}
-                  name="maxWaterInterval"
-                  labelPlacement="stacked"
-                  onInput={handleChange}
-                  type="number"
-                  helperText="After how many days the plant will be watered,
-                  even if the moisture level has not dropped under the moisture level limit."
-                  min={1}
-                  max={180}
-                />
+                <IonCheckbox
+                  justify="space-between"
+                  checked={settings.enableMaxWaterInterval}
+                  name="enableMaxWaterInterval"
+                  onIonChange={handleChange}
+                >
+                  Enable maximum watering interval
+                </IonCheckbox>
               </IonItem>
+              <li hidden={!settings.enableMaxWaterInterval}>
+                <IonItem>
+                  <IonInput
+                    label="Set maximum watering interval (days)"
+                    value={settings.maxWaterInterval}
+                    name="maxWaterInterval"
+                    labelPlacement="stacked"
+                    onInput={handleChange}
+                    type="number"
+                    helperText="After how many days the plant will be watered,
+                    even if the moisture level has not dropped under the moisture level limit."
+                    min={1}
+                    max={180}
+                  />
+                </IonItem>
+              </li>
             </li>
           </IonList>
         </IonContent>

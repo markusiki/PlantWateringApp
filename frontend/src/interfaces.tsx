@@ -5,6 +5,7 @@ export interface IUnitState {
   moistValue: number
   moistLimit: number
   waterTime: number
+  enableAutoWatering: boolean
   enableMaxWaterInterval: boolean
   enableMinWaterInterval: boolean
   maxWaterInterval: number
@@ -59,6 +60,7 @@ export interface IUnitSettingsState {
   name: string
   moistLimit: number
   waterTime: number
+  enableAutoWatering: boolean
   enableMaxWaterInterval: boolean
   enableMinWaterInterval: boolean
   maxWaterInterval: number
@@ -66,7 +68,7 @@ export interface IUnitSettingsState {
 }
 
 export interface IDeviceSettingsState {
-  autoWatering: boolean
+  runTimeProgram: boolean
   moistMeasureInterval: number
 }
 export interface IDeviceSettingsProps {
