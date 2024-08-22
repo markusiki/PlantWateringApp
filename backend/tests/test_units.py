@@ -23,6 +23,7 @@ def test_get_all_units(client, auth):
         assert unit["moistValue"]
         assert unit["moistLimit"]
         assert unit["waterTime"]
+        assert unit["enableAutoWatering"]
         assert unit["enableMaxWaterInterval"]
         assert unit["enableMinWaterInterval"]
         assert unit["maxWaterInterval"]
@@ -37,6 +38,7 @@ def test_change_unit_settings(client, auth, app):
         "name": "Test_unit2",
         "moistLimit": 10000,
         "waterTime": 10,
+        "enableAutoWatering": False,
         "enableMaxWaterInterval": False,
         "enableMinWaterInterval": False,
         "maxWaterInterval": 9,
@@ -49,6 +51,7 @@ def test_change_unit_settings(client, auth, app):
     assert returned_unit["name"] == modified_unit["name"]
     assert returned_unit["moistLimit"] == modified_unit["moistLimit"]
     assert returned_unit["waterTime"] == modified_unit["waterTime"]
+    assert returned_unit["enableAutoWatering"] == modified_unit["enableAutoWatering"]
     assert returned_unit["enableMaxWaterInterval"] == modified_unit["enableMaxWaterInterval"]
     assert returned_unit["enableMinWaterInterval"] == modified_unit["enableMinWaterInterval"]
     assert returned_unit["maxWaterInterval"] == modified_unit["maxWaterInterval"]
