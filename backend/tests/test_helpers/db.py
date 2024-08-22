@@ -16,6 +16,13 @@ def save_to_units_db(app, units):
         saveToDb(units)
 
 
+def save_log_to_units_db(app, unitLog):
+    with app.app_context():
+        from plant_api.services.db import updateLog
+
+        updateLog(**unitLog)
+
+
 def get_device_settings(app):
     with app.app_context():
         from plant_api.services.deviceSettings import getAll
