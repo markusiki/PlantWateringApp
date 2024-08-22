@@ -24,10 +24,10 @@ def setTimeProgram():
 
     measureInterval = settings["moistMeasureInterval"]
 
-    if settings["autoWatering"] is True and runTimeProgram is False:
+    if settings["runTimeProgram"] is True and runTimeProgram is False:
         runTimeProgram = True
 
-    if settings["autoWatering"] is False and runTimeProgram:
+    if settings["runTimeProgram"] is False and runTimeProgram:
         runTimeProgram = False
 
 

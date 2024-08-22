@@ -1,1 +1,1 @@
-device = {"autoWatering": False, "moistMeasureInterval": 3}
+device = {"runTimeProgram": False, "moistMeasureInterval": 3}

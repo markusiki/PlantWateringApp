@@ -14,5 +14,5 @@ class UnitsSchema(Schema):
 
 
 class DeviceSchema(Schema):
-    autoWatering = fields.Bool(required=True)
+    runTimeProgram = fields.Bool(required=True)
     moistMeasureInterval = fields.Int(required=True, validate=validate.Range(min=1, max=100))
