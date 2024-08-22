@@ -9,7 +9,7 @@ from ..services.db import (
     deleteLog,
     getById,
 )
-from ..deviceFunctions import updateMoistValues, updateSprinklerUnitObject, waterNow
+from ..deviceFunctions import updateMoistValues, updateSprinklerUnitObject, measureSoil, waterNow
 from ..schemas import UnitsSchema
 from marshmallow import ValidationError
 
@@ -45,7 +45,8 @@ def changeUnit():
 @unitsRouter.post("/<string:unitId>")
 @jwt_required()
 def waterUnit(unitId):
-    moistValue = waterNow(unitId)
+    moistValue = measureSoil(unitId)
+    waterNow(unitId)
     updateLog(**moistValue, watered=True, waterMethod="manual")
     index = findById(unitId)
     units = getUnits()

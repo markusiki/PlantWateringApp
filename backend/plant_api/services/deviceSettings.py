@@ -29,7 +29,7 @@ def saveToDb(settings):
 
 def changeSettings(body):
     settings = getAll()
-    settings["autoWatering"] = body["autoWatering"]
+    settings["runTimeProgram"] = body["runTimeProgram"]
     settings["moistMeasureInterval"] = body["moistMeasureInterval"]
     saveToDb(settings)
     changedSettings = getAll()

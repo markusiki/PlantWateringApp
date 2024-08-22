@@ -20,7 +20,7 @@ def run_around_tests(app, set_time_program):
     yield
     # Ffter each test
     device_settings = get_device_settings(app)
-    device_settings["autoWatering"] = False
+    device_settings["runTimeProgram"] = False
     save_to_device_db(app, device_settings)
     set_time_program()
 
@@ -35,12 +35,13 @@ def last_time_measured(unit):
 def test_auto_watering_max_watering_interval(app, set_time_program):
     units = get_all_units(app)
     for unit in units:
+        unit["enableAutoWatering"] = True
         unit["enableMaxWaterInterval"] = True
         unit["maxWaterInterval"] = 1
     save_to_units_db(app, units)
 
     device_settings = get_device_settings(app)
-    device_settings["autoWatering"] = True
+    device_settings["runTimeProgram"] = True
     device_settings["moistMeasureInterval"] = 3
     save_to_device_db(app, device_settings)
 
@@ -70,12 +71,13 @@ def test_auto_watering_max_watering_interval(app, set_time_program):
 def test_auto_watering_moist_level(app, set_time_program):
     units = get_all_units(app)
     for unit in units:
+        unit["enableAutoWatering"] = True
         unit["moistLimit"] = 14000
         unit["enableMaxWaterInterval"] = False
     save_to_units_db(app, units)
 
     device_settings = get_device_settings(app)
-    device_settings["autoWatering"] = True
+    device_settings["runTimeProgram"] = True
     device_settings["moistMeasureInterval"] = 10
     save_to_device_db(app, device_settings)
 
@@ -110,7 +112,36 @@ def test_auto_watering_does_not_water(app, set_time_program):
     save_to_units_db(app, units)
 
     device_settings = get_device_settings(app)
-    device_settings["autoWatering"] = True
+    device_settings["runTimeProgram"] = True
+    device_settings["moistMeasureInterval"] = 5
+    save_to_device_db(app, device_settings)
+
+    set_time_program()
+
+    sleep(4)
+    units = get_all_units(app)
+    for unit in units:
+        assert len(unit["logs"]) == 1
+        assert unit["logs"][0]["watered"] == False
+
+    sleep(5)
+    units = get_all_units(app)
+    for unit in units:
+        assert len(unit["logs"]) == 2
+        assert unit["logs"][0]["watered"] == False
+
+
+def test_time_program_does_not_water_if_auto_watering_not_enabled(app, set_time_program):
+    units = get_all_units(app)
+    for unit in units:
+        unit["enableAutoWatering"] = False
+        unit["enableMaxWaterInterval"] = True
+        unit["enableMinWaterInterval"] = True
+
+    save_to_units_db(app, units)
+
+    device_settings = get_device_settings(app)
+    device_settings["runTimeProgram"] = True
     device_settings["moistMeasureInterval"] = 5
     save_to_device_db(app, device_settings)
 
@@ -132,7 +163,7 @@ def test_auto_watering_does_not_water(app, set_time_program):
 def test_moist_measure_interval_can_be_changed_while_timeprogram_is_running(app, set_time_program):
     # Tests timer function
     device_settings = get_device_settings(app)
-    device_settings["autoWatering"] = True
+    device_settings["runTimeProgram"] = True
     device_settings["moistMeasureInterval"] = 2
     save_to_device_db(app, device_settings)
 

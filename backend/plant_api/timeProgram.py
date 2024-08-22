@@ -24,10 +24,10 @@ def setTimeProgram():
 
     measureInterval = settings["moistMeasureInterval"]
 
-    if settings["autoWatering"] is True and runTimeProgram is False:
+    if settings["runTimeProgram"] is True and runTimeProgram is False:
         runTimeProgram = True
 
-    if settings["autoWatering"] is False and runTimeProgram:
+    if settings["runTimeProgram"] is False and runTimeProgram:
         runTimeProgram = False
 
 
@@ -79,28 +79,33 @@ def timeProgram():
                     "status": unit["status"],
                     "moistValue": unit["moistValue"],
                 }
-                wateredLastTime = lastTimeWatered(unit)
-                if (
-                    unit["enableMaxWaterInterval"] == True
-                    and unit["maxWaterInterval"] <= wateredLastTime
-                ):
-                    waterNow(unit["id"])
-                    updateLog(**unitLog, watered=True, waterMethod="auto: max watering interval")
-
-                elif unit["moistValue"] > unit["moistLimit"]:
-
+                if unit["enableAutoWatering"]:
+                    wateredLastTime = lastTimeWatered(unit)
                     if (
-                        unit["enableMinWaterInterval"] == True
-                        and unit["minWaterInterval"] >= wateredLastTime
+                        unit["enableMaxWaterInterval"] == True
+                        and unit["maxWaterInterval"] <= wateredLastTime
                     ):
-                        updateLog(**unitLog)
-                        continue
-                    if unit["status"] != "ERROR":
                         waterNow(unit["id"])
-                        updateLog(**unitLog, watered=True, waterMethod="auto: moist level")
+                        updateLog(
+                            **unitLog, watered=True, waterMethod="auto: max watering interval"
+                        )
+
+                    elif unit["moistValue"] > unit["moistLimit"]:
+
+                        if (
+                            unit["enableMinWaterInterval"] == True
+                            and unit["minWaterInterval"] >= wateredLastTime
+                        ):
+                            updateLog(**unitLog)
+                            continue
+                        if unit["status"] != "ERROR":
+                            waterNow(unit["id"])
+                            updateLog(**unitLog, watered=True, waterMethod="auto: moist level")
+                        else:
+                            updateLog(**unitLog)
+
                     else:
                         updateLog(**unitLog)
-
                 else:
                     updateLog(**unitLog)
             timer()
