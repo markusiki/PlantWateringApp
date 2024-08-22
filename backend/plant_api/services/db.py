@@ -59,6 +59,7 @@ def modifyUnitToDB(unitToChange, index):
     unit["name"] = unitToChange["name"]
     unit["moistLimit"] = int(unitToChange["moistLimit"])
     unit["waterTime"] = int(unitToChange["waterTime"])
+    unit["enableAutoWatering"] = unitToChange["enableAutoWatering"]
     unit["enableMaxWaterInterval"] = unitToChange["enableMaxWaterInterval"]
     unit["enableMinWaterInterval"] = unitToChange["enableMinWaterInterval"]
     unit["maxWaterInterval"] = unitToChange["maxWaterInterval"]
