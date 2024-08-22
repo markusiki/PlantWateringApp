@@ -64,7 +64,7 @@ def modifyUnitToDB(unitToChange, index):
     unit["maxWaterInterval"] = unitToChange["maxWaterInterval"]
     unit["minWaterInterval"] = unitToChange["minWaterInterval"]
     saveToDb(units)
-    changedUnits = getUnits()
+    changedUnits = getUnits(innerUse=False)
     changedUnit = changedUnits[index]
     return changedUnit
 
