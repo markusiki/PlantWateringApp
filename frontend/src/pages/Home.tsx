@@ -40,7 +40,7 @@ const Home: React.FC = () => {
   const [units, setUnits] = useState<IUnitState[]>([])
   const [backendStatus, setBackendStatus] = useState<boolean>(false)
   const [deviceSettings, setDeviceSettings] = useState<IDeviceSettingsState>({
-    autoWatering: true,
+    runTimeProgram: true,
     moistMeasureInterval: 0,
   })
   const [waterNowDisabeled, setWaterNowDisabled] = useState(false)
