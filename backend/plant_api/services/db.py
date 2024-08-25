@@ -3,12 +3,15 @@ import json
 from datetime import datetime
 
 path: str
+testing = False
 
 
 def setUnitsDB(app):
     global path
+    global testing
     with app.app_context():
         path = current_app.config["UNITS_DB"]
+        testing = current_app.testing
 
 
 # base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -26,6 +29,11 @@ def getUnits(innerUse=True):
         for unit in units:
             unit.pop("sensor")
             unit.pop("valve")
+            for log in unit["logs"]:
+                log["date"] = datetime.strftime(
+                    datetime.strptime(log["date"], "%d.%m.%Y %H:%M:%S"), "%d.%m.%Y %H:%M"
+                )
+
         return units
 
 
@@ -71,7 +79,7 @@ def modifyUnitToDB(unitToChange, index):
 
 
 def updateLog(id="", status="", moistValue=0, watered=False, waterMethod=""):
-    timeStamp = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+    timeStamp = datetime.now().strftime(f"%d.%m.%Y %H:%M{':%S' if testing else ''}")
     units = getUnits()
     index = findById(id)
     unit = units[index]
@@ -102,27 +110,23 @@ def updateMoistValuesToDB(moistValues):
     for unit in units:
         for moistValue in moistValues:
             if unit["id"] == moistValue["id"]:
-                if moistValue["status"] == "OK":
-                    if moistValue["moistValue"] > maxValue:
-                        if moistValue["moistValue"] > (maxValue + 1000):
-                            unit["status"] = "ERROR"
-                            unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
-                        else:
-                            unit["status"] = "OK"
-                            unit["moistValue"] = maxValue
-
-                    elif moistValue["moistValue"] < minValue:
-                        if moistValue["moistValue"] < (minValue - 1000):
-                            unit["status"] = "ERROR"
-                            unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
-                        else:
-                            unit["status"] = "OK"
-                            unit["moistValue"] = minValue
-                    else:
-                        unit["status"] = "OK"
+                if moistValue["moistValue"] > maxValue:
+                    if moistValue["moistValue"] > (maxValue + 1000):
+                        unit["status"] = "ERROR"
                         unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
+                    else:
+                        unit["status"] = "OK" if moistValue["status"] == "OK" else "ERROR"
+                        unit["moistValue"] = maxValue
 
+                elif moistValue["moistValue"] < minValue:
+                    if moistValue["moistValue"] < (minValue - 1000):
+                        unit["status"] = "ERROR"
+                        unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
+                    else:
+                        unit["status"] = "OK" if moistValue["status"] == "OK" else "ERROR"
+                        unit["moistValue"] = minValue
                 else:
-                    unit["status"] = "ERROR"
-                    unit["moistValue"] = maxValue
+                    unit["status"] = "OK" if moistValue["status"] == "OK" else "ERROR"
+                    unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
+
     saveToDb(units)
