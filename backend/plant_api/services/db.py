@@ -29,10 +29,11 @@ def getUnits(innerUse=True):
         for unit in units:
             unit.pop("sensor")
             unit.pop("valve")
-            for log in unit["logs"]:
-                log["date"] = datetime.strftime(
-                    datetime.strptime(log["date"], "%d.%m.%Y %H:%M:%S"), "%d.%m.%Y %H:%M"
-                )
+            if not testing:
+                for log in unit["logs"]:
+                    log["date"] = datetime.strftime(
+                        datetime.strptime(log["date"], "%d.%m.%Y %H:%M:%S"), "%d.%m.%Y %H:%M"
+                    )
 
         return units
 
