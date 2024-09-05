@@ -1,21 +1,8 @@
-import {
-  IonModal,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
-  IonButton,
-  IonContent,
-  IonList,
-  IonItem,
-  IonInput,
-  useIonAlert,
-  IonCheckbox,
-} from '@ionic/react'
+import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonInput, useIonAlert, IonCheckbox } from '@ionic/react'
 import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 
-const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handleUnitChange }) => {
+const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) => {
   const [settings, setSettings] = useState<IUnitSettingsState>({
     name: '',
     moistLimit: 0,
@@ -41,16 +28,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
       maxWaterInterval: unit.maxWaterInterval,
       minWaterInterval: unit.minWaterInterval,
     })
-  }, [
-    unit.enableAutoWatering,
-    unit.enableMaxWaterInterval,
-    unit.enableMinWaterInterval,
-    unit.maxWaterInterval,
-    unit.minWaterInterval,
-    unit.moistLimit,
-    unit.name,
-    unit.waterTime,
-  ])
+  }, [unit.enableAutoWatering, unit.enableMaxWaterInterval, unit.enableMinWaterInterval, unit.maxWaterInterval, unit.minWaterInterval, unit.moistLimit, unit.name, unit.waterTime])
 
   const validateInputs = () => {
     if (settings.name.length > 100 || settings.name.length < 1) {
@@ -77,12 +55,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
       })
       return false
     }
-    if (
-      settings.minWaterInterval < 1 ||
-      settings.minWaterInterval > 180 ||
-      settings.maxWaterInterval < 1 ||
-      settings.maxWaterInterval > 180
-    ) {
+    if (settings.minWaterInterval < 1 || settings.minWaterInterval > 180 || settings.maxWaterInterval < 1 || settings.maxWaterInterval > 180) {
       presentAlert({
         header: 'Invalid input',
         message: 'Water Interval must be between 1 and 180!',
@@ -90,11 +63,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
       })
       return false
     }
-    if (
-      settings.enableMaxWaterInterval &&
-      settings.enableMinWaterInterval &&
-      settings.minWaterInterval > settings.maxWaterInterval
-    ) {
+    if (settings.enableMaxWaterInterval && settings.enableMinWaterInterval && settings.minWaterInterval > settings.maxWaterInterval) {
       presentAlert({
         header: 'Invalid input',
         message: 'Minimun water interval must be shorter than maximum watering interval!',
@@ -116,13 +85,11 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
 
   const handleChange = (event: any) => {
     if (event.target.name === 'name') {
-      console.log('!!')
       setSettings({ ...settings, [event.target.name]: event.target.value })
     } else if (event.target.localName === 'ion-checkbox') {
       setSettings({ ...settings, [event.target.name]: event.detail.checked })
     } else {
       setSettings({ ...settings, [event.target.name]: parseInt(event.target.value) })
-      console.log('??')
     }
   }
 
@@ -143,16 +110,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
         <IonContent className="ion-padding">
           <IonList>
             <IonItem>
-              <IonInput
-                label="Plant name"
-                value={settings.name}
-                name="name"
-                labelPlacement="stacked"
-                type="text"
-                minlength={2}
-                maxlength={100}
-                onInput={handleChange}
-              />
+              <IonInput label="Plant name" value={settings.name} name="name" labelPlacement="stacked" type="text" minlength={2} maxlength={100} onInput={handleChange} />
             </IonItem>
             <IonItem>
               <IonInput
@@ -181,23 +139,13 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
               />
             </IonItem>
             <IonItem>
-              <IonCheckbox
-                justify="space-between"
-                checked={settings.enableAutoWatering}
-                name="enableAutoWatering"
-                onIonChange={handleChange}
-              >
+              <IonCheckbox justify="space-between" checked={settings.enableAutoWatering} name="enableAutoWatering" onIonChange={handleChange}>
                 Enable automatic watering
               </IonCheckbox>
             </IonItem>
             <li hidden={!settings.enableAutoWatering}>
               <IonItem>
-                <IonCheckbox
-                  justify="space-between"
-                  checked={settings.enableMinWaterInterval}
-                  name="enableMinWaterInterval"
-                  onIonChange={handleChange}
-                >
+                <IonCheckbox justify="space-between" checked={settings.enableMinWaterInterval} name="enableMinWaterInterval" onIonChange={handleChange}>
                   Enable minimum watering interval
                 </IonCheckbox>
               </IonItem>
@@ -218,12 +166,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, index, units, handle
                 </IonItem>
               </li>
               <IonItem>
-                <IonCheckbox
-                  justify="space-between"
-                  checked={settings.enableMaxWaterInterval}
-                  name="enableMaxWaterInterval"
-                  onIonChange={handleChange}
-                >
+                <IonCheckbox justify="space-between" checked={settings.enableMaxWaterInterval} name="enableMaxWaterInterval" onIonChange={handleChange}>
                   Enable maximum watering interval
                 </IonCheckbox>
               </IonItem>

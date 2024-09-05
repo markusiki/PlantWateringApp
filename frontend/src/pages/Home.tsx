@@ -1,70 +1,51 @@
-import {
-  IonAlert,
-  IonApp,
-  IonButton,
-  IonButtons,
-  IonCard,
-  IonCol,
-  IonContent,
-  IonGrid,
-  IonHeader,
-  IonIcon,
-  IonMenuButton,
-  IonPage,
-  IonProgressBar,
-  IonRefresher,
-  IonRefresherContent,
-  IonRow,
-  IonText,
-  IonTitle,
-  IonToolbar,
-  RefresherEventDetail,
-  useIonToast,
-} from '@ionic/react'
-import { settingsOutline } from 'ionicons/icons'
+import { IonApp, IonContent, IonPage, IonRefresher, IonRefresherContent, RefresherEventDetail, useIonToast } from '@ionic/react'
 import './Home.css'
 import { useEffect, useState } from 'react'
 import { IUnitState, IDeviceSettingsState, IUnitSettingsState } from '../interfaces'
-import Log from '../components/Log'
-import UnitSettings from '../components/UnitSettings'
+import serviceHelper from '../services/helpers'
 import userService from '../services/user'
 import unitService from '../services/units'
 import deviceService from '../services/device'
-import Login from '../components/Login'
+import Login from './Login'
 import Menu from '../components/Menu'
+import Unit from '../components/Unit'
+import Header from '../components/Header'
 
 const Home: React.FC = () => {
-  const [user, setUser] = useState('')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [units, setUnits] = useState<IUnitState[]>([])
-  const [backendStatus, setBackendStatus] = useState<boolean>(false)
+  const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false)
   const [deviceSettings, setDeviceSettings] = useState<IDeviceSettingsState>({
     runTimeProgram: true,
     moistMeasureInterval: 0,
+    numberOfUnits: 4,
   })
   const [waterNowDisabeled, setWaterNowDisabled] = useState(false)
 
   const [toast] = useIonToast()
 
-  useEffect(() => {}, [user])
-
-  const setCounter = async (unitToCount: IUnitState) => {
-    setUnits((prevUnits) =>
-      prevUnits.map((unit: IUnitState) =>
-        unit.id !== unitToCount.id ? unit : { ...unit, counter: unit.waterTime + 1 }
-      )
-    )
-    let counter = unitToCount.waterTime
-    while (counter! > 0) {
-      setUnits((prevUnits) =>
-        prevUnits.map((unit) =>
-          unit.id !== unitToCount.id ? unit : { ...unit, counter: unit.counter! - 1 }
-        )
-      )
-      counter--
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+  useEffect(() => {
+    const initialize = async () => {
+      await refresh()
+      setIsInitialized(true)
     }
+    initialize()
+  }, [isLoggedIn])
+
+  useEffect(() => {
+    const loggedUser = window.localStorage.getItem('user')
+    if (loggedUser) {
+      serviceHelper.setUser(loggedUser)
+    }
+  }, [])
+
+  const deauthorize = () => {
+    setUnits([])
+    setIsLoggedIn(false)
+    window.localStorage.removeItem('user')
   }
 
   const handleLogin = async (event: React.MouseEvent) => {
@@ -72,10 +53,11 @@ const Home: React.FC = () => {
     try {
       const response = await userService.login({ username, password })
       if (response?.status === 200) {
+        window.localStorage.setItem('user', username)
+        serviceHelper.setUser(username)
         setUsername('')
         setPassword('')
-        setUser(response.data.username)
-        refresh()
+        setIsLoggedIn(true)
       }
     } catch (error: any) {
       toast({
@@ -95,30 +77,44 @@ const Home: React.FC = () => {
       console.log(response.data.message)
     } catch (error) {
     } finally {
-      setUnits([])
-      setUser('')
+      deauthorize()
+    }
+  }
+
+  const fetchDeviceSettings = async () => {
+    try {
+      const deviceResponse = await deviceService.getAll()
+      if (deviceResponse?.status === 200) {
+        setIsBackendConnected(true)
+        setDeviceSettings(deviceResponse.data)
+        setIsLoggedIn(true)
+      }
+    } catch (error: any) {
+      setIsBackendConnected(false)
+      if (error.response.status === 401) {
+        deauthorize()
+      }
+    }
+  }
+
+  const fetchUnits = async () => {
+    try {
+      const unitsResponse = await unitService.getAll()
+      if (unitsResponse?.status === 200) {
+        setIsBackendConnected(true)
+        setUnits(unitsResponse.data)
+      }
+    } catch (error: any) {
+      setIsBackendConnected(false)
+      if (error.response.status === 401) {
+        deauthorize()
+      }
     }
   }
 
   const refresh = async () => {
-    try {
-      const deviceResponse = await deviceService.getAll()
-      if (deviceResponse?.status === 200) {
-        setBackendStatus(true)
-        setDeviceSettings(deviceResponse.data)
-      }
-
-      const unitsResponse = await unitService.getAll()
-      if (unitsResponse?.status === 200) {
-        setBackendStatus(true)
-        setUnits(unitsResponse.data)
-      }
-    } catch (error: any) {
-      setBackendStatus(false)
-      if (error.response.status === 401) {
-        setUser('')
-      }
-    }
+    fetchDeviceSettings()
+    fetchUnits()
   }
 
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
@@ -128,17 +124,6 @@ const Home: React.FC = () => {
     }, 1000)
   }
 
-  const setColor = (moistValue: IUnitState['moistValue']) => {
-    if (moistValue < 0.33) {
-      return 'danger'
-    }
-    if (moistValue >= 0.33 && moistValue < 0.66) {
-      return 'success'
-    } else {
-      return 'primary'
-    }
-  }
-
   const deleteLogs = async (event: React.MouseEvent, id: string) => {
     event.preventDefault()
     try {
@@ -146,7 +131,7 @@ const Home: React.FC = () => {
       setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
     } catch (error: any) {
       if (error.response.status === 401) {
-        setUser('')
+        deauthorize()
       }
     }
   }
@@ -159,36 +144,35 @@ const Home: React.FC = () => {
       setUnits((prevUnits) => prevUnits.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
     } catch (error: any) {
       if (error.response.status === 401) {
-        setUser('')
+        deauthorize()
       }
-      setBackendStatus(false)
+      setIsBackendConnected(false)
     } finally {
       setWaterNowDisabled(false)
     }
   }
 
-  const handleDeciveSettingsChange = async (
-    event: React.MouseEvent,
-    settings: IDeviceSettingsState
-  ) => {
+  const handleDeciveSettingsChange = async (event: React.MouseEvent, settings: IDeviceSettingsState) => {
     event.preventDefault()
     try {
       const returnedDeviceSettings = await deviceService.updateSettings(settings)
       if (returnedDeviceSettings?.status === 200) {
         setDeviceSettings(returnedDeviceSettings.data)
+        if (units.length > returnedDeviceSettings.data.numberOfUnits) {
+          setUnits(units.splice(0, returnedDeviceSettings.data.numberOfUnits))
+        }
+        if (units.length < returnedDeviceSettings.data.numberOfUnits) {
+          fetchUnits()
+        }
       }
     } catch (error: any) {
       if (error.response.status === 401) {
-        setUser('')
+        deauthorize()
       }
     }
   }
 
-  const handleUnitChange = async (
-    event: React.MouseEvent,
-    unitSettings: IUnitSettingsState,
-    id: IUnitState['id']
-  ) => {
+  const handleUnitChange = async (event: React.MouseEvent, unitSettings: IUnitSettingsState, id: IUnitState['id']) => {
     event.preventDefault()
     try {
       const unitToUpdate = { ...unitSettings, id: id }
@@ -198,238 +182,29 @@ const Home: React.FC = () => {
       }
     } catch (error: any) {
       if (error.response.status === 401) {
-        setUser('')
+        deauthorize()
       }
     }
   }
 
-  const getAbsoluteValue = (moistValue: IUnitState['moistValue']) => {
-    const minValue = 8000
-    const maxValue = 20000
-    const absoluteValue =
-      Math.round((1 - (moistValue - minValue) / (maxValue - minValue)) * 100) / 100
-
-    if (absoluteValue > 1) {
-      return 1.0
-    }
-    if (absoluteValue < 0) {
-      return 0
-    }
-    return absoluteValue
+  if (!isInitialized) {
+    return null
   }
 
-  const getRelativeValue = (unit: IUnitState) => {
-    const minValue = 10000
-    const maxValue = unit.moistLimit
-    const relativeValue =
-      Math.round((1 - (unit.moistValue - minValue) / (maxValue - minValue)) * 100) / 100
-
-    if (relativeValue > 1) {
-      return 1.0
-    }
-    if (relativeValue < 0) {
-      return 0
-    }
-    return relativeValue
+  if (!isLoggedIn) {
+    return <Login username={username} setUsername={setUsername} password={password} setPassword={setPassword} handleLogin={handleLogin}></Login>
   }
-
-  const buttonEffect = (unit: IUnitState) => {
-    if (!unit.counter) {
-      return 'Water now'
-    } else {
-      return (
-        <p style={{ textTransform: 'capitalize' }}>
-          Watering... {unit.counter} seconds to complete
-        </p>
-      )
-    }
-  }
-
-  if (user === '') {
-    return (
-      <Login
-        username={username}
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}
-        handleLogin={handleLogin}
-      ></Login>
-    )
-  }
-
   return (
     <IonApp>
-      <Menu
-        deviceSettings={deviceSettings}
-        handleDeciveSettingsChange={handleDeciveSettingsChange}
-        handleLogout={handleLogout}
-      />
+      <Menu deviceSettings={deviceSettings} handleDeciveSettingsChange={handleDeciveSettingsChange} handleLogout={handleLogout} />
       <IonPage id="main-content">
-        <IonHeader>
-          <IonToolbar>
-            <IonButtons slot="start">
-              <IonMenuButton></IonMenuButton>
-            </IonButtons>
-            <IonText>Status: </IonText>
-            {backendStatus ? (
-              <IonText color={'success'}>Connected</IonText>
-            ) : (
-              <IonText color={'danger'}>Disconnected</IonText>
-            )}
-
-            <IonTitle slot="secondary">My plants</IonTitle>
-
-            <IonButtons slot="end">
-              <IonButton color={'primary'} onClick={refresh}>
-                REFRESH
-              </IonButton>
-            </IonButtons>
-          </IonToolbar>
-        </IonHeader>
+        <Header isBackendConnected={isBackendConnected} refresh={refresh} />
         <IonContent>
           <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
             <IonRefresherContent></IonRefresherContent>
           </IonRefresher>
-          {units.map((unit, index) => (
-            <IonCard key={unit.id}>
-              <IonGrid>
-                <IonRow>
-                  <IonCol>
-                    <p>{unit.id}</p>
-                  </IonCol>
-                  <IonCol>
-                    <h3 className="align-center">{unit.name}</h3>
-                  </IonCol>
-                  <IonCol class="ion-padding-start">
-                    <IonButtons class="ion-justify-content-end">
-                      <IonButton id={`${unit.id}-settings`}>
-                        <IonIcon icon={settingsOutline}></IonIcon>
-                      </IonButton>
-                    </IonButtons>
-                    <UnitSettings
-                      unit={unit}
-                      index={index}
-                      units={units}
-                      handleUnitChange={handleUnitChange}
-                    />
-                  </IonCol>
-                </IonRow>
-                <IonRow>
-                  {unit.status === 'OK' ? (
-                    <IonCol>
-                      <p className="align-center">
-                        Status: <IonText color="success">{unit.status}</IonText>
-                      </p>
-                    </IonCol>
-                  ) : (
-                    <IonCol>
-                      <p className="align-center">
-                        Status: <IonText color="danger">{unit.status}</IonText>
-                      </p>
-                    </IonCol>
-                  )}
-                </IonRow>
-                <IonRow>
-                  <IonCol>
-                    <p className="align-center">Moist Value:{unit.moistValue}</p>
-                  </IonCol>
-                </IonRow>
-                <IonRow class="ion-justify-content-center">
-                  <IonCol class="ion-align-self-end" size="auto">
-                    <IonText>
-                      <p>Relative moist level:</p>
-                    </IonText>
-                  </IonCol>
-                  <IonCol size="6">
-                    <div className="moistValueDisplay">
-                      <p className="moist-percent">{(getRelativeValue(unit) * 100).toFixed(0)}%</p>
-                    </div>
-                    <IonProgressBar
-                      value={getRelativeValue(unit)}
-                      color={setColor(getRelativeValue(unit))}
-                    ></IonProgressBar>
-                  </IonCol>
-                </IonRow>
-                <IonRow class="ion-justify-content-center">
-                  <IonCol class="ion-align-self-center" size="auto">
-                    <IonText>
-                      <p>Absolute moist level:</p>
-                    </IonText>
-                  </IonCol>
-                  <IonCol size="6">
-                    <div className="align-center">
-                      <p className="moist-percent">
-                        {(getAbsoluteValue(unit.moistValue) * 100).toFixed(0)}%
-                      </p>
-                    </div>
-                    <IonProgressBar
-                      value={getAbsoluteValue(unit.moistValue)}
-                      color={setColor(getAbsoluteValue(unit.moistValue))}
-                    ></IonProgressBar>
-                    <IonRow class="ion-justify-content-between">
-                      <p>air</p>
-                      <p>water</p>
-                    </IonRow>
-                  </IonCol>
-                </IonRow>
-                <IonRow>
-                  <IonCol>
-                    <IonText>
-                      <p className="last-time-watered">
-                        Last time watered:
-                        <br />
-                        {unit.logs.find((log) => log.watered === true)?.date}
-                      </p>
-                    </IonText>
-                  </IonCol>
-                </IonRow>
-                <IonRow class="ion-align-items-center">
-                  <IonCol class="ion-text-center">
-                    <IonButton id={`${unit.id}-log`} shape="round" expand="block" color="danger">
-                      Log
-                    </IonButton>
-                    <Log unit={unit} deleteLogs={deleteLogs}></Log>
-                  </IonCol>
-                  <IonCol class="ion-text-center">
-                    <IonButton
-                      id={`confirm-water-${unit.id}`}
-                      shape="round"
-                      expand="block"
-                      color="primary"
-                      disabled={waterNowDisabeled}
-                    >
-                      {buttonEffect(unit)}
-                    </IonButton>
-                    <IonAlert
-                      header="Confirm"
-                      message={`Confirm watering for ${unit.name}`}
-                      trigger={`confirm-water-${unit.id}`}
-                      buttons={[
-                        {
-                          text: 'CANCEL',
-                          role: 'cancel',
-                          handler: () => {
-                            console.log('Watering canceled ' + unit.id)
-                          },
-                        },
-                        {
-                          text: 'WATER NOW',
-                          role: 'confirm',
-                          handler: () => {
-                            waterNow(unit.id)
-                            setCounter(unit)
-                            console.log('Watering confirmed ' + unit.id)
-                          },
-                        },
-                      ]}
-                      onDidDismiss={({ detail }) =>
-                        console.log(`Dismissed with role: ${detail.role}`)
-                      }
-                    ></IonAlert>
-                  </IonCol>
-                </IonRow>
-              </IonGrid>
-            </IonCard>
+          {units.map((unit) => (
+            <Unit unit={unit} setUnits={setUnits} handleUnitChange={handleUnitChange} waterNow={waterNow} deleteLogs={deleteLogs} waterNowDisabeled={waterNowDisabeled} />
           ))}
         </IonContent>
       </IonPage>

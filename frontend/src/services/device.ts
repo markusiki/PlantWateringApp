@@ -1,21 +1,16 @@
 import axios from "axios";
 import { IDeviceSettingsState } from "../interfaces";
-import { getAccessCookie } from './user'
+import serviceHelpers from './helpers'
 const baseUrl = `/api/device`
 
-const getConfig = () => {
-  return {
-    headers: { 'X-CSRF-TOKEN': getAccessCookie() }
-  }
-}
 
 const getAll = async () => {
-  const response = await axios.get(baseUrl, getConfig())
+  const response = await axios.get(baseUrl, serviceHelpers.getConfig())
   return response
 }
 
 const updateSettings = async (deviceSettings: IDeviceSettingsState) => {
-  const response = await axios.put(baseUrl, deviceSettings, getConfig())
+  const response = await axios.put(baseUrl, deviceSettings, serviceHelpers.getConfig())
   return response
 }
 
