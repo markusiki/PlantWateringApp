@@ -1,4 +1,4 @@
-from flask import request, Blueprint
+from flask import jsonify, request, Blueprint
 from flask_jwt_extended import jwt_required
 from ..services.db import (
     updateMoistValuesToDB,
@@ -25,7 +25,7 @@ def getAll():
         response = getUnits(innerUse=False)
         return response
     except Exception as error:
-        return 503
+        return "Internal error", 500
 
 
 @unitsRouter.put("")
@@ -38,25 +38,31 @@ def changeUnit():
         response = modifyUnitToDB(body, index)
         updateSprinklerUnitObject(body["id"], index)
         return response
-    except ValidationError as error:
-        return "Error", 500
+    except Exception as error:
+        return jsonify({"message": "Internal server error"}), 500
 
 
 @unitsRouter.post("/<string:unitId>")
 @jwt_required()
 def waterUnit(unitId):
-    moistValue = measureSoil(unitId)
-    waterNow(unitId)
-    updateLog(**moistValue, watered=True, waterMethod="manual")
-    index = findById(unitId)
-    units = getUnits()
-    unit = units[index]
-    return unit
+    try:
+        moistValue = measureSoil(unitId)
+        waterNow(unitId)
+        updateLog(**moistValue, watered=True, waterMethod="manual")
+        index = findById(unitId)
+        units = getUnits()
+        unit = units[index]
+        return unit
+    except Exception:
+        return jsonify({"message": "Internal server error"}), 500
 
 
 @unitsRouter.delete("/logs/<string:unitId>")
 @jwt_required()
 def deleteLogs(unitId):
-    deleteLog(unitId)
-    unit = getById(unitId)
-    return unit
+    try:
+        deleteLog(unitId)
+        unit = getById(unitId)
+        return unit
+    except Exception:
+        return jsonify({"message": "Internal server error"}), 500

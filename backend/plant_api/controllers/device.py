@@ -1,8 +1,9 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from ..services.deviceSettings import getAll, changeSettings
 from ..schemas import DeviceSchema
 from ..timeProgram import setTimeProgram
+from ..deviceFunctions import setUnitObjects
 
 deviceRouter = Blueprint("deviceRouter", __name__)
 
@@ -14,7 +15,7 @@ def getAllDevice():
         response = getAll()
         return response
     except Exception as error:
-        return 503
+        return jsonify({"message": "Internal server error"}), 500
 
 
 @deviceRouter.put("")
@@ -25,6 +26,7 @@ def changeDeciveSettings():
         DeviceSchema().load(body)
         response = changeSettings(body)
         setTimeProgram()
-        return response
+        setUnitObjects()
+        return response, 200
     except Exception as error:
-        return 503
+        return jsonify({"message": "Internal server error"}), 500

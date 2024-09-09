@@ -1,6 +1,7 @@
 from flask import current_app
 import json
 from datetime import datetime
+from .deviceSettings import getNumberOfUnits
 
 path: str
 testing = False
@@ -14,11 +15,6 @@ def setUnitsDB(app):
         testing = current_app.testing
 
 
-# base_dir = os.path.dirname(os.path.abspath(__file__))
-# db = "../unitsDB.json"
-# path = os.path.join(base_dir, db)
-
-
 def getUnits(innerUse=True):
     file = open(path, "r")
     units = json.load(file)
@@ -26,7 +22,8 @@ def getUnits(innerUse=True):
     if innerUse:
         return units
     else:
-        for unit in units:
+        numberOfUnits = getNumberOfUnits()
+        for unit in units[:numberOfUnits]:
             unit.pop("sensor")
             unit.pop("valve")
             if not testing:
@@ -35,7 +32,7 @@ def getUnits(innerUse=True):
                         datetime.strptime(log["date"], "%d.%m.%Y %H:%M:%S"), "%d.%m.%Y %H:%M"
                     )
 
-        return units
+        return units[:numberOfUnits]
 
 
 def findById(id):
@@ -80,7 +77,7 @@ def modifyUnitToDB(unitToChange, index):
 
 
 def updateLog(id="", status="", moistValue=0, watered=False, waterMethod=""):
-    timeStamp = datetime.now().strftime(f"%d.%m.%Y %H:%M{':%S' if testing else ''}")
+    timeStamp = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
     units = getUnits()
     index = findById(id)
     unit = units[index]

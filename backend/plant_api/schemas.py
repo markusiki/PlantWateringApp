@@ -16,3 +16,4 @@ class UnitsSchema(Schema):
 class DeviceSchema(Schema):
     runTimeProgram = fields.Bool(required=True)
     moistMeasureInterval = fields.Int(required=True, validate=validate.Range(min=1, max=100))
+    numberOfUnits = fields.Int(required=True, validate=validate.Range(min=1, max=4))

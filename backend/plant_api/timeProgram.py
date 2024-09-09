@@ -1,7 +1,7 @@
 from flask import current_app
 from datetime import datetime
 from time import monotonic
-from .services.deviceSettings import getAll
+from .services.deviceSettings import getAll, getNumberOfUnits
 from .services.db import getUnits, updateMoistValuesToDB, updateLog
 from .deviceFunctions import updateMoistValues, waterNow
 import threading
@@ -73,7 +73,7 @@ def timeProgram():
                 updateMoistValuesToDB(moistValues)
             units = getUnits()
 
-            for unit in units:
+            for unit in units[: getNumberOfUnits()]:
                 unitLog = {
                     "id": unit["id"],
                     "status": unit["status"],
