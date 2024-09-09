@@ -41,6 +41,10 @@ def create_app(test_config=None):
     setUnitsDB(app)
     setDeviceDB(app)
 
+    from .deviceFunctions import setUnitObjects
+
+    setUnitObjects()
+
     if app.testing:
         from plant_api.deviceFunctions import setTestingMode
         from plant_api.timeProgram import (
