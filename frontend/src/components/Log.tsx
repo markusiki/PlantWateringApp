@@ -132,13 +132,7 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
                   </IonCol>
                   <IonCol>
                     <IonItem lines="none">
-                      <IonText>
-                        {log.watered ? (
-                          <p className="logItem">Yes</p>
-                        ) : (
-                          <p className="logItem">No</p>
-                        )}
-                      </IonText>
+                      <IonText>{log.watered ? <p className="logItem">Yes</p> : <p className="logItem">No</p>}</IonText>
                     </IonItem>
                   </IonCol>
                   <IonCol>

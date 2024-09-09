@@ -1,26 +1,12 @@
-import {
-  IonModal,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
-  IonButton,
-  IonContent,
-  IonList,
-  IonItem,
-  IonInput,
-  IonCheckbox,
-} from '@ionic/react'
+import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonInput, IonCheckbox, useIonAlert } from '@ionic/react'
 import { IDeviceSettingsProps, IDeviceSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 
-const DeviceSettings: React.FC<IDeviceSettingsProps> = ({
-  deviceSettings,
-  handleDeciveSettingsChange,
-}) => {
+const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handleDeciveSettingsChange }) => {
   const [settings, setSettings] = useState<IDeviceSettingsState>({
     runTimeProgram: false,
     moistMeasureInterval: 1,
+    numberOfUnits: 4,
   })
 
   useEffect(() => {
@@ -28,10 +14,35 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({
   }, [deviceSettings])
 
   const modal = useRef<HTMLIonModalElement>(null)
+  const [presentAlert] = useIonAlert()
+
+  const validateInputs = () => {
+    if (settings.moistMeasureInterval < 1 || settings.moistMeasureInterval > 30) {
+      presentAlert({
+        header: 'Invalid input',
+        message: 'Moist measure interval must be between 1 and 30!',
+        buttons: ['Dismiss'],
+      })
+      return false
+    }
+    if (settings.numberOfUnits < 1 || settings.numberOfUnits > 4) {
+      presentAlert({
+        header: 'Invalid input',
+        message: 'Number of units must be between 1 and 4!',
+        buttons: ['Dismiss'],
+      })
+      return false
+    } else {
+      return true
+    }
+  }
 
   const confirm = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
-    handleDeciveSettingsChange(event, settings)
-    modal.current?.dismiss()
+    const validInputs = validateInputs()
+    if (validInputs) {
+      handleDeciveSettingsChange(event, settings)
+      modal.current?.dismiss()
+    }
   }
 
   return (
@@ -55,9 +66,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({
                 justify="space-between"
                 checked={settings.runTimeProgram}
                 name="runTimeProgram"
-                onIonChange={(event) =>
-                  setSettings({ ...settings, runTimeProgram: event.detail.checked })
-                }
+                onIonChange={(event) => setSettings({ ...settings, runTimeProgram: event.detail.checked })}
               >
                 Enable time program
               </IonCheckbox>
@@ -76,6 +85,24 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({
                   setSettings({
                     ...settings,
                     moistMeasureInterval: parseInt((event.target as HTMLInputElement).value),
+                  })
+                }
+              />
+            </IonItem>
+            <IonItem>
+              <IonInput
+                label="Number of units"
+                labelPlacement="stacked"
+                value={settings.numberOfUnits}
+                name="numberOfUnits"
+                type="number"
+                inputMode="numeric"
+                max={4}
+                min={1}
+                onInput={(event) =>
+                  setSettings({
+                    ...settings,
+                    numberOfUnits: parseInt((event.target as HTMLInputElement).value),
                   })
                 }
               />

@@ -36,6 +36,11 @@ export interface IMenuProps extends IDeviceSettingsProps {
   handleLogout: (event: React.MouseEvent) => Promise<void>
 }
 
+export interface IHeaderProps {
+  isBackendConnected: boolean
+  refresh: () => Promise<void>
+}
+
 export interface ILog {
   date: string
   status: string
@@ -49,10 +54,17 @@ export interface ILogProps {
   deleteLogs: (event: React.MouseEvent, id: string) => Promise<void>
 }
 
+export interface IUnitProps {
+  unit: IUnitState
+  setUnits: React.Dispatch<React.SetStateAction<IUnitState[]>>
+  handleUnitChange: any
+  waterNow: (id: string) => Promise<void>
+  deleteLogs: (event: React.MouseEvent, id: string) => Promise<void>
+  waterNowDisabeled: boolean
+}
+
 export interface IUnitSettingsProps {
   unit: IUnitState
-  index: number
-  units: IUnitState[]
   handleUnitChange: any
 }
 
@@ -70,6 +82,7 @@ export interface IUnitSettingsState {
 export interface IDeviceSettingsState {
   runTimeProgram: boolean
   moistMeasureInterval: number
+  numberOfUnits: number
 }
 export interface IDeviceSettingsProps {
   deviceSettings: IDeviceSettingsState
