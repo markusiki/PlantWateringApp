@@ -66,7 +66,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 justify="space-between"
                 checked={settings.runTimeProgram}
                 name="runTimeProgram"
-                onIonChange={(event) => setSettings({ ...settings, runTimeProgram: event.detail.checked })}
+                onIonChange={(event: any) => setSettings({ ...settings, runTimeProgram: event.detail.checked })}
               >
                 Enable time program
               </IonCheckbox>

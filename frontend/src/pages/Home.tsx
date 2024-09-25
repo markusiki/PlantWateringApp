@@ -1,4 +1,12 @@
-import { IonApp, IonContent, IonPage, IonRefresher, IonRefresherContent, RefresherEventDetail, useIonToast } from '@ionic/react'
+import {
+  IonApp,
+  IonContent,
+  IonPage,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
+  useIonToast,
+} from '@ionic/react'
 import './Home.css'
 import { useEffect, useState } from 'react'
 import { IUnitState, IDeviceSettingsState, IUnitSettingsState } from '../interfaces'
@@ -23,6 +31,7 @@ const Home: React.FC = () => {
     moistMeasureInterval: 0,
     numberOfUnits: 4,
   })
+
   const [waterNowDisabeled, setWaterNowDisabled] = useState(false)
 
   const [toast] = useIonToast()
@@ -137,7 +146,6 @@ const Home: React.FC = () => {
   }
 
   const waterNow = async (id: string) => {
-    setWaterNowDisabled(true)
     try {
       const returnedUnit = await unitService.waterPlant(id)
       console.log('status: ', returnedUnit?.status)
@@ -147,8 +155,6 @@ const Home: React.FC = () => {
         deauthorize()
       }
       setIsBackendConnected(false)
-    } finally {
-      setWaterNowDisabled(false)
     }
   }
 
@@ -192,11 +198,23 @@ const Home: React.FC = () => {
   }
 
   if (!isLoggedIn) {
-    return <Login username={username} setUsername={setUsername} password={password} setPassword={setPassword} handleLogin={handleLogin}></Login>
+    return (
+      <Login
+        username={username}
+        setUsername={setUsername}
+        password={password}
+        setPassword={setPassword}
+        handleLogin={handleLogin}
+      ></Login>
+    )
   }
   return (
     <IonApp>
-      <Menu deviceSettings={deviceSettings} handleDeciveSettingsChange={handleDeciveSettingsChange} handleLogout={handleLogout} />
+      <Menu
+        deviceSettings={deviceSettings}
+        handleDeciveSettingsChange={handleDeciveSettingsChange}
+        handleLogout={handleLogout}
+      />
       <IonPage id="main-content">
         <Header isBackendConnected={isBackendConnected} refresh={refresh} />
         <IonContent>
@@ -204,7 +222,15 @@ const Home: React.FC = () => {
             <IonRefresherContent></IonRefresherContent>
           </IonRefresher>
           {units.map((unit) => (
-            <Unit unit={unit} setUnits={setUnits} handleUnitChange={handleUnitChange} waterNow={waterNow} deleteLogs={deleteLogs} waterNowDisabeled={waterNowDisabeled} />
+            <Unit
+              unit={unit}
+              setUnits={setUnits}
+              handleUnitChange={handleUnitChange}
+              waterNow={waterNow}
+              deleteLogs={deleteLogs}
+              waterNowDisabled={waterNowDisabeled}
+              setWaterNowDisabled={setWaterNowDisabled}
+            />
           ))}
         </IonContent>
       </IonPage>

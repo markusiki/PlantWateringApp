@@ -60,7 +60,8 @@ export interface IUnitProps {
   handleUnitChange: any
   waterNow: (id: string) => Promise<void>
   deleteLogs: (event: React.MouseEvent, id: string) => Promise<void>
-  waterNowDisabeled: boolean
+  waterNowDisabled: boolean
+  setWaterNowDisabled: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export interface IUnitSettingsProps {

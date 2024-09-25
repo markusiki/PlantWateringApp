@@ -1,4 +1,18 @@
-import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonInput, useIonAlert, IonCheckbox } from '@ionic/react'
+import {
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonButton,
+  IonContent,
+  IonList,
+  IonItem,
+  IonInput,
+  useIonAlert,
+  IonCheckbox,
+  IonItemGroup,
+} from '@ionic/react'
 import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 
@@ -28,7 +42,16 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
       maxWaterInterval: unit.maxWaterInterval,
       minWaterInterval: unit.minWaterInterval,
     })
-  }, [unit.enableAutoWatering, unit.enableMaxWaterInterval, unit.enableMinWaterInterval, unit.maxWaterInterval, unit.minWaterInterval, unit.moistLimit, unit.name, unit.waterTime])
+  }, [
+    unit.enableAutoWatering,
+    unit.enableMaxWaterInterval,
+    unit.enableMinWaterInterval,
+    unit.maxWaterInterval,
+    unit.minWaterInterval,
+    unit.moistLimit,
+    unit.name,
+    unit.waterTime,
+  ])
 
   const validateInputs = () => {
     if (settings.name.length > 100 || settings.name.length < 1) {
@@ -55,7 +78,12 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
       })
       return false
     }
-    if (settings.minWaterInterval < 1 || settings.minWaterInterval > 180 || settings.maxWaterInterval < 1 || settings.maxWaterInterval > 180) {
+    if (
+      settings.minWaterInterval < 1 ||
+      settings.minWaterInterval > 180 ||
+      settings.maxWaterInterval < 1 ||
+      settings.maxWaterInterval > 180
+    ) {
       presentAlert({
         header: 'Invalid input',
         message: 'Water Interval must be between 1 and 180!',
@@ -63,7 +91,11 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
       })
       return false
     }
-    if (settings.enableMaxWaterInterval && settings.enableMinWaterInterval && settings.minWaterInterval > settings.maxWaterInterval) {
+    if (
+      settings.enableMaxWaterInterval &&
+      settings.enableMinWaterInterval &&
+      settings.minWaterInterval > settings.maxWaterInterval
+    ) {
       presentAlert({
         header: 'Invalid input',
         message: 'Minimun water interval must be shorter than maximum watering interval!',
@@ -110,7 +142,16 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
         <IonContent className="ion-padding">
           <IonList>
             <IonItem>
-              <IonInput label="Plant name" value={settings.name} name="name" labelPlacement="stacked" type="text" minlength={2} maxlength={100} onInput={handleChange} />
+              <IonInput
+                label="Plant name"
+                value={settings.name}
+                name="name"
+                labelPlacement="stacked"
+                type="text"
+                minlength={2}
+                maxlength={100}
+                onInput={handleChange}
+              />
             </IonItem>
             <IonItem>
               <IonInput
@@ -139,54 +180,71 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
               />
             </IonItem>
             <IonItem>
-              <IonCheckbox justify="space-between" checked={settings.enableAutoWatering} name="enableAutoWatering" onIonChange={handleChange}>
+              <IonCheckbox
+                justify="space-between"
+                checked={settings.enableAutoWatering}
+                name="enableAutoWatering"
+                onIonChange={handleChange}
+              >
                 Enable automatic watering
               </IonCheckbox>
             </IonItem>
-            <li hidden={!settings.enableAutoWatering}>
-              <IonItem>
-                <IonCheckbox justify="space-between" checked={settings.enableMinWaterInterval} name="enableMinWaterInterval" onIonChange={handleChange}>
-                  Enable minimum watering interval
-                </IonCheckbox>
-              </IonItem>
-              <li hidden={!settings.enableMinWaterInterval}>
+            {settings.enableAutoWatering ? (
+              <IonItemGroup>
                 <IonItem>
-                  <IonInput
-                    label="Set minimum watering interval (days)"
-                    value={settings.minWaterInterval}
-                    name="minWaterInterval"
-                    labelPlacement="stacked"
-                    type="number"
-                    helperText="For how many days the plant will not be watered,
+                  <IonCheckbox
+                    justify="space-between"
+                    checked={settings.enableMinWaterInterval}
+                    name="enableMinWaterInterval"
+                    onIonChange={handleChange}
+                  >
+                    Enable minimum watering interval
+                  </IonCheckbox>
+                </IonItem>
+                {settings.enableMinWaterInterval ? (
+                  <IonItem hidden={!settings.enableMinWaterInterval}>
+                    <IonInput
+                      label="Set minimum watering interval (days)"
+                      value={settings.minWaterInterval}
+                      name="minWaterInterval"
+                      labelPlacement="stacked"
+                      type="number"
+                      helperText="For how many days the plant will not be watered,
                     even if the moisture level drops under the moisture level limit."
-                    min={1}
-                    max={180}
-                    onInput={handleChange}
-                  />
-                </IonItem>
-              </li>
-              <IonItem>
-                <IonCheckbox justify="space-between" checked={settings.enableMaxWaterInterval} name="enableMaxWaterInterval" onIonChange={handleChange}>
-                  Enable maximum watering interval
-                </IonCheckbox>
-              </IonItem>
-              <li hidden={!settings.enableMaxWaterInterval}>
+                      min={1}
+                      max={180}
+                      onInput={handleChange}
+                    />
+                  </IonItem>
+                ) : null}
                 <IonItem>
-                  <IonInput
-                    label="Set maximum watering interval (days)"
-                    value={settings.maxWaterInterval}
-                    name="maxWaterInterval"
-                    labelPlacement="stacked"
-                    onInput={handleChange}
-                    type="number"
-                    helperText="After how many days the plant will be watered,
-                    even if the moisture level has not dropped under the moisture level limit."
-                    min={1}
-                    max={180}
-                  />
+                  <IonCheckbox
+                    justify="space-between"
+                    checked={settings.enableMaxWaterInterval}
+                    name="enableMaxWaterInterval"
+                    onIonChange={handleChange}
+                  >
+                    Enable maximum watering interval
+                  </IonCheckbox>
                 </IonItem>
-              </li>
-            </li>
+                {!settings.enableMaxWaterInterval ? (
+                  <IonItem>
+                    <IonInput
+                      label="Set maximum watering interval (days)"
+                      value={settings.maxWaterInterval}
+                      name="maxWaterInterval"
+                      labelPlacement="stacked"
+                      onInput={handleChange}
+                      type="number"
+                      helperText="After how many days the plant will be watered,
+                    even if the moisture level has not dropped under the moisture level limit."
+                      min={1}
+                      max={180}
+                    />
+                  </IonItem>
+                ) : null}
+              </IonItemGroup>
+            ) : null}
           </IonList>
         </IonContent>
       </IonModal>
