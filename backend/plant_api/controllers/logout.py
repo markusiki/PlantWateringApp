@@ -7,6 +7,9 @@ logoutRouter = Blueprint("logoutRouter", __name__)
 
 @logoutRouter.post("")
 def logout():
-    response = jsonify({"message": "logout successful"})
-    unset_jwt_cookies(response)
-    return response
+    try:
+        response = jsonify({"message": "logout successful"})
+        unset_jwt_cookies(response)
+        return response
+    except Exception:
+        return jsonify({"message": "Internal server error"}), 500

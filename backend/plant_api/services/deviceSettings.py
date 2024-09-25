@@ -1,10 +1,6 @@
 from flask import current_app
 import json
 
-# base_dir = os.path.dirname(os.path.abspath(__file__))
-# db = "../deviceSettings.json"
-# path = os.path.join(base_dir, db)
-
 path = ""
 
 
@@ -31,6 +27,13 @@ def changeSettings(body):
     settings = getAll()
     settings["runTimeProgram"] = body["runTimeProgram"]
     settings["moistMeasureInterval"] = body["moistMeasureInterval"]
+    settings["numberOfUnits"] = body["numberOfUnits"]
     saveToDb(settings)
     changedSettings = getAll()
     return changedSettings
+
+
+def getNumberOfUnits():
+    deviceSettings = getAll()
+    numberOfUnits = deviceSettings["numberOfUnits"]
+    return numberOfUnits

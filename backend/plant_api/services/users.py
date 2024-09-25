@@ -1,10 +1,6 @@
 from flask import current_app
 import json
 
-# base_dir = os.path.dirname(os.path.abspath(__file__))
-# db = "../users.json"
-# path = os.path.join(base_dir, db)
-
 path = ""
 
 

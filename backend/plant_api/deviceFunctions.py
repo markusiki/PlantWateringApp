@@ -6,7 +6,9 @@ import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 from .services.db import getUnits, findById
+from .services.deviceSettings import getNumberOfUnits
 from statistics import pstdev
+import json
 
 # Initialize the I2C interface
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -51,6 +53,8 @@ class Sprinkler_unit:
 
 
 pump = Pump(17, 4)
+
+
 sprinkler_unit_objects = []
 units = getUnits()
 for unit in units:
@@ -65,11 +69,18 @@ for unit in units:
         )
     )
 
+sprinkler_units_in_use = sprinkler_unit_objects
+
+
+def setUnitObjects():
+    global sprinkler_units_in_use
+    sprinkler_units_in_use = sprinkler_unit_objects[: getNumberOfUnits()]
+
 
 def updateSprinklerUnitObject(id, index):
     units = getUnits()
     updatedUnit = units[index]
-    for unit in sprinkler_unit_objects:
+    for unit in sprinkler_units_in_use:
         if unit.id == id:
             unit.update(
                 updatedUnit["moistValue"],
@@ -81,14 +92,14 @@ def updateSprinklerUnitObject(id, index):
 
 def updateMoistValues():
     moistValues = []
-    for unit in sprinkler_unit_objects:
+    for unit in sprinkler_units_in_use:
         moistValues.append(measureSoil(unit.id))
     return moistValues
 
 
 def waterNow(id):
     index = findById(id)
-    unit = sprinkler_unit_objects[index]
+    unit = sprinkler_units_in_use[index]
     moistValue = measureSoil(id)
     water(unit.valve, unit.waterTime)
 
@@ -105,7 +116,7 @@ def calculateStandardDeviation(values):
 def measureSoil(id):
     values = []
     valueSum = 0
-    for unit in sprinkler_unit_objects:
+    for unit in sprinkler_units_in_use:
         if unit.id == id:
             for i in range(5):
                 value = unit.sensor.value
@@ -129,4 +140,4 @@ def water(valve, waterTime):
 
 
 def getObjects():
-    return sprinkler_unit_objects
+    return sprinkler_units_in_use
