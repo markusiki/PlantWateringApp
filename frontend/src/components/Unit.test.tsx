@@ -138,14 +138,16 @@ describe('Unit renders', () => {
     test('that can be canceled and watering will be canceled', async () => {
       await user.click(waterNowButton)
       await user.click(screen.getByText('CANCEL'))
-      expect(waterNowMock).not.toHaveBeenCalledOnce()
+      expect(waterNowMock).not.toHaveBeenCalled()
     })
   })
-  test('unit settings button which opens unit settings modal when clicked', async () => {
+  describe('unit settings button which opens unit settings modal when clicked', () => {
     const settingsButton = screen.getByTestId('settings-button')
-    await user.click(settingsButton)
-    console.log(prettyDOM(container, 20000))
-    const modal = screen.getByText('Settings')
-    expect(modal).toBeDefined()
+    test('and the modal is rendered', async () => {
+      await user.click(settingsButton)
+      //console.log(prettyDOM(container, 20000))
+      const modal = screen.getByText('Settings')
+      expect(modal).toBeInTheDocument()
+    })
   })
 })
