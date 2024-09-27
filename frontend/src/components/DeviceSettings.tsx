@@ -1,8 +1,21 @@
-import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonInput, IonCheckbox, useIonAlert } from '@ionic/react'
+import {
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonButton,
+  IonContent,
+  IonList,
+  IonItem,
+  IonInput,
+  IonCheckbox,
+  useIonAlert,
+} from '@ionic/react'
 import { IDeviceSettingsProps, IDeviceSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 
-const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handleDeciveSettingsChange }) => {
+const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handleDeviceSettingsChange }) => {
   const [settings, setSettings] = useState<IDeviceSettingsState>({
     runTimeProgram: false,
     moistMeasureInterval: 1,
@@ -39,8 +52,9 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
 
   const confirm = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
     const validInputs = validateInputs()
+
     if (validInputs) {
-      handleDeciveSettingsChange(event, settings)
+      handleDeviceSettingsChange(event, settings)
       modal.current?.dismiss()
     }
   }
@@ -73,6 +87,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
             </IonItem>
             <IonItem>
               <IonInput
+                data-testId="moistMeasureIntervalInput"
                 label="Soil moisture measure interval (days):"
                 labelPlacement="stacked"
                 value={settings.moistMeasureInterval}
@@ -91,6 +106,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
             </IonItem>
             <IonItem>
               <IonInput
+                data-testId="numberOfUnitsInput"
                 label="Number of units"
                 labelPlacement="stacked"
                 value={settings.numberOfUnits}
