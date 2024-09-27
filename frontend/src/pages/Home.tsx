@@ -158,7 +158,7 @@ const Home: React.FC = () => {
     }
   }
 
-  const handleDeciveSettingsChange = async (event: React.MouseEvent, settings: IDeviceSettingsState) => {
+  const handleDeviceSettingsChange = async (event: React.MouseEvent, settings: IDeviceSettingsState) => {
     event.preventDefault()
     try {
       const returnedDeviceSettings = await deviceService.updateSettings(settings)
@@ -212,7 +212,7 @@ const Home: React.FC = () => {
     <IonApp>
       <Menu
         deviceSettings={deviceSettings}
-        handleDeciveSettingsChange={handleDeciveSettingsChange}
+        handleDeviceSettingsChange={handleDeviceSettingsChange}
         handleLogout={handleLogout}
       />
       <IonPage id="main-content">

@@ -87,7 +87,7 @@ export interface IDeviceSettingsState {
 }
 export interface IDeviceSettingsProps {
   deviceSettings: IDeviceSettingsState
-  handleDeciveSettingsChange: any
+  handleDeviceSettingsChange: (event: React.MouseEvent, settings: IDeviceSettingsState) => Promise<void>
 }
 
 export interface IUnitToUpdate {
