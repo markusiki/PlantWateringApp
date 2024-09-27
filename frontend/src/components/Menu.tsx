@@ -11,14 +11,10 @@ import {
   IonMenuToggle,
 } from '@ionic/react'
 import { settingsOutline, logOutOutline, closeOutline } from 'ionicons/icons'
-import Settings from './DeviceSettings'
+import DeviceSettings from './DeviceSettings'
 import { IMenuProps } from '../interfaces'
 
-const Menu: React.FC<IMenuProps> = ({
-  deviceSettings,
-  handleDeciveSettingsChange,
-  handleLogout,
-}) => {
+const Menu: React.FC<IMenuProps> = ({ deviceSettings, handleDeviceSettingsChange, handleLogout }) => {
   return (
     <IonMenu contentId="main-content">
       <IonHeader>
@@ -38,10 +34,7 @@ const Menu: React.FC<IMenuProps> = ({
           Device Settings
           <IonIcon slot="end" icon={settingsOutline}></IonIcon>
         </IonButton>
-        <Settings
-          deviceSettings={deviceSettings}
-          handleDeciveSettingsChange={handleDeciveSettingsChange}
-        />
+        <DeviceSettings deviceSettings={deviceSettings} handleDeviceSettingsChange={handleDeviceSettingsChange} />
         <IonButton expand="block" color="light" onClick={handleLogout}>
           <IonText color="danger">Log Out</IonText>
           <IonIcon slot="end" icon={logOutOutline}></IonIcon>
