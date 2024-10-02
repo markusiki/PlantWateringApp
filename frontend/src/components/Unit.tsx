@@ -212,9 +212,6 @@ const Unit: React.FC<IUnitProps> = ({
                   {
                     text: 'CANCEL',
                     role: 'cancel',
-                    handler: () => {
-                      console.log('Watering canceled ' + unit.id)
-                    },
                   },
                   {
                     text: 'WATER NOW',
@@ -224,7 +221,6 @@ const Unit: React.FC<IUnitProps> = ({
                     },
                   },
                 ]}
-                onDidDismiss={({ detail }) => console.log(`Dismissed with role: ${detail.role}`)}
               ></IonAlert>
             </IonCol>
           </IonRow>
