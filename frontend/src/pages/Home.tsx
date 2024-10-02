@@ -82,8 +82,6 @@ const Home: React.FC = () => {
     try {
       const response = await userService.logout()
       toast({ message: response.data.message, duration: 1500, position: 'middle' })
-
-      console.log(response.data.message)
     } catch (error) {
     } finally {
       deauthorize()
@@ -100,7 +98,7 @@ const Home: React.FC = () => {
       }
     } catch (error: any) {
       setIsBackendConnected(false)
-      if (error.response.status === 401) {
+      if (error?.response?.status === 401) {
         deauthorize()
       }
     }
@@ -122,8 +120,8 @@ const Home: React.FC = () => {
   }
 
   const refresh = async () => {
-    fetchDeviceSettings()
-    fetchUnits()
+    await fetchDeviceSettings()
+    await fetchUnits()
   }
 
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
@@ -148,7 +146,6 @@ const Home: React.FC = () => {
   const waterNow = async (id: string) => {
     try {
       const returnedUnit = await unitService.waterPlant(id)
-      console.log('status: ', returnedUnit?.status)
       setUnits((prevUnits) => prevUnits.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
     } catch (error: any) {
       if (error.response.status === 401) {
@@ -167,6 +164,7 @@ const Home: React.FC = () => {
         if (units.length > returnedDeviceSettings.data.numberOfUnits) {
           setUnits(units.splice(0, returnedDeviceSettings.data.numberOfUnits))
         }
+
         if (units.length < returnedDeviceSettings.data.numberOfUnits) {
           fetchUnits()
         }
@@ -223,6 +221,7 @@ const Home: React.FC = () => {
           </IonRefresher>
           {units.map((unit) => (
             <Unit
+              key={unit.id}
               unit={unit}
               setUnits={setUnits}
               handleUnitChange={handleUnitChange}
