@@ -1,10 +1,9 @@
 import { IonApp, IonPage } from '@ionic/react'
-import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Menu from './Menu'
-import { IUnitState } from '../interfaces'
-import { prettyDOM } from '@testing-library/react'
+//import { prettyDOM } from '@testing-library/react'
 
 const testDeviceSettings = {
   runTimeProgram: false,
@@ -17,6 +16,7 @@ describe('Menu renders', () => {
   const handleLogoutMock = vi.fn()
   const handleDeviceSettingsChangeMock = vi.fn()
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { container, rerender } = render(
     <IonApp>
       <Menu
@@ -43,7 +43,6 @@ describe('Menu renders', () => {
         numberOfUnits: 2,
       }
 
-      console.log(prettyDOM(container, 20000))
       const runTimeProgramCheckbox = screen.getByText('Enable time program')
       const measureIntervalInput = await screen.findByLabelText('Soil moisture measure interval (days):')
       const numberOfUnitsInput = await screen.findByLabelText('Number of units')
@@ -82,7 +81,6 @@ describe('Menu renders', () => {
       const confirmButton = await screen.findByText('Confirm')
 
       await user.click(confirmButton)
-      //console.log(prettyDOM(container, 20000))
       expect(await screen.findByText('Invalid input')).toBeInTheDocument()
       expect(handleDeviceSettingsChangeMock).not.toHaveBeenCalled()
     })
