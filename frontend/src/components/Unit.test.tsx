@@ -1,11 +1,10 @@
 // @ts-nocheck
 import { IonApp } from '@ionic/react'
-import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Unit from './Unit'
 import { IUnitState } from '../interfaces'
-import { prettyDOM } from '@testing-library/react'
 
 const testUnit: IUnitState = {
   id: 'Unit1',
@@ -37,7 +36,7 @@ describe('Unit renders', () => {
   const deleteLogsMock = vi.fn()
   const setUnitsMock = vi.fn()
   const setWaterNowDisabled = vi.fn()
-  const { container, rerender } = render(
+  const { rerender } = render(
     <IonApp>
       <Unit
         unit={testUnit}
@@ -145,7 +144,6 @@ describe('Unit renders', () => {
     const settingsButton = screen.getByTestId('settings-button')
     test('and the modal is rendered', async () => {
       await user.click(settingsButton)
-      //console.log(prettyDOM(container, 20000))
       const modal = screen.getByText('Settings')
       expect(modal).toBeInTheDocument()
     })
