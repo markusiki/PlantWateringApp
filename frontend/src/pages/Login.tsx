@@ -1,6 +1,20 @@
 import React from 'react'
 import './Login.css'
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonInput, IonItem, IonList, IonPage, IonRow } from '@ionic/react'
+import {
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonInput,
+  IonItem,
+  IonList,
+  IonPage,
+  IonRow,
+} from '@ionic/react'
 import { ILoginProps } from '../interfaces'
 
 const Login: React.FC<ILoginProps> = ({ username, setUsername, password, setPassword, handleLogin }) => {
@@ -22,7 +36,7 @@ const Login: React.FC<ILoginProps> = ({ username, setUsername, password, setPass
             <IonCol sizeXs="11" sizeMd="8" sizeLg="7" sizeXl="6">
               <IonCard className="login">
                 <IonCardHeader>
-                  <IonCardTitle>Login</IonCardTitle>
+                  <IonCardTitle>Log in</IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent>
                   <IonList>
