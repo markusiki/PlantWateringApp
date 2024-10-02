@@ -69,7 +69,9 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
             </IonButtons>
             <IonTitle slot="secondary">Device Settings</IonTitle>
             <IonButtons slot="end">
-              <IonButton onClick={confirm}>Confirm</IonButton>
+              <IonButton data-testid="confirmDeviceSettingsButton" onClick={confirm}>
+                Confirm
+              </IonButton>
             </IonButtons>
           </IonToolbar>
         </IonHeader>
@@ -87,7 +89,6 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
             </IonItem>
             <IonItem>
               <IonInput
-                data-testId="moistMeasureIntervalInput"
                 label="Soil moisture measure interval (days):"
                 labelPlacement="stacked"
                 value={settings.moistMeasureInterval}
@@ -106,7 +107,6 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
             </IonItem>
             <IonItem>
               <IonInput
-                data-testId="numberOfUnitsInput"
                 label="Number of units"
                 labelPlacement="stacked"
                 value={settings.numberOfUnits}
