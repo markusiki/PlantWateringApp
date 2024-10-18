@@ -18,15 +18,24 @@ import '@ionic/react/css/text-transformation.css'
 import '@ionic/react/css/flex-utils.css'
 import '@ionic/react/css/display.css'
 
-import { setupIonicReact } from '@ionic/react'
+import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react'
+import { IonReactRouter } from '@ionic/react-router'
+import { Route, Redirect, Switch } from 'react-router-dom'
 
 setupIonicReact()
 
 function App() {
   return (
-    <>
-      <Home />
-    </>
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="*" render={() => <Redirect to="/" />} />
+          </Switch>
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
   )
 }
 

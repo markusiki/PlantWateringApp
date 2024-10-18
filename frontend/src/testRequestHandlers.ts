@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeAll } from 'vitest'
 import { setupServer } from 'msw/node'
-import { HttpResponse, http } from 'msw'
+import { http, HttpResponse, PathParams } from 'msw'
 import { IDeviceSettingsState, IUnitState } from './interfaces'
 
 const testUnits: IUnitState[] = 
@@ -95,25 +95,30 @@ const testUnits: IUnitState[] =
   }
 ]
 
-const testDeviceSettings: IDeviceSettingsState = {
+let testDeviceSettings: IDeviceSettingsState = {
   runTimeProgram: false,
   moistMeasureInterval: 1,
   numberOfUnits: 4
 } 
+
+ 
 
 export const restHandlers = [
   http.post('/api/login', () => {
     return HttpResponse.json()
   }),
   http.get('/api/units', async () => {
-    return HttpResponse.json(testUnits)
+    console.log(testUnits.slice(0, testDeviceSettings.numberOfUnits))
+    console.log('test device settings', testDeviceSettings)
+    return HttpResponse.json(testUnits.slice(0, testDeviceSettings.numberOfUnits))
   }),
   http.get('/api/device', async () => {
     return HttpResponse.json(testDeviceSettings)
   }),
-  http.put('/api/device', async ({ request }) => {
-    const requestBody = await request.json()
-    return HttpResponse.json(requestBody)
+  http.put<PathParams, IDeviceSettingsState, IDeviceSettingsState>('/api/device', async ({request}) => {
+    const updatedSettings = await request.json()
+    testDeviceSettings = updatedSettings
+    return HttpResponse.json(testDeviceSettings)
 
   })
 ]
