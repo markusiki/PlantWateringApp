@@ -4,7 +4,9 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
+  IonRouterOutlet,
   RefresherEventDetail,
+  useIonRouter,
   useIonToast,
 } from '@ionic/react'
 import './Home.css'
@@ -18,6 +20,7 @@ import Login from './Login'
 import Menu from '../components/Menu'
 import Unit from '../components/Unit'
 import Header from '../components/Header'
+import { Redirect, Route, Switch } from 'react-router-dom'
 
 const Home: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -35,6 +38,7 @@ const Home: React.FC = () => {
   const [waterNowDisabeled, setWaterNowDisabled] = useState(false)
 
   const [toast] = useIonToast()
+  const router = useIonRouter()
 
   useEffect(() => {
     const initialize = async () => {
@@ -67,6 +71,7 @@ const Home: React.FC = () => {
         setUsername('')
         setPassword('')
         setIsLoggedIn(true)
+        router.push('/')
       }
     } catch (error: any) {
       toast({
@@ -195,45 +200,80 @@ const Home: React.FC = () => {
     return null
   }
 
-  if (!isLoggedIn) {
+  /*   if (!isLoggedIn) {
     return (
-      <Login
-        username={username}
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}
-        handleLogin={handleLogin}
-      ></Login>
-    )
-  }
-  return (
-    <IonApp>
-      <Menu
-        deviceSettings={deviceSettings}
-        handleDeviceSettingsChange={handleDeviceSettingsChange}
-        handleLogout={handleLogout}
-      />
-      <IonPage id="main-content">
-        <Header isBackendConnected={isBackendConnected} refresh={refresh} />
-        <IonContent>
-          <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-            <IonRefresherContent></IonRefresherContent>
-          </IonRefresher>
-          {units.map((unit) => (
-            <Unit
-              key={unit.id}
-              unit={unit}
-              setUnits={setUnits}
-              handleUnitChange={handleUnitChange}
-              waterNow={waterNow}
-              deleteLogs={deleteLogs}
-              waterNowDisabled={waterNowDisabeled}
-              setWaterNowDisabled={setWaterNowDisabled}
-            />
-          ))}
-        </IonContent>
+      <IonPage>
+        <Switch>
+          <Route
+            path="/login"
+            render={() => (
+              <Login
+                username={username}
+                setUsername={setUsername}
+                password={password}
+                setPassword={setPassword}
+                handleLogin={handleLogin}
+              />
+            )}
+          ></Route>
+        </Switch>
       </IonPage>
-    </IonApp>
+    )
+  } */
+  return (
+    <IonPage>
+      <Switch>
+        {!isLoggedIn ? (
+          <Route
+            path="/login"
+            render={() => (
+              <Login
+                username={username}
+                setUsername={setUsername}
+                password={password}
+                setPassword={setPassword}
+                handleLogin={handleLogin}
+              />
+            )}
+          ></Route>
+        ) : (
+          <Route
+            exact
+            path="/"
+            render={() => (
+              <>
+                <Menu
+                  deviceSettings={deviceSettings}
+                  handleDeviceSettingsChange={handleDeviceSettingsChange}
+                  handleLogout={handleLogout}
+                />
+                <IonPage id="main-content">
+                  <Header isBackendConnected={isBackendConnected} refresh={refresh} />
+                  <IonContent>
+                    <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+                      <IonRefresherContent></IonRefresherContent>
+                    </IonRefresher>
+                    {units.map((unit) => (
+                      <Unit
+                        key={unit.id}
+                        unit={unit}
+                        setUnits={setUnits}
+                        handleUnitChange={handleUnitChange}
+                        waterNow={waterNow}
+                        deleteLogs={deleteLogs}
+                        waterNowDisabled={waterNowDisabeled}
+                        setWaterNowDisabled={setWaterNowDisabled}
+                      />
+                    ))}
+                  </IonContent>
+                </IonPage>
+              </>
+            )}
+          ></Route>
+        )}
+        <Route path="*" render={() => <Redirect to={isLoggedIn ? '/' : '/login'} />} />
+      </Switch>
+    </IonPage>
   )
 }
 
