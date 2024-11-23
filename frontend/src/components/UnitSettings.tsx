@@ -209,8 +209,8 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
                       name="minWaterInterval"
                       labelPlacement="stacked"
                       type="number"
-                      helperText="For how many days the plant will not be watered,
-                    even if the moisture level drops under the moisture level limit."
+                      helperText="After how many days the plant will be watered,
+                      even if the moisture level has not dropped under the moisture level limit."
                       min={1}
                       max={180}
                       onInput={handleChange}
@@ -236,8 +236,8 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
                       labelPlacement="stacked"
                       onInput={handleChange}
                       type="number"
-                      helperText="After how many days the plant will be watered,
-                    even if the moisture level has not dropped under the moisture level limit."
+                      helperText="For how many days the plant will not be watered,
+                    even if the moisture level drops under the moisture level limit."
                       min={1}
                       max={180}
                     />
