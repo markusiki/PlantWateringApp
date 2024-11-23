@@ -1,6 +1,6 @@
 import pytest
 from .conftest import path_to_unitsDB
-from .test_helpers.db import get_all_units
+from .test_helpers.db import get_all_units, convert_moist_value
 
 base_url = "/api/units"
 
@@ -36,7 +36,7 @@ def test_change_unit_settings(client, auth, app):
     modified_unit = {
         "id": "Unit2",
         "name": "Test_unit2",
-        "moistLimit": 10000,
+        "moistLimit": 50,
         "waterTime": 10,
         "enableAutoWatering": False,
         "enableMaxWaterInterval": False,
@@ -69,8 +69,7 @@ def test_change_unit_settings(client, auth, app):
 
     for unit in unit_objects:
         if unit.id == modified_unit["id"]:
-            assert unit.moistValue == returned_unit["moistValue"]
-            assert unit.moistLimit == modified_unit["moistLimit"]
+            assert unit.moistLimit == convert_moist_value(app, modified_unit["moistLimit"])
             assert unit.waterTime == modified_unit["waterTime"]
 
 

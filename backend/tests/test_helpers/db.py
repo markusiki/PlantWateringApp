@@ -1,6 +1,14 @@
 import json
 
 
+def convert_moist_value(app, value):
+    with app.app_context():
+        from plant_api.services.db import convertMoistValue
+
+        converted_value = convertMoistValue(value)
+        return converted_value
+
+
 def get_all_units(app):
     with app.app_context():
         from plant_api.services.db import getUnits
