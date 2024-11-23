@@ -62,10 +62,10 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
       })
       return false
     }
-    if (settings.moistLimit < 8000 || settings.moistLimit > 20000) {
+    if (settings.moistLimit < 0 || settings.moistLimit > 100) {
       presentAlert({
         header: 'Invalid input',
-        message: 'Moisture level limit must be between 8000 and 20000!',
+        message: 'Moisture level limit must be between 0 and 100!',
         buttons: ['Dismiss'],
       })
       return false
@@ -160,9 +160,9 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
                 name="moistLimit"
                 labelPlacement="stacked"
                 type="number"
-                helperText="Set moisture level limit value between 10000 (wet) and 18000 (dry)."
-                min={10000}
-                max={18000}
+                helperText="Set moisture level limit value between 0 (dry) and 100 (wet)."
+                min={0}
+                max={100}
                 onInput={handleChange}
               />
             </IonItem>
@@ -227,7 +227,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
                     Enable maximum watering interval
                   </IonCheckbox>
                 </IonItem>
-                {!settings.enableMaxWaterInterval ? (
+                {settings.enableMaxWaterInterval ? (
                   <IonItem>
                     <IonInput
                       label="Set maximum watering interval (days)"
