@@ -25,7 +25,8 @@ def getAll():
         response = getUnits(innerUse=False)
         return response
     except Exception as error:
-        return "Internal error", 500
+        print(error)
+        return jsonify({"message": "Internal server error"}), 500
 
 
 @unitsRouter.put("")
@@ -39,6 +40,7 @@ def changeUnit():
         updateSprinklerUnitObject(body["id"], index)
         return response
     except Exception as error:
+        print(error)
         return jsonify({"message": "Internal server error"}), 500
 
 
@@ -49,11 +51,10 @@ def waterUnit(unitId):
         moistValue = measureSoil(unitId)
         waterNow(unitId)
         updateLog(**moistValue, watered=True, waterMethod="manual")
-        index = findById(unitId)
-        units = getUnits()
-        unit = units[index]
+        unit = getById(unitId, innerUse=False)
         return unit
-    except Exception:
+    except Exception as error:
+        print(error)
         return jsonify({"message": "Internal server error"}), 500
 
 
@@ -62,7 +63,8 @@ def waterUnit(unitId):
 def deleteLogs(unitId):
     try:
         deleteLog(unitId)
-        unit = getById(unitId)
+        unit = getById(unitId, innerUse=False)
         return unit
-    except Exception:
+    except Exception as error:
+        print(error)
         return jsonify({"message": "Internal server error"}), 500

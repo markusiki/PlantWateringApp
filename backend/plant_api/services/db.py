@@ -6,6 +6,23 @@ from .deviceSettings import getNumberOfUnits
 path: str
 testing = False
 
+minMoistValue: int = 8000  # totally wet soil
+maxMoistValue: int = 18200  # totally dry soil
+
+
+# Converts moist value to scale 0-100 and back to maxMoistValue-minMoistValue (100=wet)
+def convertMoistValue(value):
+    if value > 100:
+        convertedValue = round(
+            100 - (value - minMoistValue) / (maxMoistValue - minMoistValue) * 100
+        )
+        return convertedValue
+    else:
+        convertedValue = round(
+            (100 - value) * (maxMoistValue - minMoistValue) / 100 + minMoistValue
+        )
+        return convertedValue
+
 
 def setUnitsDB(app):
     global path
@@ -26,6 +43,8 @@ def getUnits(innerUse=True):
         for unit in units[:numberOfUnits]:
             unit.pop("sensor")
             unit.pop("valve")
+            unit["moistValue"] = convertMoistValue(unit["moistValue"])
+            unit["moistLimit"] = convertMoistValue(unit["moistLimit"])
             if not testing:
                 for log in unit["logs"]:
                     log["date"] = datetime.strftime(
@@ -46,8 +65,8 @@ def findById(id):
         return index
 
 
-def getById(id):
-    units = getUnits()
+def getById(id, innerUse=True):
+    units = getUnits(innerUse)
     for unit in units:
         if unit["id"] == id:
             return unit
@@ -63,7 +82,7 @@ def modifyUnitToDB(unitToChange, index):
     units = getUnits()
     unit = units[index]
     unit["name"] = unitToChange["name"]
-    unit["moistLimit"] = int(unitToChange["moistLimit"])
+    unit["moistLimit"] = convertMoistValue(int(unitToChange["moistLimit"]))
     unit["waterTime"] = int(unitToChange["waterTime"])
     unit["enableAutoWatering"] = unitToChange["enableAutoWatering"]
     unit["enableMaxWaterInterval"] = unitToChange["enableMaxWaterInterval"]
@@ -102,27 +121,26 @@ def deleteLog(id):
 
 
 def updateMoistValuesToDB(moistValues):
-    minValue: int = 8000  # totally wet soil
-    maxValue: int = 18200  # totally dry soil
+
     units = getUnits()
     for unit in units:
         for moistValue in moistValues:
             if unit["id"] == moistValue["id"]:
-                if moistValue["moistValue"] > maxValue:
-                    if moistValue["moistValue"] > (maxValue + 1000):
+                if moistValue["moistValue"] > maxMoistValue:
+                    if moistValue["moistValue"] > (maxMoistValue + 1000):
                         unit["status"] = "ERROR"
                         unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
                     else:
                         unit["status"] = "OK" if moistValue["status"] == "OK" else "ERROR"
-                        unit["moistValue"] = maxValue
+                        unit["moistValue"] = maxMoistValue
 
-                elif moistValue["moistValue"] < minValue:
-                    if moistValue["moistValue"] < (minValue - 1000):
+                elif moistValue["moistValue"] < minMoistValue:
+                    if moistValue["moistValue"] < (minMoistValue - 1000):
                         unit["status"] = "ERROR"
                         unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
                     else:
                         unit["status"] = "OK" if moistValue["status"] == "OK" else "ERROR"
-                        unit["moistValue"] = minValue
+                        unit["moistValue"] = minMoistValue
                 else:
                     unit["status"] = "OK" if moistValue["status"] == "OK" else "ERROR"
                     unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
