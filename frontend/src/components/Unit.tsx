@@ -25,24 +25,8 @@ const Unit: React.FC<IUnitProps> = ({
   waterNowDisabled,
   setWaterNowDisabled,
 }) => {
-  const getAbsoluteValue = (moistValue: IUnitState['moistValue']) => {
-    const minValue = 8000
-    const maxValue = 20000
-    const absoluteValue = Math.round((1 - (moistValue - minValue) / (maxValue - minValue)) * 100) / 100
-
-    if (absoluteValue > 1) {
-      return 1.0
-    }
-    if (absoluteValue < 0) {
-      return 0
-    }
-    return absoluteValue
-  }
-
   const getRelativeValue = (unit: IUnitState) => {
-    const minValue = 10000
-    const maxValue = unit.moistLimit
-    const relativeValue = Math.round((1 - (unit.moistValue - minValue) / (maxValue - minValue)) * 100) / 100
+    const relativeValue = Math.round((unit.moistValue / unit.moistLimit) * 100) / 100
 
     if (relativeValue > 1) {
       return 1.0
@@ -163,13 +147,10 @@ const Unit: React.FC<IUnitProps> = ({
             <IonCol size="6">
               <div className="align-center">
                 <p data-testid="abs-moist-value" className="moist-percent">
-                  {(getAbsoluteValue(unit.moistValue) * 100).toFixed(0)}%
+                  {unit.moistValue}%
                 </p>
               </div>
-              <IonProgressBar
-                value={getAbsoluteValue(unit.moistValue)}
-                color={setColor(getAbsoluteValue(unit.moistValue))}
-              ></IonProgressBar>
+              <IonProgressBar value={unit.moistValue / 100} color={setColor(unit.moistValue / 100)}></IonProgressBar>
               <IonRow className="ion-justify-content-between">
                 <p>air</p>
                 <p>water</p>
