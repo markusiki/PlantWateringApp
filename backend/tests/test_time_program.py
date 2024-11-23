@@ -18,7 +18,7 @@ def run_around_tests(app, set_time_program):
     create_test_units_db(path_to_unitsDB)
     create_test_device_db(path_to_deviceDB)
     yield
-    # Ffter each test
+    # After each test
     device_settings = get_device_settings(app)
     device_settings["runTimeProgram"] = False
     save_to_device_db(app, device_settings)
@@ -32,12 +32,12 @@ def last_time_measured(unit):
     return abs((last_measure - first_measure).seconds)
 
 
-def test_auto_watering_max_watering_interval(app, set_time_program):
+def test_auto_watering_min_watering_interval(app, set_time_program):
     units = get_all_units(app)
     for unit in units:
         unit["enableAutoWatering"] = True
-        unit["enableMaxWaterInterval"] = True
-        unit["maxWaterInterval"] = 1
+        unit["enableMinWaterInterval"] = True
+        unit["minWaterInterval"] = 1
     save_to_units_db(app, units)
 
     device_settings = get_device_settings(app)
@@ -54,11 +54,11 @@ def test_auto_watering_max_watering_interval(app, set_time_program):
     units = get_all_units(app)
     for unit in units:
         assert len(unit["logs"]) == 1
-        assert unit["logs"][0]["waterMethod"] == "auto: max watering interval"
+        assert unit["logs"][0]["waterMethod"] == "auto: minimum watering interval"
     # Change unit settings to prevent watering
     for unit in units:
-        unit["enableMaxWaterInterval"] = False
-        unit["maxWaterInterval"] = 1
+        unit["enableMinWaterInterval"] = False
+        unit["minWaterInterval"] = 1
     save_to_units_db(app, units)
 
     sleep(5)
@@ -73,7 +73,7 @@ def test_auto_watering_moist_level(app, set_time_program):
     for unit in units:
         unit["enableAutoWatering"] = True
         unit["moistLimit"] = 14000
-        unit["enableMaxWaterInterval"] = False
+        unit["enableMinWaterInterval"] = False
     save_to_units_db(app, units)
 
     device_settings = get_device_settings(app)
@@ -89,8 +89,8 @@ def test_auto_watering_moist_level(app, set_time_program):
         assert len(unit["logs"]) == 1
         assert unit["logs"][0]["waterMethod"] == "auto: moist level"
     # Change unit settings to prevent watering of two units
-    units[0]["enableMinWaterInterval"] = True
-    units[0]["minWaterInterval"] = 100
+    units[0]["enableMaxWaterInterval"] = True
+    units[0]["maxWaterInterval"] = 100
     units[1]["status"] = "ERROR"
     save_to_units_db(app, units)
 
@@ -108,7 +108,7 @@ def test_auto_watering_does_not_water(app, set_time_program):
     units = get_all_units(app)
     for unit in units:
         unit["moistLimit"] = 19000
-        unit["enableMaxWaterInterval"] = False
+        unit["enableMinWaterInterval"] = False
     save_to_units_db(app, units)
 
     device_settings = get_device_settings(app)
@@ -165,7 +165,7 @@ def test_time_program_only_waters_number_of_units_defined_by_numberOfUnits(app, 
     for unit in units:
         unit["enableAutoWatering"] = True
         unit["moistLimit"] = 14000
-        unit["enableMaxWaterInterval"] = False
+        unit["enableMinWaterInterval"] = False
     save_to_units_db(app, units)
 
     device_settings = get_device_settings(app)
@@ -204,7 +204,7 @@ def test_moist_measure_interval_can_be_changed_while_timeprogram_is_running(app,
     units = get_all_units(app)
     for unit in units:
         unit["moistLimit"] = 19000
-        unit["enableMaxWaterInterval"] = False
+        unit["enableMinWaterInterval"] = False
     save_to_units_db(app, units)
 
     set_time_program()
@@ -238,7 +238,7 @@ def test_last_time_watered_function(app):
             "status": unit["status"],
             "moistValue": unit["moistValue"],
             "watered": True,
-            "waterMethod": "auto: max watering interval",
+            "waterMethod": "auto: minimum watering interval",
         }
         save_log_to_units_db(app, unitLog)
 

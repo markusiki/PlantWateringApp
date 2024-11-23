@@ -82,19 +82,19 @@ def timeProgram():
                 if unit["enableAutoWatering"]:
                     wateredLastTime = lastTimeWatered(unit)
                     if (
-                        unit["enableMaxWaterInterval"] == True
-                        and unit["maxWaterInterval"] <= wateredLastTime
+                        unit["enableMinWaterInterval"] == True
+                        and unit["minWaterInterval"] <= wateredLastTime
                     ):
                         waterNow(unit["id"])
                         updateLog(
-                            **unitLog, watered=True, waterMethod="auto: max watering interval"
+                            **unitLog, watered=True, waterMethod="auto: minimum watering interval"
                         )
 
                     elif unit["moistValue"] > unit["moistLimit"]:
 
                         if (
-                            unit["enableMinWaterInterval"] == True
-                            and unit["minWaterInterval"] >= wateredLastTime
+                            unit["enableMaxWaterInterval"] == True
+                            and unit["maxWaterInterval"] >= wateredLastTime
                         ):
                             updateLog(**unitLog)
                             continue
