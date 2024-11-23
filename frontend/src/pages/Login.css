@@ -11,3 +11,7 @@
 .logo {
   border-radius: 100%;
 }
+
+ion-card-title {
+  text-align: center
+};

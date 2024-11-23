@@ -1,8 +1,21 @@
-import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonInput, IonCheckbox, useIonAlert } from '@ionic/react'
+import {
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonButton,
+  IonContent,
+  IonList,
+  IonItem,
+  IonInput,
+  IonCheckbox,
+  useIonAlert,
+} from '@ionic/react'
 import { IDeviceSettingsProps, IDeviceSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 
-const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handleDeciveSettingsChange }) => {
+const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handleDeviceSettingsChange }) => {
   const [settings, setSettings] = useState<IDeviceSettingsState>({
     runTimeProgram: false,
     moistMeasureInterval: 1,
@@ -39,8 +52,9 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
 
   const confirm = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
     const validInputs = validateInputs()
+
     if (validInputs) {
-      handleDeciveSettingsChange(event, settings)
+      handleDeviceSettingsChange(event, settings)
       modal.current?.dismiss()
     }
   }
@@ -55,7 +69,9 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
             </IonButtons>
             <IonTitle slot="secondary">Device Settings</IonTitle>
             <IonButtons slot="end">
-              <IonButton onClick={confirm}>Confirm</IonButton>
+              <IonButton data-testid="confirmDeviceSettingsButton" onClick={confirm}>
+                Confirm
+              </IonButton>
             </IonButtons>
           </IonToolbar>
         </IonHeader>
@@ -66,7 +82,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 justify="space-between"
                 checked={settings.runTimeProgram}
                 name="runTimeProgram"
-                onIonChange={(event) => setSettings({ ...settings, runTimeProgram: event.detail.checked })}
+                onIonChange={(event: any) => setSettings({ ...settings, runTimeProgram: event.detail.checked })}
               >
                 Enable time program
               </IonCheckbox>

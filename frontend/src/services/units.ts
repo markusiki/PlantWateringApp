@@ -5,13 +5,8 @@ const baseUrl = `/api/units`
 
 
 const getAll = async () => {
-  try {
-    const response = await axios.get(baseUrl, serviceHelper.getConfig())
-    return response
-  }
-  catch (error) {
-    console.log(error)
-  }
+  const response = await axios.get(baseUrl, serviceHelper.getConfig())
+  return response
 }
 
 const changeSettings = async (unit: IUnitToUpdate) => {

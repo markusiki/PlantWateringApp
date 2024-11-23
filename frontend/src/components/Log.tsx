@@ -59,9 +59,9 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
                 <IonIcon icon={arrowBackOutline}></IonIcon>
               </IonButton>
             </IonButtons>
-            <IonTitle class="ion-text-center">{unit.name} logs</IonTitle>
+            <IonTitle className="ion-text-center">{unit.name} logs</IonTitle>
             <IonButtons slot="end">
-              <IonButton color={'danger'} onClick={handleDelete}>
+              <IonButton data-testid="deleteLogs-button" color={'danger'} onClick={handleDelete}>
                 <IonIcon icon={trashOutline}></IonIcon>
               </IonButton>
             </IonButtons>
@@ -108,7 +108,7 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
                 </IonCol>
               </IonRow>
               {unit.logs.map((log, index) => (
-                <IonRow key={index} class="ion-justify-content-start" className="log">
+                <IonRow key={index} className="ion-justify-content-start log">
                   <IonCol>
                     <IonItem lines="none">
                       <IonText>

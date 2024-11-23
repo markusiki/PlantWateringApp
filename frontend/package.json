@@ -2,26 +2,23 @@
   "name": "plant_watering_app_frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
-    "@ionic/react": "^7.7.2",
-    "@ionic/react-router": "^7.7.2",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.82",
-    "@types/react": "^18.2.55",
-    "@types/react-dom": "^18.2.19",
-    "axios": "^1.6.7",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "@ionic/react": "^8.3.1",
+    "@types/node": "^22.7.4",
+    "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.5",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^5.3.4",
+    "react-scripts": "^5.0.1",
+    "web-vitals": "^4.2.3"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "vitest",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -43,10 +40,33 @@
     ]
   },
   "overrides": {
-    "typescript": "^5.4.5"
+    "typescript": "^5.6.2"
   },
   "proxy": "http://192.168.1.107:5000",
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "@babel/preset-react": "^7.24.7",
+    "@ionic/react-router": "^8.3.2",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^22.7.4",
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-react": "^4.3.2",
+    "@vitest/browser": "^2.1.1",
+    "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
+    "jsdom": "^25.0.1",
+    "msw": "^2.4.11",
+    "playwright": "^1.47.2",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.5",
+    "react-dom": "^18.3.1",
+    "react-scripts": "^5.0.1",
+    "react-test-renderer": "^18.3.1",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.1",
+    "web-vitals": "^4.2.3"
   }
 }

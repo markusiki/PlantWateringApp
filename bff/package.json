@@ -9,7 +9,8 @@
     "build:ui": "rm -rf build && cd ../frontend && npm install && npm run build && cp -r ./build ../bff",
     "build:full": "npm install && npx tsc && npm run build:ui",
     "start": "node ./dist/index.js",
-    "deploy": "npm run build && npm start"
+    "deploy": "npm run build && npm start",
+    "start:ts": "tsx index.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,8 +18,13 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/morgan": "^1.9.9",
-    "http-proxy-middleware": "^3.0.0",
-    "typescript": "^5.4.5"
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "http-proxy-middleware": "^3.0.3",
+    "morgan": "^1.10.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
