@@ -10,8 +10,8 @@ const testUnit: IUnitState = {
   id: 'Unit1',
   name: 'Test1',
   status: 'OK',
-  moistValue: 12000,
-  moistLimit: 14000,
+  moistValue: 50,
+  moistLimit: 60,
   waterTime: 5,
   enableAutoWatering: false,
   enableMaxWaterInterval: false,
@@ -22,7 +22,7 @@ const testUnit: IUnitState = {
     {
       date: '27.08.2024 10:54',
       status: 'OK',
-      moistValue: 12000,
+      moistValue: 50,
       watered: true,
       waterMethod: 'auto: max watering interval',
     },
@@ -53,7 +53,7 @@ describe('Unit renders', () => {
     const unitId = screen.getByText(testUnit.id)
     const unitName = screen.getByText(testUnit.name)
     const unitStatus = screen.getByText(testUnit.status)
-    const unitMoistValue = screen.getByText(/12000/)
+    const unitMoistValue = screen.getByText(/50%/)
     const unitLastTimeWatered = screen.getByText(/27.08.2024 10:54/)
     expect(unitId).toBeDefined()
     expect(unitName).toBeDefined()
@@ -65,8 +65,8 @@ describe('Unit renders', () => {
   test('absolute and relative moist values correctly', () => {
     const absMoistValue = screen.getByTestId('abs-moist-value')
     const relMoistValue = screen.getByTestId('rel-moist-value')
-    expect(absMoistValue).toHaveTextContent('67%')
-    expect(relMoistValue).toHaveTextContent('50%')
+    expect(absMoistValue).toHaveTextContent('50%')
+    expect(relMoistValue).toHaveTextContent('83%')
   })
   describe('log button which opens log modal when clicked', () => {
     beforeAll(async () => {
@@ -78,7 +78,7 @@ describe('Unit renders', () => {
       expect(date).toBeInTheDocument()
       const status = screen.getByText('OK', { selector: 'p' })
       expect(status).toBeInTheDocument()
-      const moistValue = screen.getByText('12000')
+      const moistValue = screen.getByText('50')
       expect(moistValue).toBeInTheDocument()
 
       const watered = screen.getByText('Yes')
