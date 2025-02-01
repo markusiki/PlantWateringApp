@@ -107,6 +107,12 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
     }
   }
 
+  const setMoistLevelLimit = () => {
+    
+
+  }
+
+
   const confirm = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
     const validInputs = validateInputs()
     if (validInputs) {
@@ -164,8 +170,17 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
                 min={0}
                 max={100}
                 onInput={handleChange}
-              />
+               
+                >
+                <IonButton fill='clear' slot='end' onClick={() => setSettings({ ...settings, moistLimit: unit.moistValue})}>
+                Set current moisture level
+              </IonButton>
+
+                </IonInput>
+             
+
             </IonItem>
+
             <IonItem>
               <IonInput
                 label="Watering time"
