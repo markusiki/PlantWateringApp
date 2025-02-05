@@ -1,8 +1,15 @@
 # Plant Watering App
 
-This project is for controlling and monitoring an automatic plant watering process, run by Raspberry Pi.
+This project is for controlling and monitoring an automatic plant watering process, run by Raspberry Pi. It aims to help users maintain optimal soil moisture levels for their plants by automating the watering process. The system uses soil moisture sensors to monitor the moisture levels and a water pump and solenoid valves to deliver water to the plants as needed.
 
-This project consists of a React/TypeScript frontend and a Python/Flask backend.
+The project consists of a React/TypeScript frontend and a Python/Flask backend. The frontend provides a user-friendly interface for monitoring and controlling the watering system, while the backend handles the logic for reading sensor data, controlling the water pump and solenoid valves, and managing user authentication.
+
+The system supports different watering methods:
+- **Manual Watering**: Users can manually trigger watering for each plant.
+- **Automatic Watering by Moisture Level**: The system automatically waters the plants when the soil moisture level drops below a specified limit.
+- **Automatic Watering by Interval**: The system can be configured to water the plants at regular intervals, regardless of the soil moisture level.
+
+The system supports up to 4 solenoid valves, but the water flow can be divided to various plants, allowing for flexible watering configurations.
 
 ## Table of Contents
 
