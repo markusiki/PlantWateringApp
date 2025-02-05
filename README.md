@@ -104,4 +104,5 @@ To set up the Plant Watering hardware, you will need the following hardware comp
 3. Use the navigation menu to access different functionalities like watering plants, checking logs, and updating settings.
 
 Home page view:
-![image](https://github.com/markusiki/PlantWateringApp/assets/110092345/c86a7ca4-dcef-4b7b-8042-5cf24921d38d)
+![image](https://github.com/user-attachments/assets/8c6807a9-4efe-4c08-a5e3-c6095f0aa616)
+
