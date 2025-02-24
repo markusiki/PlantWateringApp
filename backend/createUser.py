@@ -19,13 +19,22 @@ while True:
                 print("Username already exists.")
                 break
         else:
-            password = getpass("Enter password: ")
+            while True:
+                password = getpass("Enter password: ")
+                password_confirm = getpass("Enter password again: ")
+                if password != password_confirm:
+                    print("Passwords do not match. Try again.")
+                else:
+                    break
             hash = generate_password_hash(password, 10).decode("utf-8")
             user = {"username": username, "passwordHash": hash}
             users.append(user)
             file.seek(0)
             json.dump(users, file, indent=3)
-            file.close()
+            file.close()  
+            backup = open(f"{db[:-4]}back.json", "w")
+            json.dump(users, backup, indent=3)
+            backup.close()
             break
 
     except FileNotFoundError:
