@@ -15,6 +15,7 @@ describe('Menu renders', () => {
   const user = userEvent.setup()
   const handleLogoutMock = vi.fn()
   const handleDeviceSettingsChangeMock = vi.fn()
+  const handleShutdownMock = vi.fn()
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { container, rerender } = render(
@@ -23,6 +24,7 @@ describe('Menu renders', () => {
         deviceSettings={testDeviceSettings}
         handleLogout={handleLogoutMock}
         handleDeviceSettingsChange={handleDeviceSettingsChangeMock}
+        handleShutdown={handleShutdownMock}
       />
       <IonPage id="main-content" />
     </IonApp>

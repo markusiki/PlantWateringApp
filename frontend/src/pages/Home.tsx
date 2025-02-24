@@ -93,6 +93,17 @@ const Home: React.FC = () => {
     }
   }
 
+  const handleShutdown = async () => {
+
+    try {
+      const response = await deviceService.shutdown()
+    }
+    catch (error: any) {
+      console.log(error)
+    }
+  }
+      
+
   const fetchDeviceSettings = async () => {
     try {
       const deviceResponse = await deviceService.getAll()
@@ -246,6 +257,7 @@ const Home: React.FC = () => {
                   deviceSettings={deviceSettings}
                   handleDeviceSettingsChange={handleDeviceSettingsChange}
                   handleLogout={handleLogout}
+                  handleShutdown={handleShutdown}
                 />
                 <IonPage id="main-content">
                   <Header isBackendConnected={isBackendConnected} refresh={refresh} />

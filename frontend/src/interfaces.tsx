@@ -34,6 +34,7 @@ export interface ILoginCredentials {
 
 export interface IMenuProps extends IDeviceSettingsProps {
   handleLogout: (event: React.MouseEvent) => Promise<void>
+  handleShutdown: () => Promise<void>
 }
 
 export interface IHeaderProps {
