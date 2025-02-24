@@ -1,5 +1,5 @@
 from flask import current_app
-import json
+from .dbHelper import openDB, dumpDB
 
 path = ""
 
@@ -9,19 +9,12 @@ def setDeviceDB(app):
     with app.app_context():
         path = current_app.config["DEVICE_DB"]
 
-
 def getAll():
-    file = open(path)
-    settings = json.load(file)
-    file.close()
+    settings = openDB(path)
     return settings
 
-
 def saveToDb(settings):
-    file = open(path, "w")
-    json.dump(settings, file)
-    file.close()
-
+    dumpDB(path, settings)
 
 def changeSettings(body):
     settings = getAll()
@@ -31,7 +24,6 @@ def changeSettings(body):
     saveToDb(settings)
     changedSettings = getAll()
     return changedSettings
-
 
 def getNumberOfUnits():
     deviceSettings = getAll()

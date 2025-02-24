@@ -1,5 +1,5 @@
 from flask import current_app
-import json
+from .dbHelper import openDB
 
 path = ""
 
@@ -11,9 +11,7 @@ def setUsersDB(app):
 
 
 def findUser(username):
-    file = open(path)
-    users = json.load(file)
-    file.close()
+    users = openDB(path)
     for user in users:
         if user["username"] == username:
             return user
