@@ -3,7 +3,6 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Menu from './Menu'
-//import { prettyDOM } from '@testing-library/react'
 
 const testDeviceSettings = {
   runTimeProgram: false,
@@ -17,7 +16,6 @@ describe('Menu renders', () => {
   const handleDeviceSettingsChangeMock = vi.fn()
   const handleShutdownMock = vi.fn()
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { container, rerender } = render(
     <IonApp>
       <Menu
@@ -85,6 +83,23 @@ describe('Menu renders', () => {
       await user.click(confirmButton)
       expect(await screen.findByText('Invalid input')).toBeInTheDocument()
       expect(handleDeviceSettingsChangeMock).not.toHaveBeenCalled()
+    })
+  })
+  describe('a power button, which opens an alert box when clicked', () => {
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    const powerButton = screen.getByText('Power')
+    test('that can be confirmed', async () => {
+      const confirmButton = screen.getByText('SHUTDOWN DEVICE')
+      await user.click(confirmButton)
+      expect(handleShutdownMock).toHaveBeenCalledOnce()
+    })
+    test('that can be canceled', async () => {
+      const cancelButton = screen.getByText('CANCEL')
+      await user.click(cancelButton)
+      expect(handleShutdownMock).not.toHaveBeenCalled()
     })
   })
 })

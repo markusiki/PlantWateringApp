@@ -36,14 +36,14 @@ const Menu: React.FC<IMenuProps> = ({ deviceSettings, handleDeviceSettingsChange
           <IonIcon slot="end" icon={settingsOutline}></IonIcon>
         </IonButton>
         <DeviceSettings deviceSettings={deviceSettings} handleDeviceSettingsChange={handleDeviceSettingsChange} />
-        <IonButton className="ion-margin-bottom" expand="block" color="secondary" id='shutdown'>
+        <IonButton className="ion-margin-bottom" expand="block" color="secondary" id="shutdown">
           Power
           <IonIcon slot="end" icon={powerOutline}></IonIcon>
         </IonButton>
         <IonAlert
-          trigger='shutdown'
-          header='Confirm device shutdown'
-          message='Are you sure you want to shutdown the device? It cannot be turned back on remotely.'
+          trigger="shutdown"
+          header="Confirm device shutdown"
+          message="Are you sure you want to shutdown the device? It cannot be turned back on remotely."
           buttons={[
             {
               text: 'CANCEL',
