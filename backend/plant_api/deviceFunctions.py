@@ -5,7 +5,7 @@ import board
 import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
-from .services.db import getUnits, findById
+from .services.unitsDB import getUnits, findById
 from .services.deviceSettings import getNumberOfUnits
 from statistics import pstdev
 import json

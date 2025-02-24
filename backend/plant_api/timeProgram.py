@@ -2,7 +2,7 @@ from flask import current_app
 from datetime import datetime
 from time import monotonic
 from .services.deviceSettings import getAll, getNumberOfUnits
-from .services.db import getUnits, updateMoistValuesToDB, updateLog
+from .services.unitsDB import getUnits, updateMoistValuesToDB, updateLog
 from .deviceFunctions import updateMoistValues, waterNow
 import threading
 

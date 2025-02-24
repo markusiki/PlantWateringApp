@@ -3,7 +3,7 @@ from flask import Flask
 import secrets
 import os
 from .services.users import setUsersDB
-from .services.db import setUnitsDB
+from .services.unitsDB import setUnitsDB
 from .services.deviceSettings import setDeviceDB
 
 

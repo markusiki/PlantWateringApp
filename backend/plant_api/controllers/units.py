@@ -1,6 +1,6 @@
 from flask import jsonify, request, Blueprint
 from flask_jwt_extended import jwt_required
-from ..services.db import (
+from ..services.unitsDB import (
     updateMoistValuesToDB,
     getUnits,
     findById,
@@ -25,6 +25,7 @@ def getAll():
         response = getUnits(innerUse=False)
         return response
     except Exception as error:
+        print(error, )
         return jsonify({"message": "Internal server error"}), 500
 
 
