@@ -25,7 +25,6 @@ def getAll():
         response = getUnits(innerUse=False)
         return response
     except Exception as error:
-        print(error)
         return jsonify({"message": "Internal server error"}), 500
 
 
@@ -40,7 +39,6 @@ def changeUnit():
         updateSprinklerUnitObject(body["id"], index)
         return response
     except Exception as error:
-        print(error)
         return jsonify({"message": "Internal server error"}), 500
 
 
@@ -54,7 +52,6 @@ def waterUnit(unitId):
         unit = getById(unitId, innerUse=False)
         return unit
     except Exception as error:
-        print(error)
         return jsonify({"message": "Internal server error"}), 500
 
 
@@ -66,5 +63,4 @@ def deleteLogs(unitId):
         unit = getById(unitId, innerUse=False)
         return unit
     except Exception as error:
-        print(error)
         return jsonify({"message": "Internal server error"}), 500
