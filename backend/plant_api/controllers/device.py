@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
+import os
+import sys
 from ..services.deviceSettings import getAll, changeSettings
 from ..schemas import DeviceSchema
 from ..timeProgram import setTimeProgram
@@ -7,7 +9,17 @@ from ..deviceFunctions import setUnitObjects
 
 deviceRouter = Blueprint("deviceRouter", __name__)
 
-
+@deviceRouter.post("/shutdown")
+@jwt_required()
+def shutdown():
+    try:
+        os.system("sudo shutdown -h now &")
+        return jsonify({"message": "System shutting down"})
+    
+    except Exception as error:
+        return jsonify({"message": "Internal server error"}), 500
+    
+        
 @deviceRouter.get("")
 @jwt_required()
 def getAllDevice():
