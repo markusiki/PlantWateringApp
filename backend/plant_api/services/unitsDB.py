@@ -1,5 +1,5 @@
 from flask import current_app
-import json
+from .dbHelper import openDB, dumpDB
 from datetime import datetime
 from .deviceSettings import getNumberOfUnits
 
@@ -33,9 +33,7 @@ def setUnitsDB(app):
 
 
 def getUnits(innerUse=True):
-    file = open(path, "r")
-    units = json.load(file)
-    file.close()
+    units = openDB(path)
     if innerUse:
         return units
     else:
@@ -73,9 +71,7 @@ def getById(id, innerUse=True):
 
 
 def saveToDb(units):
-    file = open(path, "w")
-    json.dump(units, file)
-    file.close()
+    dumpDB(path, units)
 
 
 def modifyUnitToDB(unitToChange, index):
@@ -121,7 +117,6 @@ def deleteLog(id):
 
 
 def updateMoistValuesToDB(moistValues):
-
     units = getUnits()
     for unit in units:
         for moistValue in moistValues:
