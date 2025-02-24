@@ -1,21 +1,16 @@
 from datetime import timedelta
 from flask import Flask
-from dotenv import load_dotenv
+import secrets
 import os
 from .services.users import setUsersDB
 from .services.db import setUnitsDB
 from .services.deviceSettings import setDeviceDB
 
 
-load_dotenv()
-
-
-
-
 def create_app(test_config=None):
 
     app = Flask(__name__, instance_relative_config=True)
-    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+    app.config["JWT_SECRET_KEY"] = secrets.token_hex()
     app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
     app.config["JWT_COOKIE_CSRF_PROTECT"] = True
     app.config["JWT_CSRF_METHODS"] = ["POST", "PUT", "PATCH", "DELETE", "GET"]
