@@ -2,10 +2,11 @@
 # If database does not exist, it will be creted and initialised
 
 from flask_bcrypt import generate_password_hash
+import os
 import json
 from getpass import getpass
 
-db = "./datadases/users.json"
+db = os.path.join(os.path.dirname(__file__), "plant_api/databases/users.json")
 
 
 while True:
