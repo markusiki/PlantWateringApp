@@ -4,6 +4,7 @@ import config from '../utils/config'
 import { authToken } from '../app'
 import { IUser } from '../interfaces'
 import axios from 'axios'
+import { HydratedDocument } from 'mongoose'
 
 const deviceRegistrationRouter = express.Router()
 
@@ -35,17 +36,14 @@ deviceRegistrationRouter.post('/', async (req, res) => {
   const response = await axios.put(`${config.IOTSERVICE_URI}/devices/${serial}/`, requestBody, auth)
 
   const data = await response.data
-  console.log(data)
 
-  const user = new User<IUser>({
+  const user: HydratedDocument<IUser> = new User({
     username: username,
     pwhash: pwhash,
-    devices: [
-      {
-        serial: serial,
-        wormhole_slug: data.wormhole_slug,
-      },
-    ],
+    devices: {
+      serial: serial,
+      wormhole_slug: data.wormhole_slug,
+    },
   })
 
   await user.save()

@@ -1,12 +1,11 @@
-import express from 'express'
-import { createProxyMiddleware } from 'http-proxy-middleware'
 import mongoose from 'mongoose'
-import morgan from 'morgan'
 import config from './utils/config'
+import express from 'express'
+import { createProxyMiddleware, Options } from 'http-proxy-middleware'
+import morgan from 'morgan'
 import deviceRegistrationRouter from './controllers/deviceRegistartionRouter'
-
-const app = express()
-app.use(express.json())
+import loginRouter from './controllers/login'
+import { tokenExtractor, userExtractor } from './utils/middleware'
 
 mongoose
   .connect(config.MONGODB_URI!)
@@ -30,28 +29,43 @@ fetch(`${config.IOTSERVICE_URI}/auth/`, {
   .then((text) => {
     const data = JSON.parse(text)
     authToken = data.token
-    console.log(authToken)
+    console.log('token fetched')
   })
   .catch((error) => {
     console.error('error connection to IOTSERVICE', error)
   })
 
-app.use(express.static('build'))
-app.use(morgan('combined'))
-
-// create the proxy
-/** @type {import('http-proxy-middleware/dist/types').RequestHandler<express.Request, express.Response>} */
-/* const proxy = createProxyMiddleware({
-  target: process.env.API_SERVER_URI,
+const proxyOptions: Options = {
   changeOrigin: true,
   secure: false,
-  pathFilter: '/api',
-})
+  router: (req: any) => {
+    const target = config.getTargetURI(req.user?.wormhole_slug!)
+    return target
+  },
+  on: {
+    proxyReq: (proxyReq, req: any, res) => {
+      if (req.body) {
+        const bodyData = JSON.stringify(req.body)
+        proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
+        proxyReq.write(bodyData)
+      }
+    },
+    proxyRes: (proxyRes, req: any, res: any) => {
+      const proxyCookies = proxyRes.headers['set-cookie'] || []
+      proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
+    },
+  },
+}
 
-app.use('/', proxy) */
+const proxy = createProxyMiddleware(proxyOptions)
+
+const app = express()
+app.use(express.json())
+app.use(express.static('build'))
+app.use(morgan('combined'))
+app.use(tokenExtractor)
 app.use('/api/register', deviceRegistrationRouter)
-app.get('/*', async (req, res) => {
-  res.redirect('/')
-})
+app.use('/api/login', loginRouter)
+app.use('/', userExtractor, proxy)
 
 export default app
