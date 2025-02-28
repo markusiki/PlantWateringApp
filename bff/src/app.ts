@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import config from './utils/config'
 import express from 'express'
+import iotService from './utils/iotService'
 import { createProxyMiddleware, Options } from 'http-proxy-middleware'
 import morgan from 'morgan'
 import deviceRegistrationRouter from './controllers/deviceRegistartionRouter'
@@ -16,23 +17,13 @@ mongoose
     console.error('error connection to MongoDB', error.message)
   })
 
-export let authToken: string
-
-fetch(`${config.IOTSERVICE_URI}/auth/`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(config.IOTSERVICE_CREDENTIALS),
-})
-  .then((response) => response.text())
-  .then((text) => {
-    const data = JSON.parse(text)
-    authToken = data.token
-    console.log('token fetched')
+iotService
+  .connect()
+  .then(() => {
+    console.log('connected to IOT Service')
   })
   .catch((error) => {
-    console.error('error connection to IOTSERVICE', error)
+    console.error('error connection to IOT Service', error.message)
   })
 
 const proxyOptions: Options = {

@@ -1,7 +1,7 @@
 import express from 'express'
 import User from '../models/user'
 import config from '../utils/config'
-import { authToken } from '../app'
+import iotService from '../utils/iotService'
 import { IUser } from '../interfaces'
 import axios from 'axios'
 import { HydratedDocument } from 'mongoose'
@@ -29,7 +29,7 @@ deviceRegistrationRouter.post('/', async (req, res) => {
 
   const auth = {
     headers: {
-      Authorization: `Token ${authToken}`,
+      Authorization: `Token ${iotService.authToken}`,
     },
   }
 
