@@ -48,8 +48,8 @@ def changeUnit():
 def waterUnit(unitId):
     try:
         moistValue = measureSoil(unitId)
-        waterNow(unitId)
-        updateLog(**moistValue, watered=True, waterMethod="manual")
+        status = waterNow(unitId)
+        updateLog(**moistValue, watered=status["isWatered"], waterMethod="manual", message=status["message"])
         unit = getById(unitId, innerUse=False)
         return unit
     except Exception as error:

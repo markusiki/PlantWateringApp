@@ -5,7 +5,7 @@ def createFile(path):
     if path.endswith('unitsDB.json'):
         dumpDB(path, units.units_model)
     elif path.endswith('deviceSettings.json'):
-        json.dump(path, device.device_model)
+        dumpDB(path, device.device_model)
     file = open(path, "r")
     content = json.load(file)
     file.close()

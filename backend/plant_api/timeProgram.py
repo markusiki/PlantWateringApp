@@ -1,7 +1,7 @@
 from flask import current_app
 from datetime import datetime
 from time import monotonic
-from .services.deviceSettings import getAll, getNumberOfUnits
+from .services.deviceSettings import getAll, getData
 from .services.unitsDB import getUnits, updateMoistValuesToDB, updateLog
 from .deviceFunctions import updateMoistValues, waterNow
 import threading
@@ -73,7 +73,7 @@ def timeProgram():
                 updateMoistValuesToDB(moistValues)
             units = getUnits()
 
-            for unit in units[: getNumberOfUnits()]:
+            for unit in units[: getData("numberOfUnits")]:
                 unitLog = {
                     "id": unit["id"],
                     "status": unit["status"],
@@ -85,9 +85,13 @@ def timeProgram():
                         unit["enableMinWaterInterval"] == True
                         and unit["minWaterInterval"] <= wateredLastTime
                     ):
-                        waterNow(unit["id"])
+                        status = waterNow(unit["id"])
+                        message = "minimum watering interval" if not status["message"] else status["message"]
                         updateLog(
-                            **unitLog, watered=True, waterMethod="auto: minimum watering interval"
+                            **unitLog,
+                            watered=status["isWatered"],
+                            waterMethod="auto",
+                            message=message
                         )
 
                     elif unit["moistValue"] > unit["moistLimit"]:
@@ -99,8 +103,14 @@ def timeProgram():
                             updateLog(**unitLog)
                             continue
                         if unit["status"] != "ERROR":
-                            waterNow(unit["id"])
-                            updateLog(**unitLog, watered=True, waterMethod="auto: moist level")
+                            status = waterNow(unit["id"])
+                            message = "moist level" if not status["message"] else status["message"]
+                            updateLog(
+                                **unitLog,
+                                watered=True,
+                                waterMethod="auto",
+                                message=message                                  
+                            )
                         else:
                             updateLog(**unitLog)
 

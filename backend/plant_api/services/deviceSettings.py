@@ -21,11 +21,19 @@ def changeSettings(body):
     settings["runTimeProgram"] = body["runTimeProgram"]
     settings["moistMeasureInterval"] = body["moistMeasureInterval"]
     settings["numberOfUnits"] = body["numberOfUnits"]
+    if body["waterAmount"]:
+        settings["waterAmount"] = body["waterAmount"]
     saveToDb(settings)
     changedSettings = getAll()
     return changedSettings
 
-def getNumberOfUnits():
+def getData(data):
     deviceSettings = getAll()
-    numberOfUnits = deviceSettings["numberOfUnits"]
-    return numberOfUnits
+    data = deviceSettings[data]
+    return data
+
+def updateWaterAmount(wateringAmount: float):
+    settings = getAll()
+    settings["waterAmount"] = round(settings["waterAmount"] - wateringAmount, 2)
+    saveToDb(settings)
+
