@@ -20,9 +20,10 @@ def test_get_all_device(app, client, auth):
 
 
 def test_change_device_settings(client, auth):
-    changed_device = {"runTimeProgram": False, "moistMeasureInterval": 1, "numberOfUnits": 2}
+    changed_device = {"runTimeProgram": False, "moistMeasureInterval": 1, "numberOfUnits": 2, "waterAmount": 50}
     response = client.put(base_url, json=changed_device, headers=auth.get_headers())
     returned_settings = response.get_json()
     assert returned_settings["runTimeProgram"] == changed_device["runTimeProgram"]
     assert returned_settings["moistMeasureInterval"] == changed_device["moistMeasureInterval"]
     assert returned_settings["numberOfUnits"] == changed_device["numberOfUnits"]
+    assert returned_settings["waterAmount"] == changed_device["waterAmount"]

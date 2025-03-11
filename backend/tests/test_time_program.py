@@ -54,7 +54,8 @@ def test_auto_watering_min_watering_interval(app, set_time_program):
     units = get_all_units(app)
     for unit in units:
         assert len(unit["logs"]) == 1
-        assert unit["logs"][0]["waterMethod"] == "auto: minimum watering interval"
+        assert unit["logs"][0]["waterMethod"] == "auto"
+        assert unit["logs"][0]["message"] == "minimum watering interval"
     # Change unit settings to prevent watering
     for unit in units:
         unit["enableMinWaterInterval"] = False
@@ -87,7 +88,8 @@ def test_auto_watering_moist_level(app, set_time_program):
     units = get_all_units(app)
     for unit in units:
         assert len(unit["logs"]) == 1
-        assert unit["logs"][0]["waterMethod"] == "auto: moist level"
+        assert unit["logs"][0]["waterMethod"] == "auto"
+        assert unit["logs"][0]["message"] == "moist level"
     # Change unit settings to prevent watering of two units
     units[0]["enableMaxWaterInterval"] = True
     units[0]["maxWaterInterval"] = 100
@@ -100,8 +102,12 @@ def test_auto_watering_moist_level(app, set_time_program):
         assert len(unit["logs"]) == 2
     assert units[0]["logs"][0]["watered"] == False
     assert units[1]["logs"][0]["watered"] == False
-    assert units[2]["logs"][0]["waterMethod"] == "auto: moist level"
-    assert units[3]["logs"][0]["waterMethod"] == "auto: moist level"
+    assert units[2]["logs"][0]["watered"] == True
+    assert units[2]["logs"][0]["waterMethod"] == "auto"
+    assert units[2]["logs"][0]["message"] == "moist level"
+    assert units[3]["logs"][0]["watered"] == True
+    assert units[3]["logs"][0]["waterMethod"] == "auto"
+    assert units[3]["logs"][0]["message"] == "moist level"
 
 
 def test_auto_watering_does_not_water(app, set_time_program):
@@ -238,7 +244,8 @@ def test_last_time_watered_function(app):
             "status": unit["status"],
             "moistValue": unit["moistValue"],
             "watered": True,
-            "waterMethod": "auto: minimum watering interval",
+            "waterMethod": "auto",
+            "message": "minimum watering interval"
         }
         save_log_to_units_db(app, unitLog)
 

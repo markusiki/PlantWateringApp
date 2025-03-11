@@ -14,6 +14,8 @@ units = [
         "enableMinWaterInterval": True,
         "maxWaterInterval": 5,
         "minWaterInterval": 1,
+        "waterFlowRate": 0.1,
+        "totalWateredAmount": 0
     },
     {
         "id": "Unit2",
@@ -30,6 +32,8 @@ units = [
         "enableMinWaterInterval": True,
         "maxWaterInterval": 7,
         "minWaterInterval": 1,
+        "waterFlowRate": 0.1,
+        "totalWateredAmount": 0
     },
     {
         "id": "Unit3",
@@ -46,6 +50,8 @@ units = [
         "enableMinWaterInterval": True,
         "maxWaterInterval": 7,
         "minWaterInterval": 1,
+        "waterFlowRate": 0.1,
+        "totalWateredAmount": 0
     },
     {
         "id": "Unit4",
@@ -62,5 +68,7 @@ units = [
         "enableMinWaterInterval": True,
         "maxWaterInterval": 7,
         "minWaterInterval": 1,
+        "waterFlowRate": 0.1,
+        "totalWateredAmount": 0
     },
 ]

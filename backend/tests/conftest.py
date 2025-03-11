@@ -35,7 +35,6 @@ def app():
     )
 
     JWTManager(app)
-    set
 
     yield app
 
