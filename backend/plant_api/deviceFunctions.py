@@ -6,9 +6,8 @@ import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 from .services.unitsDB import getUnits, findById
-from .services.deviceSettings import getNumberOfUnits
+from .services.deviceSettings import getData
 from statistics import pstdev
-import json
 
 # Initialize the I2C interface
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -37,18 +36,20 @@ class Pump:
 
 
 class Sprinkler_unit:
-    def __init__(self, id, valve, sensor, moistValue, moistLimit, waterTime):
+    def __init__(self, id, valve, sensor, moistValue, moistLimit, waterTime, waterFlowRate):
         self.id = id
         self.valve = gpiozero.OutputDevice(valve, active_high=False, initial_value=False)
         self.sensor = AnalogIn(ads, eval(sensor))
         self.moistValue = moistValue
         self.moistLimit = moistLimit
         self.waterTime = waterTime
+        self.waterFlowRate = waterFlowRate
 
-    def update(self, moistValue, moistLimit, waterTime):
+    def update(self, moistValue, moistLimit, waterTime, waterFlowRate):
         self.moistValue = moistValue
         self.moistLimit = moistLimit
         self.waterTime = waterTime
+        self.waterFlowRate = waterFlowRate
         return
 
 
@@ -66,6 +67,7 @@ for unit in units:
             unit["moistValue"],
             unit["moistLimit"],
             unit["waterTime"],
+            unit["waterFlowRate"]
         )
     )
 
@@ -74,7 +76,7 @@ sprinkler_units_in_use = sprinkler_unit_objects
 
 def setUnitObjects():
     global sprinkler_units_in_use
-    sprinkler_units_in_use = sprinkler_unit_objects[: getNumberOfUnits()]
+    sprinkler_units_in_use = sprinkler_unit_objects[: getData("numberOfUnits")]
 
 
 def updateSprinklerUnitObject(id, index):
@@ -86,6 +88,7 @@ def updateSprinklerUnitObject(id, index):
                 updatedUnit["moistValue"],
                 updatedUnit["moistLimit"],
                 updatedUnit["waterTime"],
+                updatedUnit["waterFlowRate"]
             )
     return {"message": "saved"}
 
@@ -100,10 +103,12 @@ def updateMoistValues():
 def waterNow(id):
     index = findById(id)
     unit = sprinkler_units_in_use[index]
-    moistValue = measureSoil(id)
+    waterAvailable = getData("waterAmount")
+    if ((unit.waterFlowRate * unit.waterTime) >= waterAvailable):  
+      return { "isWatered": False, "message": "Not enough water" }
+    
     water(unit.valve, unit.waterTime)
-
-    return moistValue
+    return { "isWatered": True, "message": "" }
 
 
 def calculateStandardDeviation(values):

@@ -35,7 +35,6 @@ def app():
     )
 
     JWTManager(app)
-    set
 
     yield app
 
@@ -72,3 +71,20 @@ def set_time_program(app):
         from plant_api.timeProgram import setTimeProgram
 
         return setTimeProgram
+
+@pytest.fixture()
+def water_now(app):
+    with app.app_context():
+        from plant_api.deviceFunctions import waterNow
+
+        return waterNow
+    
+@pytest.fixture()
+def update_object(app):
+    with app.app_context():
+        from plant_api.deviceFunctions import updateSprinklerUnitObject
+
+        return updateSprinklerUnitObject
+
+        
+    

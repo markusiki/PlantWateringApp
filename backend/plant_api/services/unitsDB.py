@@ -1,7 +1,7 @@
 from flask import current_app
 from .dbHelper import openDB, dumpDB
 from datetime import datetime
-from .deviceSettings import getNumberOfUnits
+from .deviceSettings import getData, updateWaterAmount
 
 path: str
 testing = False
@@ -37,7 +37,7 @@ def getUnits(innerUse=True):
     if innerUse:
         return units
     else:
-        numberOfUnits = getNumberOfUnits()
+        numberOfUnits = getData("numberOfUnits")
         for unit in units[:numberOfUnits]:
             unit.pop("sensor")
             unit.pop("valve")
@@ -85,17 +85,22 @@ def modifyUnitToDB(unitToChange, index):
     unit["enableMinWaterInterval"] = unitToChange["enableMinWaterInterval"]
     unit["maxWaterInterval"] = unitToChange["maxWaterInterval"]
     unit["minWaterInterval"] = unitToChange["minWaterInterval"]
+    unit["waterFlowRate"] = unitToChange["waterFlowRate"]
     saveToDb(units)
     changedUnits = getUnits(innerUse=False)
     changedUnit = changedUnits[index]
     return changedUnit
 
 
-def updateLog(id="", status="", moistValue=0, watered=False, waterMethod=""):
+def updateLog(id="", status="", moistValue=0, watered=False, waterMethod="", message=""):
     timeStamp = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
     units = getUnits()
     index = findById(id)
     unit = units[index]
+    if watered:
+        wateringAmount = round(unit["waterFlowRate"] * unit["waterTime"], 3)
+        unit["totalWateredAmount"] += wateringAmount
+        updateWaterAmount(wateringAmount)
     logs = unit["logs"]
     newLog = {
         "date": timeStamp,
@@ -103,6 +108,7 @@ def updateLog(id="", status="", moistValue=0, watered=False, waterMethod=""):
         "status": status,
         "watered": watered,
         "waterMethod": waterMethod,
+        "message": message
     }
     logs.insert(0, newLog)
     saveToDb(units)
@@ -140,4 +146,10 @@ def updateMoistValuesToDB(moistValues):
                     unit["status"] = "OK" if moistValue["status"] == "OK" else "ERROR"
                     unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
 
+    saveToDb(units)
+
+def clearWaterCounter(unitId):
+    units = getUnits()
+    index = findById(unitId)
+    units[index]["totalWateredAmount"] = 0
     saveToDb(units)

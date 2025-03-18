@@ -8,10 +8,11 @@ from ..services.unitsDB import (
     updateLog,
     deleteLog,
     getById,
+    clearWaterCounter
 )
+from ..services.deviceSettings import getData
 from ..deviceFunctions import updateMoistValues, updateSprinklerUnitObject, measureSoil, waterNow
 from ..schemas import UnitsSchema
-from marshmallow import ValidationError
 
 unitsRouter = Blueprint("unitsRouter", __name__)
 
@@ -24,8 +25,7 @@ def getAll():
         updateMoistValuesToDB(moistValues)
         response = getUnits(innerUse=False)
         return response
-    except Exception as error:
-        print(error, )
+    except Exception:
         return jsonify({"message": "Internal server error"}), 500
 
 
@@ -39,7 +39,7 @@ def changeUnit():
         response = modifyUnitToDB(body, index)
         updateSprinklerUnitObject(body["id"], index)
         return response
-    except Exception as error:
+    except Exception:
         return jsonify({"message": "Internal server error"}), 500
 
 
@@ -48,11 +48,13 @@ def changeUnit():
 def waterUnit(unitId):
     try:
         moistValue = measureSoil(unitId)
-        waterNow(unitId)
-        updateLog(**moistValue, watered=True, waterMethod="manual")
+        status = waterNow(unitId)
+        updateLog(**moistValue, watered=status["isWatered"], waterMethod="manual", message=status["message"])
         unit = getById(unitId, innerUse=False)
-        return unit
+        waterAmount = getData("waterAmount")
+        return jsonify({ "unit": unit, "waterAmount": waterAmount })
     except Exception as error:
+        print(error)
         return jsonify({"message": "Internal server error"}), 500
 
 
@@ -63,5 +65,15 @@ def deleteLogs(unitId):
         deleteLog(unitId)
         unit = getById(unitId, innerUse=False)
         return unit
-    except Exception as error:
+    except Exception:
         return jsonify({"message": "Internal server error"}), 500
+    
+@unitsRouter.put("/counter/<string:unitId>")
+@jwt_required()
+def clearCounters(unitId):
+    try:
+        clearWaterCounter(unitId)
+        unit = getById(unitId, innerUse=False)
+        return unit
+    except Exception:
+        return jsonify({"message": "Internal server error"}), 500 

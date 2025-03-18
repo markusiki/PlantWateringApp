@@ -1,15 +1,32 @@
 import json
+from ..databases.models import device, units
 
-def openDB(path):
+def createFile(path):
+    if path.endswith('unitsDB.json'):
+        dumpDB(path, units.units_model)
+    elif path.endswith('deviceSettings.json'):
+        dumpDB(path, device.device_model)
+    file = open(path, "r")
+    content = json.load(file)
+    file.close()
+
+    return content
+
+def openDB(path: str):
     try:
         file = open(path, "r")
         content = json.load(file)
-    except Exception:
-        file = open(f"{path[:-4]}back.json", "r")
-        content = json.load(file)
-    finally:
         file.close()
-      
+    except Exception:
+        try:
+            file = open(f"{path[:-4]}back.json", "r")
+            content = json.load(file)
+            file.close()
+            dumpDB(path, content)
+        except Exception:
+            content = createFile(path)
+        
+        
     return content
 
 def dumpDB(path, content):

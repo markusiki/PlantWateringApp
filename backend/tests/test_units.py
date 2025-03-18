@@ -43,6 +43,7 @@ def test_change_unit_settings(client, auth, app):
         "enableMinWaterInterval": False,
         "maxWaterInterval": 9,
         "minWaterInterval": 10,
+        "waterFlowRate": 0.2,
     }
 
     response = client.put(base_url, json=modified_unit, headers=auth.get_headers())
@@ -56,6 +57,7 @@ def test_change_unit_settings(client, auth, app):
     assert returned_unit["enableMinWaterInterval"] == modified_unit["enableMinWaterInterval"]
     assert returned_unit["maxWaterInterval"] == modified_unit["maxWaterInterval"]
     assert returned_unit["minWaterInterval"] == modified_unit["minWaterInterval"]
+    assert returned_unit["waterFlowRate"] == modified_unit["waterFlowRate"]
     assert returned_unit["status"]
     assert returned_unit["moistValue"]
     assert returned_unit["logs"] == []
@@ -80,6 +82,11 @@ def test_water_unit(app, client, auth):
     response_data = response.get_json()
     assert len(response_data["logs"]) == 1
     assert response_data["logs"][0]["watered"] is True
+    assert (
+        response_data["totalWateredAmount"]
+        == units_in_db[0]["totalWateredAmount"]
+        + units_in_db[0]["waterFlowRate"] * units_in_db[0]["waterTime"]
+    )
 
 
 def test_delete_unit_logs(app, client, auth):
