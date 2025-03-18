@@ -104,8 +104,6 @@ def waterNow(id):
     index = findById(id)
     unit = sprinkler_units_in_use[index]
     waterAvailable = getData("waterAmount")
-    print("waterAvailable: ", waterAvailable)
-    print("unit.waterFlowRate: ", unit.waterFlowRate)
     if ((unit.waterFlowRate * unit.waterTime) >= waterAvailable):  
       return { "isWatered": False, "message": "Not enough water" }
     
