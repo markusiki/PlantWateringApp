@@ -26,6 +26,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
     enableMinWaterInterval: false,
     maxWaterInterval: 0,
     minWaterInterval: 0,
+    waterFlowRate: '',
   })
 
   const modal = useRef<HTMLIonModalElement>(null)
@@ -41,6 +42,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
       enableMinWaterInterval: unit.enableMinWaterInterval,
       maxWaterInterval: unit.maxWaterInterval,
       minWaterInterval: unit.minWaterInterval,
+      waterFlowRate: unit.waterFlowRate.toString(),
     })
   }, [
     unit.enableAutoWatering,
@@ -51,6 +53,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
     unit.moistLimit,
     unit.name,
     unit.waterTime,
+    unit.waterFlowRate,
   ])
 
   const validateInputs = () => {
@@ -74,6 +77,31 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
       presentAlert({
         header: 'Invalid input',
         message: 'Water time must be between 0 and 180!',
+        buttons: ['Dismiss'],
+      })
+      return false
+    }
+    if (!parseFloat(settings.waterFlowRate)) {
+      presentAlert({
+        header: 'Invalid input',
+        message: 'Water flow rate must be a number!',
+        buttons: ['Dismiss'],
+      })
+      return false
+    } else {
+      if (parseFloat(settings.waterFlowRate) < 0 || parseFloat(settings.waterFlowRate) > 0.25) {
+        presentAlert({
+          header: 'Invalid input',
+          message: 'Water flow rate must between 0 and 0.25',
+          buttons: ['Dismiss'],
+        })
+        return false
+      }
+    }
+    if (settings.waterFlowRate.length > 5) {
+      presentAlert({
+        header: 'Invalid input',
+        message: 'Water flow rate can have max 3 decimals!',
         buttons: ['Dismiss'],
       })
       return false
@@ -107,22 +135,17 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
     }
   }
 
-  const setMoistLevelLimit = () => {
-    
-
-  }
-
-
   const confirm = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
     const validInputs = validateInputs()
     if (validInputs) {
-      handleUnitChange(event, settings, unit.id)
+      const settingsToSave = { ...settings, waterFlowRate: parseFloat(settings.waterFlowRate) }
+      handleUnitChange(event, settingsToSave, unit.id)
       modal.current?.dismiss()
     }
   }
 
   const handleChange = (event: any) => {
-    if (event.target.name === 'name') {
+    if (event.target.name === 'name' || event.target.name === 'waterFlowRate') {
       setSettings({ ...settings, [event.target.name]: event.target.value })
     } else if (event.target.localName === 'ion-checkbox') {
       setSettings({ ...settings, [event.target.name]: event.detail.checked })
@@ -170,15 +193,15 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
                 min={0}
                 max={100}
                 onInput={handleChange}
-               
+              >
+                <IonButton
+                  fill="clear"
+                  slot="end"
+                  onClick={() => setSettings({ ...settings, moistLimit: unit.moistValue })}
                 >
-                <IonButton fill='clear' slot='end' onClick={() => setSettings({ ...settings, moistLimit: unit.moistValue})}>
-                Set current moisture level
-              </IonButton>
-
-                </IonInput>
-             
-
+                  Set current moisture level
+                </IonButton>
+              </IonInput>
             </IonItem>
 
             <IonItem>
@@ -191,6 +214,17 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
                 helperText="Set watering time in seconds (0 - 180)"
                 min={0}
                 max={180}
+                onInput={handleChange}
+              />
+            </IonItem>
+            <IonItem>
+              <IonInput
+                label="Water flow rate"
+                value={settings.waterFlowRate}
+                name="waterFlowRate"
+                labelPlacement="stacked"
+                type="number"
+                helperText="Set water flow rate in l/s (e.g 0.105)"
                 onInput={handleChange}
               />
             </IonItem>
