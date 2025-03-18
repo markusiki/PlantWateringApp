@@ -30,9 +30,11 @@ const Home: React.FC = () => {
   const [units, setUnits] = useState<IUnitState[]>([])
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false)
   const [deviceSettings, setDeviceSettings] = useState<IDeviceSettingsState>({
-    runTimeProgram: true,
-    moistMeasureInterval: 0,
+    runTimeProgram: false,
+    moistMeasureInterval: 1,
     numberOfUnits: 4,
+    tankVolume: 0,
+    waterAmount: 0,
   })
 
   const [waterNowDisabeled, setWaterNowDisabled] = useState(false)
@@ -94,15 +96,12 @@ const Home: React.FC = () => {
   }
 
   const handleShutdown = async () => {
-
     try {
       const response = await deviceService.shutdown()
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.log(error)
     }
   }
-      
 
   const fetchDeviceSettings = async () => {
     try {
@@ -161,8 +160,9 @@ const Home: React.FC = () => {
 
   const waterNow = async (id: string) => {
     try {
-      const returnedUnit = await unitService.waterPlant(id)
-      setUnits((prevUnits) => prevUnits.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
+      const response = await unitService.waterPlant(id)
+      setUnits((prevUnits) => prevUnits.map((unit) => (unit.id !== id ? unit : response?.data.unit)))
+      setDeviceSettings({ ...deviceSettings, waterAmount: response.data.waterAmount })
     } catch (error: any) {
       if (error.response.status === 401) {
         deauthorize()
@@ -211,26 +211,6 @@ const Home: React.FC = () => {
     return null
   }
 
-  /*   if (!isLoggedIn) {
-    return (
-      <IonPage>
-        <Switch>
-          <Route
-            path="/login"
-            render={() => (
-              <Login
-                username={username}
-                setUsername={setUsername}
-                password={password}
-                setPassword={setPassword}
-                handleLogin={handleLogin}
-              />
-            )}
-          ></Route>
-        </Switch>
-      </IonPage>
-    )
-  } */
   return (
     <IonPage>
       <Switch>
@@ -254,13 +234,13 @@ const Home: React.FC = () => {
             render={() => (
               <>
                 <Menu
-                  deviceSettings={deviceSettings}
+                  deviceSettings={deviceSettings!}
                   handleDeviceSettingsChange={handleDeviceSettingsChange}
                   handleLogout={handleLogout}
                   handleShutdown={handleShutdown}
                 />
                 <IonPage id="main-content">
-                  <Header isBackendConnected={isBackendConnected} refresh={refresh} />
+                  <Header isBackendConnected={isBackendConnected} refresh={refresh} deviceSettings={deviceSettings!} />
                   <IonContent>
                     <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
                       <IonRefresherContent></IonRefresherContent>
