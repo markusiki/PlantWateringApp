@@ -20,6 +20,8 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
     runTimeProgram: false,
     moistMeasureInterval: 1,
     numberOfUnits: 4,
+    tankVolume: 0,
+    waterAmount: 0,
   })
 
   useEffect(() => {
@@ -42,6 +44,22 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
       presentAlert({
         header: 'Invalid input',
         message: 'Number of units must be between 1 and 4!',
+        buttons: ['Dismiss'],
+      })
+      return false
+    }
+    if (settings.tankVolume < 1 || settings.tankVolume > 100000 || settings.tankVolume < settings.waterAmount) {
+      presentAlert({
+        header: 'Invalid input',
+        message: 'Tank volume must be between 1 and 100 000 and bigger than water amount',
+        buttons: ['Dismiss'],
+      })
+      return false
+    }
+    if (settings.waterAmount < 1 || settings.waterAmount > 100000 || settings.waterAmount > settings.tankVolume) {
+      presentAlert({
+        header: 'Invalid input',
+        message: 'Water amount must be between 1 and 100 000 and smaller than tank volume!',
         buttons: ['Dismiss'],
       })
       return false
@@ -119,6 +137,42 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                   setSettings({
                     ...settings,
                     numberOfUnits: parseInt((event.target as HTMLInputElement).value),
+                  })
+                }
+              />
+            </IonItem>
+            <IonItem>
+              <IonInput
+                label="Water tank volume"
+                labelPlacement="stacked"
+                value={settings.tankVolume}
+                name="tankVolume"
+                type="number"
+                inputMode="numeric"
+                max={100000}
+                min={1}
+                onInput={(event) =>
+                  setSettings({
+                    ...settings,
+                    tankVolume: parseInt((event.target as HTMLInputElement).value),
+                  })
+                }
+              />
+            </IonItem>
+            <IonItem>
+              <IonInput
+                label="Water amount"
+                labelPlacement="stacked"
+                value={settings.waterAmount}
+                name="waterAmount"
+                type="number"
+                inputMode="numeric"
+                max={100000}
+                min={1}
+                onInput={(event) =>
+                  setSettings({
+                    ...settings,
+                    waterAmount: parseInt((event.target as HTMLInputElement).value),
                   })
                 }
               />
