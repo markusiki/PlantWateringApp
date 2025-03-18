@@ -18,4 +18,5 @@ class DeviceSchema(Schema):
     runTimeProgram = fields.Bool(metadata={'required': True})
     moistMeasureInterval = fields.Int(metadata={'required': True}, validate=validate.Range(min=1, max=100))
     numberOfUnits = fields.Int(metadata={'required': True}, validate=validate.Range(min=1, max=4))
+    tankVolume = fields.Int(metadata={'required': True}, validate=validate.Range(min=1, max=100000))
     waterAmount = fields.Int(metadata={'required': True}, validate=validate.Range(min=1, max=100000))
