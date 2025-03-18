@@ -98,7 +98,7 @@ def updateLog(id="", status="", moistValue=0, watered=False, waterMethod="", mes
     index = findById(id)
     unit = units[index]
     if watered:
-        wateringAmount = round(unit["waterFlowRate"] * unit["waterTime"], 2)
+        wateringAmount = round(unit["waterFlowRate"] * unit["waterTime"], 3)
         unit["totalWateredAmount"] += wateringAmount
         updateWaterAmount(wateringAmount)
     logs = unit["logs"]
@@ -146,4 +146,10 @@ def updateMoistValuesToDB(moistValues):
                     unit["status"] = "OK" if moistValue["status"] == "OK" else "ERROR"
                     unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
 
+    saveToDb(units)
+
+def clearWaterCounter(unitId):
+    units = getUnits()
+    index = findById(unitId)
+    units[index]["totalWateredAmount"] = 0
     saveToDb(units)
