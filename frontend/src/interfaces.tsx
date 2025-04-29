@@ -12,6 +12,8 @@ export interface IUnitState {
   minWaterInterval: number
   logs: ILog[]
   counter?: number
+  waterFlowRate: number
+  totalWateredAmount: number
 }
 
 export interface IUserState {
@@ -40,6 +42,7 @@ export interface IMenuProps extends IDeviceSettingsProps {
 export interface IHeaderProps {
   isBackendConnected: boolean
   refresh: () => Promise<void>
+  deviceSettings: IDeviceSettingsState
 }
 
 export interface ILog {
@@ -79,12 +82,15 @@ export interface IUnitSettingsState {
   enableMinWaterInterval: boolean
   maxWaterInterval: number
   minWaterInterval: number
+  waterFlowRate: string
 }
 
 export interface IDeviceSettingsState {
   runTimeProgram: boolean
   moistMeasureInterval: number
   numberOfUnits: number
+  tankVolume: number
+  waterAmount: number
 }
 export interface IDeviceSettingsProps {
   deviceSettings: IDeviceSettingsState

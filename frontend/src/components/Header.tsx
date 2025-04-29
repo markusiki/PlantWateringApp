@@ -1,15 +1,8 @@
-import {
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonMenuButton,
-  IonText,
-  IonTitle,
-  IonButton,
-} from '@ionic/react'
+import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonText, IonTitle, IonButton, IonItem } from '@ionic/react'
 import { IHeaderProps } from '../interfaces'
 
-const Header: React.FC<IHeaderProps> = ({ isBackendConnected, refresh }) => {
+const Header: React.FC<IHeaderProps> = ({ isBackendConnected, refresh, deviceSettings }) => {
+  const waterTankLevel = Math.round((deviceSettings.waterAmount / deviceSettings.tankVolume) * 100)
   return (
     <IonHeader>
       <IonToolbar>
@@ -22,6 +15,14 @@ const Header: React.FC<IHeaderProps> = ({ isBackendConnected, refresh }) => {
         ) : (
           <IonText color={'danger'}>Disconnected</IonText>
         )}
+        <IonText style={{ marginLeft: '2em' }}>
+          <IonText>Water tank level: </IonText>
+          {waterTankLevel < 20 ? (
+            <IonText color={'danger'}>{waterTankLevel}%</IonText>
+          ) : (
+            <IonText color={'success'}>{waterTankLevel}%</IonText>
+          )}
+        </IonText>
 
         <IonTitle slot="secondary">My plants</IonTitle>
 
