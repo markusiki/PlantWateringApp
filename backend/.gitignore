@@ -1,5 +1,6 @@
 # Databases
-databases/
+plant_api/databases/*.json
+
 tests/databases/
 
 # Byte-compiled / optimized / DLL files
