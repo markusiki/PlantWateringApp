@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { afterAll, afterEach, beforeAll } from 'vitest'
 import { setupServer } from 'msw/node'
 import { http, HttpResponse, PathParams } from 'msw'
@@ -98,6 +100,8 @@ let testDeviceSettings: IDeviceSettingsState = {
   runTimeProgram: false,
   moistMeasureInterval: 1,
   numberOfUnits: 4,
+  tankVolume: 0,
+  waterAmount: 0,
 }
 
 export const restHandlers = [
