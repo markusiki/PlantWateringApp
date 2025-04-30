@@ -1,5 +1,4 @@
 import { Request } from 'express'
-import { JwtPayload } from 'jsonwebtoken'
 import { Types } from 'mongoose'
 
 export interface IUser {
@@ -21,4 +20,11 @@ export interface CustomRequest extends Request {
   token?: string
   user?: IUserForToken
   access_token?: string | undefined
+}
+
+export interface IRegisterBody {
+  username: string
+  pwhash: string
+  serial: string
+  rpi_serial: string
 }
