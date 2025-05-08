@@ -87,7 +87,9 @@ const Home: React.FC = () => {
         toast('The device is offline. Please make sure that the device is turned on and connected to WiFi.', 8000)
       }
     } catch (error: any) {
-      if (error.status === 503) {
+      if (error.status === 502) {
+        toast('Service unavailable. Please contact the admin.')
+      } else if (error.status === 503) {
         toast('Wormhole is closed. Please contact the admin.')
       } else {
         toast(error.response.data.message, 1500)
