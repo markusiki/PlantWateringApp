@@ -49,6 +49,8 @@ def waterUnit(unitId):
     try:
         moistValue = measureSoil(unitId)
         status = waterNow(unitId)
+        if status["isWatered"] == False:
+            return jsonify({"message": f"Cannot handle the request: {status['message']}"}), 400
         updateLog(**moistValue, watered=status["isWatered"], waterMethod="manual", message=status["message"])
         unit = getById(unitId, innerUse=False)
         waterAmount = getData("waterAmount")
