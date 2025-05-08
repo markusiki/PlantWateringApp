@@ -92,8 +92,6 @@ const Unit: React.FC<IUnitProps> = ({
     const isCompleted = await waterNow(unit.id)
     if (isCompleted) {
       counterEnabled = false
-
-      console.log('completed')
     }
   }
 

@@ -109,9 +109,7 @@ const Home: React.FC = () => {
   const handleShutdown = async () => {
     try {
       const response = await deviceService.shutdown()
-    } catch (error: any) {
-      console.log(error)
-    }
+    } catch (error: any) {}
   }
 
   const fetchDeviceSettings = async () => {
