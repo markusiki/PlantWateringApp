@@ -62,7 +62,7 @@ export interface IUnitProps {
   unit: IUnitState
   setUnits: React.Dispatch<React.SetStateAction<IUnitState[]>>
   handleUnitChange: any
-  waterNow: (id: string) => Promise<void>
+  waterNow: (id: string) => Promise<boolean>
   deleteLogs: (event: React.MouseEvent, id: string) => Promise<void>
   waterNowDisabled: boolean
   setWaterNowDisabled: React.Dispatch<React.SetStateAction<boolean>>

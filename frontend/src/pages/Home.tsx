@@ -40,8 +40,16 @@ const Home: React.FC = () => {
   const [waterNowDisabeled, setWaterNowDisabled] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
-  const [toast] = useIonToast()
+  const [present] = useIonToast()
   const router = useIonRouter()
+
+  const toast = (message: string, duration: number = 5000) => {
+    present({
+      message: message,
+      duration: duration,
+      position: 'middle',
+    })
+  }
 
   useEffect(() => {
     const initialize = async () => {
@@ -76,25 +84,13 @@ const Home: React.FC = () => {
         setIsLoggedIn(true)
         router.push('/')
       } else {
-        toast({
-          message: 'The device is offline. Please make sure that the device is turned on and connected to WiFi.',
-          duration: 8000,
-          position: 'middle',
-        })
+        toast('The device is offline. Please make sure that the device is turned on and connected to WiFi.', 8000)
       }
     } catch (error: any) {
       if (error.status === 503) {
-        toast({
-          message: 'Wormhole is closed. Please contact the admin.',
-          duration: 5000,
-          position: 'middle',
-        })
+        toast('Wormhole is closed. Please contact the admin.')
       } else {
-        toast({
-          message: error.response.data.message,
-          duration: 1500,
-          position: 'middle',
-        })
+        toast(error.response.data.message, 1500)
       }
     }
   }
@@ -103,7 +99,7 @@ const Home: React.FC = () => {
     event.preventDefault()
     try {
       const response = await userService.logout()
-      toast({ message: response.data.message, duration: 1500, position: 'middle' })
+      toast(response.data.message, 1500)
     } catch (error) {
     } finally {
       deauthorize()
@@ -179,10 +175,15 @@ const Home: React.FC = () => {
       setUnits((prevUnits) => prevUnits.map((unit) => (unit.id !== id ? unit : response?.data.unit)))
       setDeviceSettings({ ...deviceSettings, waterAmount: response.data.waterAmount })
     } catch (error: any) {
-      if (error.response.status === 401) {
+      if (error.response.status === 400) {
+        toast(error.response.data.message, 5000)
+      } else if (error.response.status === 401) {
         deauthorize()
+      } else {
+        setIsBackendConnected(false)
       }
-      setIsBackendConnected(false)
+    } finally {
+      return true
     }
   }
 
@@ -226,7 +227,6 @@ const Home: React.FC = () => {
     return null
   }
 
-  console.log(units)
   return (
     <IonPage>
       <Switch>
