@@ -1,7 +1,7 @@
 import config from './config'
 import axios from 'axios'
 
-let authToken = ''
+let authToken: string | undefined
 
 const connect = async () => {
   const response = await axios.post(`${config.IOTSERVICE_URI}/auth/`, config.IOTSERVICE_CREDENTIALS)
@@ -12,7 +12,24 @@ const connect = async () => {
   return
 }
 
+const openWormhole = async (rpi_serial: string, serial: string) => {
+  const requestBody = {
+    name: rpi_serial,
+    wormhole_enabled: true,
+  }
+
+  const auth = {
+    headers: {
+      Authorization: `Token ${authToken}`,
+    },
+  }
+
+  const response = await axios.put(`${config.IOTSERVICE_URI}/devices/${serial}/`, requestBody, auth)
+
+  return await response.data
+}
+
 export default {
-  authToken,
   connect,
+  openWormhole,
 }

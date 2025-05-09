@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { IonApp, IonPage } from '@ionic/react'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'

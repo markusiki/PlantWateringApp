@@ -38,9 +38,18 @@ const Home: React.FC = () => {
   })
 
   const [waterNowDisabeled, setWaterNowDisabled] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const [toast] = useIonToast()
+  const [present] = useIonToast()
   const router = useIonRouter()
+
+  const toast = (message: string, duration: number = 5000) => {
+    present({
+      message: message,
+      duration: duration,
+      position: 'middle',
+    })
+  }
 
   useEffect(() => {
     const initialize = async () => {
@@ -67,20 +76,24 @@ const Home: React.FC = () => {
     event.preventDefault()
     try {
       const response = await userService.login({ username, password })
-      if (response?.status === 200) {
+      if (response?.status === 200 && response.headers['content-type'] === 'application/json') {
         window.localStorage.setItem('user', username)
         serviceHelper.setUser(username)
         setUsername('')
         setPassword('')
         setIsLoggedIn(true)
         router.push('/')
+      } else {
+        toast('The device is offline. Please make sure that the device is turned on and connected to WiFi.', 8000)
       }
     } catch (error: any) {
-      toast({
-        message: error?.response.data.message,
-        duration: 1500,
-        position: 'middle',
-      })
+      if (error.status === 502) {
+        toast('Service unavailable. Please contact the admin.')
+      } else if (error.status === 503) {
+        toast('Wormhole is closed. Please contact the admin.')
+      } else {
+        toast(error.response.data.message, 1500)
+      }
     }
   }
 
@@ -88,7 +101,7 @@ const Home: React.FC = () => {
     event.preventDefault()
     try {
       const response = await userService.logout()
-      toast({ message: response.data.message, duration: 1500, position: 'middle' })
+      toast(response.data.message, 1500)
     } catch (error) {
     } finally {
       deauthorize()
@@ -98,15 +111,13 @@ const Home: React.FC = () => {
   const handleShutdown = async () => {
     try {
       const response = await deviceService.shutdown()
-    } catch (error: any) {
-      console.log(error)
-    }
+    } catch (error: any) {}
   }
 
   const fetchDeviceSettings = async () => {
     try {
       const deviceResponse = await deviceService.getAll()
-      if (deviceResponse?.status === 200) {
+      if (deviceResponse?.status === 200 && deviceResponse.headers['content-type'] === 'application/json') {
         setIsBackendConnected(true)
         setDeviceSettings(deviceResponse.data)
         setIsLoggedIn(true)
@@ -122,7 +133,7 @@ const Home: React.FC = () => {
   const fetchUnits = async () => {
     try {
       const unitsResponse = await unitService.getAll()
-      if (unitsResponse?.status === 200) {
+      if (unitsResponse?.status === 200 && unitsResponse.headers['content-type'] === 'application/json') {
         setIsBackendConnected(true)
         setUnits(unitsResponse.data)
       }
@@ -164,10 +175,15 @@ const Home: React.FC = () => {
       setUnits((prevUnits) => prevUnits.map((unit) => (unit.id !== id ? unit : response?.data.unit)))
       setDeviceSettings({ ...deviceSettings, waterAmount: response.data.waterAmount })
     } catch (error: any) {
-      if (error.response.status === 401) {
+      if (error.response.status === 400) {
+        toast(error.response.data.message, 5000)
+      } else if (error.response.status === 401) {
         deauthorize()
+      } else {
+        setIsBackendConnected(false)
       }
-      setIsBackendConnected(false)
+    } finally {
+      return true
     }
   }
 
@@ -240,7 +256,7 @@ const Home: React.FC = () => {
                   handleShutdown={handleShutdown}
                 />
                 <IonPage id="main-content">
-                  <Header isBackendConnected={isBackendConnected} refresh={refresh} deviceSettings={deviceSettings!} />
+                  <Header isBackendConnected={isBackendConnected} refresh={refresh} deviceSettings={deviceSettings} />
                   <IonContent>
                     <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
                       <IonRefresherContent></IonRefresherContent>

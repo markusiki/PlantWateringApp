@@ -1,0 +1,12 @@
+.button {
+  vertical-align: middle;
+}
+
+.contentCenter {
+  text-align: center;
+}
+
+.contentEnd {
+justify-items: end;
+text-align: end;
+} 

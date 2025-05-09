@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   IonCard,
   IonGrid,
@@ -25,6 +25,8 @@ const Unit: React.FC<IUnitProps> = ({
   waterNowDisabled,
   setWaterNowDisabled,
 }) => {
+  let counterEnabled = false
+
   const getRelativeValue = (unit: IUnitState) => {
     const relativeValue = Math.round((unit.moistValue / unit.moistLimit) * 100) / 100
 
@@ -57,30 +59,40 @@ const Unit: React.FC<IUnitProps> = ({
   }
 
   const setCounter = async (unitToCount: IUnitState) => {
+    setWaterNowDisabled(true)
+    counterEnabled = true
     setUnits((prevUnits) =>
-      prevUnits.map((unit: IUnitState) =>
-        unit.id !== unitToCount.id ? unit : { ...unit, counter: unit.waterTime + 1 }
+      prevUnits.map((prevUnit: IUnitState) =>
+        prevUnit.id !== unitToCount.id ? prevUnit : { ...prevUnit, counter: prevUnit.waterTime + 1 }
       )
     )
     let counter = unitToCount.waterTime + 1
-    while (true) {
+    while (counterEnabled) {
       setUnits((prevUnits) =>
-        prevUnits.map((unit) => (unit.id !== unitToCount.id ? unit : { ...unit, counter: unit.counter! - 1 }))
+        prevUnits.map((prevUnit) =>
+          prevUnit.id !== unitToCount.id ? prevUnit : { ...prevUnit, counter: prevUnit.counter! - 1 }
+        )
       )
       counter--
-      if (counter === 0) {
+
+      if (counter <= 0) {
         break
       }
 
       await new Promise((resolve) => setTimeout(resolve, 1000))
     }
+    setWaterNowDisabled(false)
+    setUnits((prevUnits) =>
+      prevUnits.map((prevUnit) => (prevUnit.id !== unitToCount.id ? prevUnit : { ...prevUnit, counter: 0 }))
+    )
   }
 
   const handleWaterNow = async (unit: IUnitState) => {
-    waterNow(unit.id)
-    setWaterNowDisabled(true)
-    await setCounter(unit)
-    setWaterNowDisabled(false)
+    setCounter(unit)
+    const isCompleted = await waterNow(unit.id)
+    if (isCompleted) {
+      counterEnabled = false
+    }
   }
 
   return (
