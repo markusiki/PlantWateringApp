@@ -28,3 +28,11 @@ export interface IRegisterBody {
   serial: string
   rpi_serial: string
 }
+
+export interface IChangeUserBody {
+  oldUsername: string
+  newUsername: string
+  oldPassword: string
+  pwhash: string
+  serial: string
+}
