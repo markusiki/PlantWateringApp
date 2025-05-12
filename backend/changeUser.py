@@ -1,7 +1,9 @@
 #Change user for the app and saves the changed user to the users.json database.
 
+from plant_api.services.users import findUser
+import sys
 import subprocess
-from flask_bcrypt import generate_password_hash
+from flask_bcrypt import generate_password_hash, check_password_hash
 import os
 from pwinput import pwinput
 import requests
@@ -12,9 +14,31 @@ load_dotenv()
 
 path = os.path.join(os.path.dirname(__file__), "plant_api/databases/users.json")
 
+def get_user(users, username):
+    for user in users:
+        if user["username"] == username:
+            return user
+          
+def verify_user(users):
+    username = input("Enter old username: ")
+    password = pwinput("Enter old password: ")
+    user = get_user(users, username)
+    passwordCorrect = (
+              False if user == None else check_password_hash(user["passwordHash"], password)
+          )
+    if user is None or passwordCorrect is False:
+        return False
+    
+    user = {"username": username, "password": password}
+    return user
+          
+
 def get_and_check_username(users):
     while True:
-        username = input("Enter new username: ")
+        username = input("Enter new username or leave blank to not change: ")
+        if username == "": 
+            return users[0]["username"]
+        
         for user in users:
             if user["username"] == username:
                 print("Username already exists.")
@@ -33,14 +57,19 @@ def get_and_check_password():
         
 
 users = openDB(path)
-username = get_and_check_username(users)
+old_user = verify_user(users)
+if not old_user:
+    print("Invalid username or password")
+    sys.exit()
+new_username = get_and_check_username(users)
 password = get_and_check_password()
 pwhash = generate_password_hash(password, 10).decode("utf-8")
-user = {"username": username, "passwordHash": pwhash}
+user = {"username": new_username, "passwordHash": pwhash}
 serial = subprocess.check_output("cat /opt/dataplicity/tuxtunnel/serial", shell=True).decode()
 request_body = {
-    "oldUsername": users[0]["username"],
-    "newUsername": username,
+    "oldUsername": old_user["username"],
+    "oldPassword": old_user["password"],
+    "newUsername": new_username,
     "pwhash": pwhash,
     "serial": serial,
 }
