@@ -4,12 +4,10 @@
 import subprocess
 from flask_bcrypt import generate_password_hash
 import os
-import json
 from pwinput import pwinput
 import requests
 from dotenv import load_dotenv
 from plant_api.services.dbHelper import openDB, dumpDB
-import json
 
 load_dotenv()
 
@@ -38,18 +36,18 @@ def get_and_check_password():
 users = openDB(path)
 username = get_and_check_username(users)
 password = get_and_check_password()
-hash = generate_password_hash(password, 10).decode("utf-8")
-user = {"username": username, "passwordHash": hash}
+pwhash = generate_password_hash(password, 10).decode("utf-8")
+user = {"username": username, "passwordHash": pwhash}
 serial = subprocess.check_output("cat /opt/dataplicity/tuxtunnel/serial", shell=True).decode()
 procinfo = subprocess.check_output("cat /proc/cpuinfo | grep Serial", shell=True).decode()
 rpi_serial = procinfo.split()[-1]
 request_body = {
     "username": username,
-    "pwhash": hash,
+    "pwhash": pwhash,
     "serial": serial,
     "rpi_serial": rpi_serial
 }
-response = requests.post(os.getenv("API_GATEWAY_URI"), json=request_body )
+response = requests.post(f'{os.getenv("API_GATEWAY_URI")}/register', json=request_body )
 if response.ok:
     users.append(user)
     dumpDB(path, users)

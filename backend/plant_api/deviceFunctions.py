@@ -16,6 +16,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 ads = ADS.ADS1115(i2c)
 
 testing = False
+watering = False
 
 
 def setTestingMode(app):
@@ -101,13 +102,18 @@ def updateMoistValues():
 
 
 def waterNow(id):
+    global watering
+    while watering:
+        sleep(1)
     index = findById(id)
     unit = sprinkler_units_in_use[index]
     waterAvailable = getData("waterAmount")
     if ((unit.waterFlowRate * unit.waterTime) >= waterAvailable):  
       return { "isWatered": False, "message": "Not enough water" }
     
+    watering = True
     water(unit.valve, unit.waterTime)
+    watering = False
     return { "isWatered": True, "message": "" }
 
 
