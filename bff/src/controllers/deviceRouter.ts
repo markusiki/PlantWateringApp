@@ -12,6 +12,11 @@ deviceRouter.post('/register', async (req, res) => {
   try {
     const { username, pwhash, serial, rpi_serial }: IRegisterBody = req.body
 
+    if (username.length < 7) {
+      res.status(400).json({ error: 'Username must be longer than 6 characters' })
+      return
+    }
+
     const usernameExists = await User.exists({ username: username })
     if (usernameExists) {
       res.status(400).json({ error: 'Username already exists' })
