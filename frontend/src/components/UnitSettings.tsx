@@ -16,7 +16,7 @@ import {
 import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 
-const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) => {
+const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, handleUnitCalibration }) => {
   const [settings, setSettings] = useState<IUnitSettingsState>({
     name: '',
     moistLimit: 0,
@@ -152,6 +152,33 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
     } else {
       setSettings({ ...settings, [event.target.name]: parseInt(event.target.value) })
     }
+  }
+
+  const calibrateUnit = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
+    presentAlert({
+      header: 'Calibrate wet moist value',
+      message: "Place unit's moisture sensor stick in a very WET soil, and click calibrate.",
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Calibrate',
+          role: 'confirm',
+          handler: async () => await handleUnitCalibration(event, unit.id, 'minMoistValue'),
+        },
+      ],
+    })
+    presentAlert({
+      header: 'Calibrate dry moist value',
+      message: "Place unit's moisture sensor stick in a very DRY soil, and click calibrate.",
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Calibrate',
+          role: 'confirm',
+          handler: async () => await handleUnitCalibration(event, unit.id, 'maxMoistValue'),
+        },
+      ],
+    })
   }
 
   return (
@@ -295,6 +322,8 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange }) 
               </IonItemGroup>
             ) : null}
           </IonList>
+
+          <IonButton onClick={calibrateUnit}>Calibrate unit</IonButton>
         </IonContent>
       </IonModal>
     </>
