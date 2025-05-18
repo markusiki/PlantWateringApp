@@ -8,7 +8,6 @@ base_url = "/api/device"
 @pytest.fixture(autouse=True)
 def login(auth):
     response = auth.login()
-    print(response)
 
 
 def test_get_all_device(app, client, auth):
@@ -20,7 +19,7 @@ def test_get_all_device(app, client, auth):
 
 
 def test_change_device_settings(client, auth):
-    changed_device = {"runTimeProgram": False, "moistMeasureInterval": 1, "numberOfUnits": 2, "waterAmount": 50}
+    changed_device = {"runTimeProgram": False, "moistMeasureInterval": 1, "numberOfUnits": 2, "tankVolume": 10, "waterAmount": 50}
     response = client.put(base_url, json=changed_device, headers=auth.get_headers())
     returned_settings = response.get_json()
     assert returned_settings["runTimeProgram"] == changed_device["runTimeProgram"]

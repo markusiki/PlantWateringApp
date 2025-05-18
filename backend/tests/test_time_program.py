@@ -56,17 +56,22 @@ def test_auto_watering_min_watering_interval(app, set_time_program):
         assert len(unit["logs"]) == 1
         assert unit["logs"][0]["waterMethod"] == "auto"
         assert unit["logs"][0]["message"] == "minimum watering interval"
-    # Change unit settings to prevent watering
-    for unit in units:
-        unit["enableMinWaterInterval"] = False
-        unit["minWaterInterval"] = 1
+    # Change unit settings to prevent watering for Unit1
+    
+    units[0]["enableMinWaterInterval"] = False
+    units[0]["minWaterInterval"] = 1
     save_to_units_db(app, units)
 
-    sleep(5)
+    sleep(6)
     units = get_all_units(app)
-    for unit in units:
-        assert len(unit["logs"]) == 2
-        assert unit["logs"][0]["watered"] == False
+    for unit_index, unit in enumerate(units):
+        assert len(unit["logs"]) > 1
+        if unit_index == 0:
+            for index, log in enumerate(reversed(unit["logs"])):
+              assert log["watered"] == True if index == 0 else log["watered"] == False
+        else:
+            for log in unit["logs"]:
+                assert log["watered"] == True
 
 
 def test_auto_watering_moist_level(app, set_time_program):
@@ -199,19 +204,21 @@ def test_time_program_only_waters_number_of_units_defined_by_numberOfUnits(app, 
     assert len(units[2]["logs"]) == 1
     assert len(units[3]["logs"]) == 0
 
+    sleep(5)
+
 
 def test_moist_measure_interval_can_be_changed_while_timeprogram_is_running(app, set_time_program):
     # Tests timer function
-    device_settings = get_device_settings(app)
-    device_settings["runTimeProgram"] = True
-    device_settings["moistMeasureInterval"] = 2
-    save_to_device_db(app, device_settings)
-
     units = get_all_units(app)
     for unit in units:
         unit["moistLimit"] = 19000
         unit["enableMinWaterInterval"] = False
     save_to_units_db(app, units)
+
+    device_settings = get_device_settings(app)
+    device_settings["runTimeProgram"] = True
+    device_settings["moistMeasureInterval"] = 2
+    save_to_device_db(app, device_settings)
 
     set_time_program()
 

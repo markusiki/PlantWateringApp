@@ -1,1 +1,1 @@
-device = {"runTimeProgram": False, "moistMeasureInterval": 3, "numberOfUnits": 4, "waterAmount": 100}
+device = {"runTimeProgram": False, "moistMeasureInterval": 3, "numberOfUnits": 4, "tankVolume": 100, "waterAmount": 100}

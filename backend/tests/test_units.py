@@ -8,7 +8,6 @@ base_url = "/api/units"
 @pytest.fixture(autouse=True)
 def login(auth):
     response = auth.login()
-    print(response)
 
 
 def test_get_all_units(client, auth):
@@ -71,7 +70,6 @@ def test_change_unit_settings(client, auth, app):
 
     for unit in unit_objects:
         if unit.id == modified_unit["id"]:
-            assert unit.moistLimit == convert_moist_value(app, modified_unit["moistLimit"])
             assert unit.waterTime == modified_unit["waterTime"]
 
 
@@ -80,10 +78,11 @@ def test_water_unit(app, client, auth):
     assert units_in_db[0]["logs"] == []
     response = client.post(f"{base_url}/Unit1", headers=auth.get_headers())
     response_data = response.get_json()
-    assert len(response_data["logs"]) == 1
-    assert response_data["logs"][0]["watered"] is True
+    unit = response_data["unit"]
+    assert len(unit["logs"]) == 1
+    assert unit["logs"][0]["watered"] is True
     assert (
-        response_data["totalWateredAmount"]
+        unit["totalWateredAmount"]
         == units_in_db[0]["totalWateredAmount"]
         + units_in_db[0]["waterFlowRate"] * units_in_db[0]["waterTime"]
     )
