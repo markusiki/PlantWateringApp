@@ -15,7 +15,10 @@ units_model = [
         "maxWaterInterval": 5,
         "minWaterInterval": 1,
         "waterFlowRate": 0.1,
-        "totalWateredAmount": 0
+        "totalWateredAmount": 0,
+        "minMoistValue": 8000,
+        "maxMoistValue": 18200,
+        "maxPstdev": 200
     },
     {
         "id": "Unit2",
@@ -33,7 +36,10 @@ units_model = [
         "maxWaterInterval": 7,
         "minWaterInterval": 1,
         "waterFlowRate": 0.1,
-        "totalWateredAmount": 0
+        "totalWateredAmount": 0,
+        "minMoistValue": 8000,
+        "maxMoistValue": 18200,
+        "maxPstdev": 200
     },
     {
         "id": "Unit3",
@@ -51,7 +57,10 @@ units_model = [
         "maxWaterInterval": 7,
         "minWaterInterval": 1,
         "waterFlowRate": 0.1,
-        "totalWateredAmount": 0
+        "totalWateredAmount": 0,
+        "minMoistValue": 8000,
+        "maxMoistValue": 18200,
+        "maxPstdev": 200
     },
     {
         "id": "Unit4",
@@ -69,6 +78,9 @@ units_model = [
         "maxWaterInterval": 7,
         "minWaterInterval": 1,
         "waterFlowRate": 0.1,
-        "totalWateredAmount": 0
+        "totalWateredAmount": 0,
+        "minMoistValue": 8000,
+        "maxMoistValue": 18200,
+        "maxPstdev": 200
     },
 ]

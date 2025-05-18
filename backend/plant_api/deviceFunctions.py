@@ -26,7 +26,7 @@ def setTestingMode(app):
 
 
 class Pump:
-    def __init__(self, power, pwm):
+    def __init__(self, power):
         self.power = gpiozero.OutputDevice(pin=power, active_high=False, initial_value=False)
 
     def pumpOn(self):
@@ -54,7 +54,7 @@ class Sprinkler_unit:
         return
 
 
-pump = Pump(17, 4)
+pump = Pump(17)
 
 
 sprinkler_unit_objects = []
@@ -107,8 +107,8 @@ def waterNow(id):
         sleep(1)
     index = findById(id)
     unit = sprinkler_units_in_use[index]
-    waterAvailable = getData("waterAmount")
-    if ((unit.waterFlowRate * unit.waterTime) >= waterAvailable):  
+    waterAmountLeft = getData("waterAmount")
+    if ((unit.waterFlowRate * unit.waterTime) >= waterAmountLeft):  
       return { "isWatered": False, "message": "Not enough water" }
     
     watering = True
@@ -118,10 +118,11 @@ def waterNow(id):
 
 
 def calculateStandardDeviation(values):
+    status = "OK"
     standardDeviation = pstdev(values)
     if standardDeviation > 200:
-        return "ERROR"
-    return "OK"
+        status = "ERROR"
+    return {"status": status, "value": standardDeviation }
 
 
 def measureSoil(id):
@@ -137,7 +138,7 @@ def measureSoil(id):
             pstdev = calculateStandardDeviation(values)
             valueMean = valueSum / 5
 
-    return {"id": id, "status": pstdev, "moistValue": valueMean}
+    return {"id": id, "status": pstdev["status"], "standardDeviation": pstdev["value"], "moistValue": valueMean}
 
 
 def water(valve, waterTime):
