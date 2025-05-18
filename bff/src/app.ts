@@ -4,7 +4,7 @@ import express from 'express'
 import iotService from './utils/iotService'
 import { createProxyMiddleware, Options } from 'http-proxy-middleware'
 import morgan from 'morgan'
-import deviceRegistrationRouter from './controllers/deviceRegistartionRouter'
+import deviceRouter from './controllers/deviceRouter'
 import loginRouter from './controllers/login'
 import { tokenExtractor, userExtractor } from './utils/middleware'
 
@@ -55,7 +55,7 @@ app.use(express.json())
 app.use(express.static('build'))
 app.use(morgan('combined'))
 app.use(tokenExtractor)
-app.use('/api/register', deviceRegistrationRouter)
+app.use('/api/device', deviceRouter)
 app.use('/api/login', loginRouter)
 app.use('/', userExtractor, proxy)
 
