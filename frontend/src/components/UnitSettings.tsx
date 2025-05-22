@@ -15,6 +15,7 @@ import {
 } from '@ionic/react'
 import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
+import './UnitSettings.css'
 
 const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, handleUnitCalibration }) => {
   const [settings, setSettings] = useState<IUnitSettingsState>({
@@ -157,7 +158,9 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
   const calibrateUnit = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
     presentAlert({
       header: 'Calibrate wet moist value',
-      message: "Place unit's moisture sensor stick in a very WET soil, and click calibrate.",
+      message:
+        "Place unit's moisture sensor stick in water, let it settle for a couple of seconds, and click calibrate.",
+      cssClass: 'calibration-alert',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
@@ -169,7 +172,8 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
     })
     presentAlert({
       header: 'Calibrate dry moist value',
-      message: "Place unit's moisture sensor stick in a very DRY soil, and click calibrate.",
+      message: "Clean and dry unit's moisture sensor stick, and click calibrate.",
+      cssClass: 'calibration-alert',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
