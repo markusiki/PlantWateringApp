@@ -5,6 +5,7 @@ from ..services.unitsDB import (
     getUnits,
     findById,
     modifyUnitToDB,
+    analyzeMoistValue,
     updateLog,
     deleteLog,
     getById,
@@ -49,6 +50,9 @@ def changeUnit():
 def waterUnit(unitId):
     try:
         moistValue = measureSoil(unitId)
+        unit = getById(unitId)
+        analyzedUnit = analyzeMoistValue(unit, moistValue)
+        moistValue["status"] = analyzedUnit["status"]
         del moistValue["standardDeviation"]
         status = waterNow(unitId)
         if status["isWatered"] == False:
