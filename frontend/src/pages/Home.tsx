@@ -10,7 +10,7 @@ import {
   useIonToast,
 } from '@ionic/react'
 import './Home.css'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { IUnitState, IDeviceSettingsState, IUnitSettingsState } from '../interfaces'
 import serviceHelper from '../services/helpers'
 import userService from '../services/user'
@@ -223,6 +223,20 @@ const Home: React.FC = () => {
     }
   }
 
+  const handleUnitCalibration = async (event: React.MouseEvent, id: IUnitState['id'], moistValueType: string) => {
+    event.preventDefault()
+    try {
+      const returnedUnit = await unitService.calibrateUnit(id, moistValueType)
+      if (returnedUnit?.status === 200) {
+        setUnits(units.map((unit) => (unit.id !== returnedUnit.data.id ? unit : returnedUnit.data)))
+      }
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        deauthorize()
+      }
+    }
+  }
+
   if (!isInitialized) {
     return null
   }
@@ -271,6 +285,7 @@ const Home: React.FC = () => {
                         deleteLogs={deleteLogs}
                         waterNowDisabled={waterNowDisabeled}
                         setWaterNowDisabled={setWaterNowDisabled}
+                        handleUnitCalibration={handleUnitCalibration}
                       />
                     ))}
                   </IonContent>

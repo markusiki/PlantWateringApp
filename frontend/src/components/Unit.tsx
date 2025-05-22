@@ -24,6 +24,7 @@ const Unit: React.FC<IUnitProps> = ({
   deleteLogs,
   waterNowDisabled,
   setWaterNowDisabled,
+  handleUnitCalibration,
 }) => {
   let counterEnabled = false
 
@@ -112,7 +113,11 @@ const Unit: React.FC<IUnitProps> = ({
                   <IonIcon icon={settingsOutline}></IonIcon>
                 </IonButton>
               </IonButtons>
-              <UnitSettings unit={unit} handleUnitChange={handleUnitChange} />
+              <UnitSettings
+                unit={unit}
+                handleUnitChange={handleUnitChange}
+                handleUnitCalibration={handleUnitCalibration}
+              />
             </IonCol>
           </IonRow>
           <IonRow>

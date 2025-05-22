@@ -66,11 +66,13 @@ export interface IUnitProps {
   deleteLogs: (event: React.MouseEvent, id: string) => Promise<void>
   waterNowDisabled: boolean
   setWaterNowDisabled: React.Dispatch<React.SetStateAction<boolean>>
+  handleUnitCalibration: (event: React.MouseEvent, id: IUnitState['id'], moistValueType: string) => Promise<void>
 }
 
 export interface IUnitSettingsProps {
   unit: IUnitState
   handleUnitChange: any
+  handleUnitCalibration: (event: React.MouseEvent, id: IUnitState['id'], moistValueType: string) => Promise<void>
 }
 
 export interface IUnitSettingsState {
