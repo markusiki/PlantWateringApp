@@ -11,12 +11,16 @@ testing = False
 def convertMoistValue(unit, value):
     if value > 100:
         convertedValue = round(
-            100 - (value - unit["minMoistValue"]) / (unit["maxMoistValue"] - unit["minMoistValue"]) * 100
+            100
+            - (value - unit["minMoistValue"])
+            / (unit["maxMoistValue"] - unit["minMoistValue"])
+            * 100
         )
         return convertedValue
     else:
         convertedValue = round(
-            (100 - value) * (unit["maxMoistValue"] - unit["minMoistValue"]) / 100 + unit["minMoistValue"]
+            (100 - value) * (unit["maxMoistValue"] - unit["minMoistValue"]) / 100
+            + unit["minMoistValue"]
         )
         return convertedValue
 
@@ -104,11 +108,11 @@ def updateLog(id="", status="", moistValue=0, watered=False, waterMethod="", mes
     logs = unit["logs"]
     newLog = {
         "date": timeStamp,
-        "moistValue": round(moistValue / 100) * 100,
+        "moistValue": convertMoistValue(unit, moistValue),
         "status": status,
         "watered": watered,
         "waterMethod": waterMethod,
-        "message": message
+        "message": message,
     }
     logs.insert(0, newLog)
     saveToDb(units)
@@ -127,26 +131,22 @@ def updateMoistValuesToDB(moistValues):
     for unit in units:
         for moistValue in moistValues:
             if unit["id"] == moistValue["id"]:
-                if moistValue["moistValue"] > unit["maxMoistValue"]:
-                    if moistValue["moistValue"] > (unit["maxMoistValue"] + 1000):
-                        unit["status"] = "ERROR"
-                        unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
-                    else:
-                        unit["status"] = "OK" if moistValue["status"] == "OK" else "ERROR"
-                        unit["moistValue"] = unit["maxMoistValue"]
-
+                print("moistValue: ", moistValue["moistValue"], "minValue: ", unit["minMoistValue"])
+                if moistValue["moistValue"] > unit["maxMoistValue"] - 100:
+                    print("error")
+                    unit["status"] = "ERROR: Moisture sensor may not be in soil."
+                    unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
                 elif moistValue["moistValue"] < unit["minMoistValue"]:
-                    if moistValue["moistValue"] < (unit["minMoistValue"] - 1000):
-                        unit["status"] = "ERROR"
-                        unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
-                    else:
-                        unit["status"] = "OK" if moistValue["status"] == "OK" else "ERROR"
-                        unit["moistValue"] = unit["minMoistValue"]
+                    unit["status"] = (
+                        "ERROR: Watering unit may not be connected or the soil is floading."
+                    )
+                    unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
                 else:
-                    unit["status"] = "OK" if moistValue["status"] == "OK" else "ERROR"
+                    unit["status"] = "OK" if moistValue["status"] == "OK" else moistValue["status"]
                     unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
 
     saveToDb(units)
+
 
 def clearWaterCounter(unitId):
     units = getUnits()
@@ -154,15 +154,14 @@ def clearWaterCounter(unitId):
     units[index]["totalWateredAmount"] = 0
     saveToDb(units)
 
+
 def calibrateUnitMoistValue(unitMoistValue, moistValueType):
     units = getUnits()
     index = findById(unitMoistValue["id"])
-    units[index][moistValueType] = unitMoistValue["moistValue"]
-    units[index]["maxPstdev"] = unitMoistValue["standardDeviation"] + 200
+    units[index][moistValueType] = (
+        unitMoistValue["moistValue"] - 500
+        if moistValueType == "minMoistValue"
+        else unitMoistValue["moistValue"]
+    )
+    units[index]["maxPstdev"] = unitMoistValue["standardDeviation"]
     saveToDb(units)
-
-
-
-
-    
-
