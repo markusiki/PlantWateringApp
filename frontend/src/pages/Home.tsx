@@ -38,7 +38,6 @@ const Home: React.FC = () => {
   })
 
   const [waterNowDisabeled, setWaterNowDisabled] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
 
   const [present] = useIonToast()
   const router = useIonRouter()
