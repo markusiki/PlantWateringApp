@@ -68,7 +68,7 @@ for unit in units:
             unit["moistValue"],
             unit["moistLimit"],
             unit["waterTime"],
-            unit["waterFlowRate"]
+            unit["waterFlowRate"],
         )
     )
 
@@ -89,7 +89,7 @@ def updateSprinklerUnitObject(id, index):
                 updatedUnit["moistValue"],
                 updatedUnit["moistLimit"],
                 updatedUnit["waterTime"],
-                updatedUnit["waterFlowRate"]
+                updatedUnit["waterFlowRate"],
             )
     return {"message": "saved"}
 
@@ -108,21 +108,23 @@ def waterNow(id):
     index = findById(id)
     unit = sprinkler_units_in_use[index]
     waterAmountLeft = getData("waterAmount")
-    if ((unit.waterFlowRate * unit.waterTime) >= waterAmountLeft):  
-      return { "isWatered": False, "message": "Not enough water" }
-    
+    if (unit.waterFlowRate * unit.waterTime) >= waterAmountLeft:
+        return {"isWatered": False, "message": "Not enough water"}
+
     watering = True
     water(unit.valve, unit.waterTime)
     watering = False
-    return { "isWatered": True, "message": "" }
+    return {"isWatered": True, "message": ""}
 
 
 def calculateStandardDeviation(values):
     status = "OK"
     standardDeviation = pstdev(values)
     if standardDeviation > 200:
-        status = "ERROR"
-    return {"status": status, "value": standardDeviation }
+        status = (
+            "ERROR: Watering unit may not be connected or the moisture sensor may be defective."
+        )
+    return {"status": status, "value": standardDeviation}
 
 
 def measureSoil(id):
@@ -138,7 +140,12 @@ def measureSoil(id):
             pstdev = calculateStandardDeviation(values)
             valueMean = valueSum / 5
 
-    return {"id": id, "status": pstdev["status"], "standardDeviation": pstdev["value"], "moistValue": valueMean}
+    return {
+        "id": id,
+        "status": pstdev["status"],
+        "standardDeviation": pstdev["value"],
+        "moistValue": valueMean,
+    }
 
 
 def water(valve, waterTime):
