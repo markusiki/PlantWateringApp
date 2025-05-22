@@ -125,26 +125,30 @@ def deleteLog(id):
     unit["logs"] = []
     saveToDb(units)
 
+def analyzeMoistValue(unit, moistValue):      
+    if moistValue["moistValue"] > unit["maxMoistValue"] - 100:
+        unit["status"] = "ERROR: Moisture sensor may not be in soil."
+        unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
+    elif moistValue["moistValue"] < unit["minMoistValue"]:
+        unit["status"] = (
+            "ERROR: Watering unit may not be connected or the soil is floading."
+        )
+        unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
+    else:
+        unit["status"] = "OK" if moistValue["status"] == "OK" else moistValue["status"]
+        unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
+
+    return unit
+    
+
 
 def updateMoistValuesToDB(moistValues):
     units = getUnits()
     for unit in units:
         for moistValue in moistValues:
             if unit["id"] == moistValue["id"]:
-                print("moistValue: ", moistValue["moistValue"], "minValue: ", unit["minMoistValue"])
-                if moistValue["moistValue"] > unit["maxMoistValue"] - 100:
-                    print("error")
-                    unit["status"] = "ERROR: Moisture sensor may not be in soil."
-                    unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
-                elif moistValue["moistValue"] < unit["minMoistValue"]:
-                    unit["status"] = (
-                        "ERROR: Watering unit may not be connected or the soil is floading."
-                    )
-                    unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
-                else:
-                    unit["status"] = "OK" if moistValue["status"] == "OK" else moistValue["status"]
-                    unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
-
+                analyzeMoistValue(unit, moistValue)     
+                
     saveToDb(units)
 
 
