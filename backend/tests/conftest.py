@@ -20,7 +20,7 @@ path_to_usersDB = os.path.join(os.path.dirname(__file__), "databases/users.test.
 path_to_deviceDB = os.path.join(os.path.dirname(__file__), "databases/deviceSettings.test.json")
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 def app():
     create_test_users_db(path_to_usersDB)
     create_test_units_db(path_to_unitsDB)
