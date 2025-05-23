@@ -54,7 +54,7 @@ def waterUnit(unitId):
         analyzedUnit = analyzeMoistValue(unit, moistValue)
         moistValue["status"] = analyzedUnit["status"]
         del moistValue["standardDeviation"]
-        status = waterNow(unitId)
+        status = waterNow(unitId, manual=True)
         if status["isWatered"] == False:
             return jsonify({"message": f"Cannot handle the request: {status['message']}"}), 400
         updateLog(
