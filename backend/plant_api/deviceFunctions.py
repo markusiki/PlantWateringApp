@@ -16,7 +16,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 ads = ADS.ADS1115(i2c)
 
 testing = False
-watering = False
+wateringStatus = {"watering": False, "method": "", "id": ""}
 
 
 def setTestingMode(app):
@@ -101,26 +101,36 @@ def updateMoistValues():
     return moistValues
 
 
-def waterNow(id):
-    global watering
-    while watering:
-        sleep(1)
+def waterNow(id, manual=False):
+    global wateringStatus
+    if manual and wateringStatus["watering"]:
+        return {"isWatered": False, "message": f"{wateringStatus['method']} watering of unit {wateringStatus['id']} in process."}
+    if not manual and wateringStatus["watering"]:
+        if wateringStatus["id"] == id:
+            return {"isWatered": False, "message": f"Manual waterign of {id} in process."}
+        else:
+            while wateringStatus["watering"]:
+                sleep(1)
     index = findById(id)
     unit = sprinkler_units_in_use[index]
     waterAmountLeft = getData("waterAmount")
     if (unit.waterFlowRate * unit.waterTime) >= waterAmountLeft:
         return {"isWatered": False, "message": "Not enough water"}
 
-    watering = True
+    wateringStatus["watering"] = True
+    wateringStatus["method"] = "Manual" if manual else "Auto"
+    wateringStatus["id"] = id
     water(unit.valve, unit.waterTime)
-    watering = False
-    return {"isWatered": True, "message": ""}
+    wateringStatus["watering"] = False
+    wateringStatus["method"] = ""
+    wateringStatus["id"] = ""
+    return {"isWatered": True, "message": f"Watering of unit {id} completed successfully." if manual else ""}
 
 
 def calculateStandardDeviation(values):
     status = "OK"
     standardDeviation = pstdev(values)
-    if standardDeviation > 200:
+    if standardDeviation > 500:
         status = (
             "ERROR: Watering unit may not be connected or the moisture sensor may be defective."
         )
