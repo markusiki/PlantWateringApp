@@ -32,7 +32,6 @@ def setTimeProgram():
 
 
 def lastTimeWatered(unit):
-    dateNow = datetime.now()
     lastTimeWateredDate = False
     for log in unit["logs"]:
         if log["watered"] == True:
@@ -42,9 +41,9 @@ def lastTimeWatered(unit):
         lastWateredDate = datetime.strptime(lastTimeWateredDate, "%d.%m.%Y %H:%M:%S")
 
         return (
-            abs((dateNow - lastWateredDate).days)
+            abs((datetime.now() - lastWateredDate).days)
             if not testing
-            else abs((dateNow - lastWateredDate).seconds)
+            else abs((datetime.now() - lastWateredDate).seconds)
         )
 
     return float("inf")
@@ -101,7 +100,7 @@ def timeProgram():
                         ):
                             updateLog(**unitLog)
                             continue
-                        if unit["status"] != "ERROR":
+                        if not unit["status"].startswith("ERROR"):
                             status = waterNow(unit["id"])
                             message = "moist level" if status["message"] == "" else status["message"]
                             updateLog(
