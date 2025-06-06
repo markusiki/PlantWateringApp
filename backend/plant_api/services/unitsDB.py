@@ -128,12 +128,12 @@ def deleteLog(id):
 def analyzeMoistValue(unit, moistValue):      
     if moistValue["moistValue"] > unit["maxMoistValue"] - 100:
         unit["status"] = "ERROR: Moisture sensor may not be in soil."
-        unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
+        unit["moistValue"] = unit["maxMoistValue"]
     elif moistValue["moistValue"] < unit["minMoistValue"]:
         unit["status"] = (
             "ERROR: Watering unit may not be connected or the soil is floading."
         )
-        unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
+        unit["moistValue"] = unit["minMoistValue"]
     else:
         unit["status"] = "OK" if moistValue["status"] == "OK" else moistValue["status"]
         unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
