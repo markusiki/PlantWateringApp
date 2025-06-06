@@ -74,10 +74,10 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
       })
       return false
     }
-    if (settings.waterTime < 0 || settings.waterTime > 180) {
+    if (settings.waterTime < 0 || settings.waterTime > 600) {
       presentAlert({
         header: 'Invalid input',
-        message: 'Water time must be between 0 and 180!',
+        message: 'Water time must be between 0 and 600!',
         buttons: ['Dismiss'],
       })
       return false
@@ -242,9 +242,9 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
                 name="waterTime"
                 labelPlacement="stacked"
                 type="number"
-                helperText="Set watering time in seconds (0 - 180)"
+                helperText="Set watering time in seconds (0 - 600)"
                 min={0}
-                max={180}
+                max={600}
                 onInput={handleChange}
               />
             </IonItem>

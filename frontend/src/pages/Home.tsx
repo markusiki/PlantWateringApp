@@ -122,8 +122,9 @@ const Home: React.FC = () => {
         setIsLoggedIn(true)
       }
     } catch (error: any) {
+      const status = error?.response.status
       setIsBackendConnected(false)
-      if (error?.response?.status === 401) {
+      if (status === 401 || status === 422) {
         deauthorize()
       }
     }
@@ -137,8 +138,9 @@ const Home: React.FC = () => {
         setUnits(unitsResponse.data)
       }
     } catch (error: any) {
+      const status = error?.response.status
       setIsBackendConnected(false)
-      if (error.response.status === 401) {
+      if (status === 401 || status === 422) {
         deauthorize()
       }
     }
@@ -162,7 +164,8 @@ const Home: React.FC = () => {
       const returnedUnit = await unitService.deleteLogs(id)
       setUnits(units.map((unit) => (unit.id !== id ? unit : returnedUnit?.data)))
     } catch (error: any) {
-      if (error.response.status === 401) {
+      const status = error?.response.status
+      if (status === 401 || status === 422) {
         deauthorize()
       }
     }
@@ -174,9 +177,13 @@ const Home: React.FC = () => {
       setUnits((prevUnits) => prevUnits.map((unit) => (unit.id !== id ? unit : response?.data.unit)))
       setDeviceSettings({ ...deviceSettings, waterAmount: response.data.waterAmount })
     } catch (error: any) {
-      if (error.response.status === 400) {
+      const status = error?.response.status
+      if (status === 401 || status === 422) {
+        deauthorize()
+      }
+      if (status === 400) {
         toast(error.response.data.message, 5000)
-      } else if (error.response.status === 401) {
+      } else if (status === 401 || status === 422) {
         deauthorize()
       } else {
         setIsBackendConnected(false)
@@ -201,7 +208,8 @@ const Home: React.FC = () => {
         }
       }
     } catch (error: any) {
-      if (error.response.status === 401) {
+      const status = error?.response.status
+      if (status === 401 || status === 422) {
         deauthorize()
       }
     }
@@ -216,7 +224,8 @@ const Home: React.FC = () => {
         setUnits(units.map((unit) => (unit.id !== returnedUnit.data.id ? unit : returnedUnit.data)))
       }
     } catch (error: any) {
-      if (error.response.status === 401) {
+      const status = error?.response.status
+      if (status === 401 || status === 422) {
         deauthorize()
       }
     }
@@ -230,7 +239,8 @@ const Home: React.FC = () => {
         setUnits(units.map((unit) => (unit.id !== returnedUnit.data.id ? unit : returnedUnit.data)))
       }
     } catch (error: any) {
-      if (error.response.status === 401) {
+      const status = error?.response.status
+      if (status === 401 || status === 422) {
         deauthorize()
       }
     }
