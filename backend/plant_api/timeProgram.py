@@ -78,6 +78,7 @@ def timeProgram():
                     "status": unit["status"],
                     "moistValue": unit["moistValue"],
                 }
+                inverseScaling = unit["dryMoistValue"] > unit["wetMoistValue"]
                 if unit["enableAutoWatering"]:
                     wateredLastTime = lastTimeWatered(unit)
                     if (
@@ -85,7 +86,11 @@ def timeProgram():
                         and unit["minWaterInterval"] <= wateredLastTime
                     ):
                         status = waterNow(unit["id"])
-                        message = "minimum watering interval" if status["message"] == "" else status["message"]
+                        message = (
+                            "minimum watering interval"
+                            if status["message"] == ""
+                            else status["message"]
+                        )
                         updateLog(
                             **unitLog,
                             watered=status["isWatered"],
@@ -93,7 +98,9 @@ def timeProgram():
                             message=message
                         )
 
-                    elif unit["moistValue"] > unit["moistLimit"]:
+                    elif (inverseScaling and unit["moistValue"] > unit["moistLimit"]) or (
+                        not inverseScaling and unit["moistValue"] < unit["moistLimit"]
+                    ):
                         if (
                             unit["enableMaxWaterInterval"] == True
                             and unit["maxWaterInterval"] >= wateredLastTime
@@ -102,15 +109,17 @@ def timeProgram():
                             continue
                         if not unit["status"].startswith("ERROR"):
                             status = waterNow(unit["id"])
-                            message = "moist level" if status["message"] == "" else status["message"]
+                            message = (
+                                "moist level" if status["message"] == "" else status["message"]
+                            )
                             updateLog(
                                 **unitLog,
                                 watered=status["isWatered"],
                                 waterMethod="auto",
-                                message=message                                  
+                                message=message
                             )
                         else:
-                            updateLog(**unitLog)
+                            updateLog(**unitLog, message="Unit in error, not watered.")
                     else:
                         updateLog(**unitLog)
                 else:

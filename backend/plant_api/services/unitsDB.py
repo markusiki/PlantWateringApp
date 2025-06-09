@@ -7,22 +7,26 @@ path: str
 testing = False
 
 
-# Converts moist value to scale 0-100 and back to unit["maxMoistValue"]-unit["minMoistValue"] (100=wet)
+# Converts moist value to scale 0-100 and back to unit["dryMoistValue"]-unit["wetMoistValue"] (100=wet)
 def convertMoistValue(unit, value):
+    inverseScaling = unit["dryMoistValue"] > unit["wetMoistValue"]
+
+    def valueToRange(val, inMin, inMax, outMin, outMax):
+        return round(outMin + (float(val - inMin) / float(inMax - inMin) * (outMax - outMin)))
+
     if value > 100:
-        convertedValue = round(
-            100
-            - (value - unit["minMoistValue"])
-            / (unit["maxMoistValue"] - unit["minMoistValue"])
-            * 100
-        )
-        return convertedValue
+        inMin = unit["wetMoistValue"] if inverseScaling else unit["dryMoistValue"]
+        inMax = unit["dryMoistValue"] if inverseScaling else unit["wetMoistValue"]
+        outMin = 100 if inverseScaling else 0
+        outMax = 0 if inverseScaling else 100
+
     else:
-        convertedValue = round(
-            (100 - value) * (unit["maxMoistValue"] - unit["minMoistValue"]) / 100
-            + unit["minMoistValue"]
-        )
-        return convertedValue
+        inMin = 100 if inverseScaling else 0
+        inMax = 0 if inverseScaling else 100
+        outMin = unit["wetMoistValue"] if inverseScaling else unit["dryMoistValue"]
+        outMax = unit["dryMoistValue"] if inverseScaling else unit["wetMoistValue"]
+
+    return valueToRange(value, inMin, inMax, outMin, outMax)
 
 
 def setUnitsDB(app):
@@ -44,8 +48,8 @@ def getUnits(innerUse=True):
             unit.pop("valve")
             unit["moistValue"] = convertMoistValue(unit, unit["moistValue"])
             unit["moistLimit"] = convertMoistValue(unit, unit["moistLimit"])
-            unit.pop("minMoistValue")
-            unit.pop("maxMoistValue")
+            unit.pop("wetMoistValue")
+            unit.pop("dryMoistValue")
             unit.pop("maxPstdev")
             if not testing:
                 for log in unit["logs"]:
@@ -125,21 +129,31 @@ def deleteLog(id):
     unit["logs"] = []
     saveToDb(units)
 
-def analyzeMoistValue(unit, moistValue):      
-    if moistValue["moistValue"] > unit["maxMoistValue"] - 100:
-        unit["status"] = "ERROR: Moisture sensor may not be in soil."
-        unit["moistValue"] = unit["maxMoistValue"]
-    elif moistValue["moistValue"] < unit["minMoistValue"]:
+
+def analyzeMoistValue(unit, moistValue):
+    inverseScaling = unit["dryMoistValue"] > unit["wetMoistValue"]
+    upperLimit = unit["dryMoistValue"] if inverseScaling else unit["wetMoistValue"]
+    lowerLimit = unit["wetMoistValue"] if inverseScaling else unit["dryMoistValue"]
+
+    if moistValue["moistValue"] > upperLimit:
+        unit["status"] = (
+            "ERROR: Moisture sensor may not be in soil."
+            if inverseScaling
+            else "ERROR: The soil may be floading."
+        )
+        unit["moistValue"] = upperLimit
+    elif moistValue["moistValue"] < lowerLimit:
         unit["status"] = (
             "ERROR: Watering unit may not be connected or the soil is floading."
+            if inverseScaling
+            else "ERROR: Watering unit may not be connected."
         )
-        unit["moistValue"] = unit["minMoistValue"]
+        unit["moistValue"] = lowerLimit
     else:
         unit["status"] = "OK" if moistValue["status"] == "OK" else moistValue["status"]
         unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
 
     return unit
-    
 
 
 def updateMoistValuesToDB(moistValues):
@@ -147,8 +161,8 @@ def updateMoistValuesToDB(moistValues):
     for unit in units:
         for moistValue in moistValues:
             if unit["id"] == moistValue["id"]:
-                analyzeMoistValue(unit, moistValue)     
-                
+                analyzeMoistValue(unit, moistValue)
+
     saveToDb(units)
 
 
@@ -162,10 +176,6 @@ def clearWaterCounter(unitId):
 def calibrateUnitMoistValue(unitMoistValue, moistValueType):
     units = getUnits()
     index = findById(unitMoistValue["id"])
-    units[index][moistValueType] = (
-        unitMoistValue["moistValue"] - 500
-        if moistValueType == "minMoistValue"
-        else unitMoistValue["moistValue"]
-    )
+    units[index][moistValueType] = unitMoistValue["moistValue"]
     units[index]["maxPstdev"] = unitMoistValue["standardDeviation"]
     saveToDb(units)

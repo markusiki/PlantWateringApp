@@ -96,8 +96,8 @@ def clearCounters(unitId):
 @jwt_required()
 def calibrateUnit(moistValueType, unitId):
     try:
-        if moistValueType != "minMoistValue" and moistValueType != "maxMoistValue":
-            return jsonify({"message": "minMoistValue or maxMoistValue requierd"}), 400
+        if moistValueType != "wetMoistValue" and moistValueType != "dryMoistValue":
+            return jsonify({"message": "wetMoistValue or dryMoistValue requierd"}), 400
         unitMoistValue = measureSoil(unitId)
         calibrateUnitMoistValue(unitMoistValue, moistValueType)
         unit = getById(unitId, innerUse=False)

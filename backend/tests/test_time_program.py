@@ -10,6 +10,7 @@ from .test_helpers.db import (
 from time import sleep
 from .test_helpers.create_db import create_test_units_db, create_test_device_db
 from datetime import datetime
+from threading import Timer
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -78,8 +79,20 @@ def test_auto_watering_moist_level(app, set_time_program):
     units = get_all_units(app)
     for unit in units:
         unit["enableAutoWatering"] = True
-        unit["moistLimit"] = 14000
         unit["enableMinWaterInterval"] = False
+        #Set Unit1 and Unit2 moist level scale inversed and Unit3 and Unit4 not inversed
+        if unit["id"] == "Unit1" or unit["id"] == "unit2":
+            unit["dryMoistValue"] = 20000
+            unit["wetMoistValue"] = 10000
+            unit["moistValue"] = 15000
+            unit["moistLimit"] = 14000
+        else:
+            unit["dryMoistValue"] = 15000
+            unit["wetMoistValue"] = 30000
+            unit["moistValue"] = 20000
+            unit["moistLimit"] = 21000
+            
+
     save_to_units_db(app, units)
 
     device_settings = get_device_settings(app)
@@ -98,7 +111,7 @@ def test_auto_watering_moist_level(app, set_time_program):
     # Change unit settings to prevent watering of two units
     units[0]["enableMaxWaterInterval"] = True
     units[0]["maxWaterInterval"] = 100
-    units[1]["status"] = "ERROR"
+    units[2]["status"] = "ERROR"
     save_to_units_db(app, units)
 
     sleep(14)
@@ -106,10 +119,11 @@ def test_auto_watering_moist_level(app, set_time_program):
     for unit in units:
         assert len(unit["logs"]) == 2
     assert units[0]["logs"][0]["watered"] == False
-    assert units[1]["logs"][0]["watered"] == False
-    assert units[2]["logs"][0]["watered"] == True
-    assert units[2]["logs"][0]["waterMethod"] == "auto"
-    assert units[2]["logs"][0]["message"] == "moist level"
+    assert units[1]["logs"][0]["watered"] == True
+    assert units[1]["logs"][0]["waterMethod"] == "auto"
+    assert units[1]["logs"][0]["message"] == "moist level"
+    assert units[2]["logs"][0]["watered"] == False
+    assert units[2]["logs"][0]["message"] == "Unit in error, not watered."
     assert units[3]["logs"][0]["watered"] == True
     assert units[3]["logs"][0]["waterMethod"] == "auto"
     assert units[3]["logs"][0]["message"] == "moist level"
@@ -244,16 +258,54 @@ def test_last_time_watered_function(app):
 
     units = get_all_units(app)
     for unit in units:
-        unit["logs"] = [{
-            "date": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
-            "id": unit["id"],
-            "status": unit["status"],
-            "moistValue": unit["moistValue"],
-            "watered": True,
-            "waterMethod": "auto",
-            "message": "minimum watering interval",
-        }]
+        unit["logs"] = [
+            {
+                "date": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
+                "id": unit["id"],
+                "status": unit["status"],
+                "moistValue": unit["moistValue"],
+                "watered": True,
+                "waterMethod": "auto",
+                "message": "minimum watering interval",
+            }
+        ]
 
     sleep(2)
     for unit in units:
         assert lastTimeWatered(unit) == 2
+
+
+def test_auto_watering_does_not_water_if_the_same_unit_is_being_watered_manually(
+    app, client, auth, set_time_program
+):
+    units = get_all_units(app)
+    units[0]["waterTime"] = 5
+
+    save_to_units_db(app, units)
+
+    device_settings = get_device_settings(app)
+    device_settings["runTimeProgram"] = True
+    device_settings["moistMeasureInterval"] = 10
+    save_to_device_db(app, device_settings)
+    
+    timer = Timer(2, set_time_program)
+    timer.start()
+
+    auth.login()
+    #response_put = client.put("/api/units", json=unit, headers=auth.get_headers())
+    #print("put_response: ", response_put.get_json())
+    reponse_post = client.post("/api/units/Unit1", headers=auth.get_headers())
+    print("post_response: ", reponse_post.get_json())
+
+
+    sleep(6)
+
+    units = get_all_units(app)
+    for unit in units:
+        if unit["id"] == "Unit1":
+            assert unit["logs"][1]["watered"] == False
+            assert unit["logs"][1]["message"] == "Manual waterign of Unit1 in process."
+        else:
+            assert unit["logs"][0]["watered"] == True
+            print(unit["logs"][0]["message"])
+            assert unit["logs"][0]["message"] == "minimum watering interval"
