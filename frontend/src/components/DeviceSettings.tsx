@@ -151,6 +151,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 inputMode="numeric"
                 max={100000}
                 min={1}
+                helperText="Set the water tank volume in liters."
                 onInput={(event) =>
                   setSettings({
                     ...settings,
@@ -169,6 +170,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 inputMode="numeric"
                 max={100000}
                 min={1}
+                helperText="Set the water amount in the tank in liters."
                 onInput={(event) =>
                   setSettings({
                     ...settings,
