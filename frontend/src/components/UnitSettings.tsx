@@ -159,27 +159,27 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
     presentAlert({
       header: 'Calibrate wet moist value',
       message:
-        "Place unit's moisture sensor stick in water, let it settle for a couple of seconds, and click calibrate.",
+        "Place unit's moisture sensor in a very wet soil, let it settle for a couple of seconds, and click calibrate.",
       cssClass: 'calibration-alert',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
           text: 'Calibrate',
           role: 'confirm',
-          handler: async () => await handleUnitCalibration(event, unit.id, 'minMoistValue'),
+          handler: async () => await handleUnitCalibration(event, unit.id, 'wetMoistValue'),
         },
       ],
     })
     presentAlert({
       header: 'Calibrate dry moist value',
-      message: "Clean and dry unit's moisture sensor stick, and click calibrate.",
+      message: "Place unit's moisture sensor in a very dry soil, and click calibrate.",
       cssClass: 'calibration-alert',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
           text: 'Calibrate',
           role: 'confirm',
-          handler: async () => await handleUnitCalibration(event, unit.id, 'maxMoistValue'),
+          handler: async () => await handleUnitCalibration(event, unit.id, 'dryMoistValue'),
         },
       ],
     })
