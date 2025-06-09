@@ -1,6 +1,7 @@
 import pytest
 from .conftest import path_to_unitsDB
-from .test_helpers.db import get_all_units, convert_moist_value
+from .test_helpers.db import get_all_units, convert_moist_value, save_to_units_db
+from .test_helpers.create_db import create_test_units_db
 
 base_url = "/api/units"
 
@@ -9,8 +10,24 @@ base_url = "/api/units"
 def login(auth):
     response = auth.login()
 
+@pytest.fixture(autouse=True)
+def before_tests():
+    create_test_units_db(path_to_unitsDB)
 
-def test_get_all_units(client, auth):
+
+def test_get_all_units(app, client, auth):
+    units = get_all_units(app)
+    for unit in units:
+        if unit["id"] == "Unit1" or unit["id"] == "Unit2":
+            unit["dryMoistValue"] = 21000
+            unit["wetMoistValue"] = 8000
+        else:
+            unit["dryMoistValue"] = 15000
+            unit["wetMoistValue"] = 30000
+
+
+    save_to_units_db(app, units)
+
     response = client.get(base_url, headers=auth.get_headers())
     assert response.status_code == 200
     response_data = response.get_json()
@@ -19,7 +36,7 @@ def test_get_all_units(client, auth):
         assert unit["id"]
         assert unit["name"]
         assert unit["status"]
-        assert unit["moistValue"]
+        assert unit["moistValue"] >= 0 
         assert unit["moistLimit"]
         assert unit["waterTime"]
         assert unit["enableAutoWatering"]
@@ -89,6 +106,7 @@ def test_water_unit(app, client, auth):
 
 
 def test_delete_unit_logs(app, client, auth):
+    response = client.post(f"{base_url}/Unit1", headers=auth.get_headers())
     units_in_db = get_all_units(app)
     assert len(units_in_db[0]["logs"]) == 1
     response = client.delete(f"{base_url}/logs/Unit1", headers=auth.get_headers())
