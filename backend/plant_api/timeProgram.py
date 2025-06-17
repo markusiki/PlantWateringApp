@@ -105,7 +105,7 @@ def timeProgram():
                             unit["enableMaxWaterInterval"] == True
                             and unit["maxWaterInterval"] >= wateredLastTime
                         ):
-                            updateLog(**unitLog)
+                            updateLog(**unitLog, message="max watering interval")
                             continue
                         if not unit["status"].startswith("ERROR"):
                             status = waterNow(unit["id"])
@@ -121,9 +121,9 @@ def timeProgram():
                         else:
                             updateLog(**unitLog, message="Unit in error, not watered.")
                     else:
-                        updateLog(**unitLog)
+                        updateLog(**unitLog, message="The irrigation conditions were not met.")
                 else:
-                    updateLog(**unitLog)
+                    updateLog(**unitLog, message="Automatic watering not enabled.")
             timer()
 
 
