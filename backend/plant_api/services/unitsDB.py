@@ -48,8 +48,6 @@ def getUnits(innerUse=True):
             unit.pop("valve")
             unit["moistValue"] = convertMoistValue(unit, unit["moistValue"])
             unit["moistLimit"] = convertMoistValue(unit, unit["moistLimit"])
-            unit.pop("wetMoistValue")
-            unit.pop("dryMoistValue")
             unit.pop("maxPstdev")
             if not testing:
                 for log in unit["logs"]:
