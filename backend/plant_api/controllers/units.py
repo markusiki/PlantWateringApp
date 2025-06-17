@@ -90,6 +90,15 @@ def clearCounters(unitId):
         return unit
     except Exception:
         return jsonify({"message": "Internal server error"}), 500
+    
+@unitsRouter.get("/rawMoistValue/<string:unitId>")
+@jwt_required()
+def getRawMoistValue(unitId):
+    try:
+        measuredSoil = measureSoil(unitId)
+        return measuredSoil
+    except Exception as error:
+        return jsonify({"message": "Internal server error", "error": error}), 500
 
 
 @unitsRouter.put("/calibrate/<string:moistValueType>/<string:unitId>")
