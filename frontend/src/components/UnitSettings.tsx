@@ -146,7 +146,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
     if (
       settings.enableMaxWaterInterval &&
       settings.enableMinWaterInterval &&
-      settings.minWaterInterval < settings.maxWaterInterval
+      settings.minWaterInterval <= settings.maxWaterInterval
     ) {
       presentAlert({
         header: 'Invalid input',
