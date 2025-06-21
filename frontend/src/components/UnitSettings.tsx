@@ -146,11 +146,11 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
     if (
       settings.enableMaxWaterInterval &&
       settings.enableMinWaterInterval &&
-      settings.minWaterInterval > settings.maxWaterInterval
+      settings.minWaterInterval < settings.maxWaterInterval
     ) {
       presentAlert({
         header: 'Invalid input',
-        message: 'Minimun water interval must be shorter than maximum watering interval!',
+        message: 'Minimun water interval must be longer than maximum watering interval!',
         buttons: ['Dismiss'],
       })
       return false
@@ -177,55 +177,6 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
       setSettings({ ...settings, [event.target.name]: parseInt(event.target.value) })
     }
   }
-
-  /*   const getRawMoistValue = async () => {
-    try {
-      const response = await unitService.getRawMoistValue(unit.id)
-      setRawMoistValue(response.moistValue)
-      console.log(response)
-    } catch (error) {
-      console.log(error)
-    }
-  } */
-
-  /*const calibrateUnit = async (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, moistType: string) => {
-    event.preventDefault()
-    const currentMoistValue = rawMoistValueRef.current
-    console.log(currentMoistValue)
-    console.log(rawMoistValue)
-    presentAlert({
-      header: `Calibrate ${moistType} moist value`,
-      message:
-        moistType === 'wet'
-          ? "Place unit's moisture sensor in a very wet soil, let it settle for a couple of seconds, and click calibrate."
-          : "Place unit's moisture sensor in a very dry soil, and click calibrate.",
-      cssClass: 'calibration-alert',
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Calibrate',
-          role: 'confirm',
-          handler: async () => {
-            await handleUnitCalibration(event, unit.id, moistType)
-          },
-        },
-      ],
-    })
-
-    /*     presentAlert({
-      header: 'Calibrate dry moist value',
-      message: "Place unit's moisture sensor in a very dry soil, and click calibrate.",
-      cssClass: 'calibration-alert',
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Calibrate',
-          role: 'confirm',
-          handler: async () => await handleUnitCalibration(event, unit.id, 'dryMoistValue'),
-        },
-      ],
-    }) 
-  } */
 
   return (
     <>
