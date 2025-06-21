@@ -113,10 +113,10 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
       })
       return false
     } else {
-      if (parseFloat(settings.waterFlowRate) < 0 || parseFloat(settings.waterFlowRate) > 0.25) {
+      if (parseFloat(settings.waterFlowRate) < 0 || parseFloat(settings.waterFlowRate) > 2) {
         presentAlert({
           header: 'Invalid input',
-          message: 'Water flow rate must between 0 and 0.25',
+          message: 'Water flow rate must between 0 and 2',
           buttons: ['Dismiss'],
         })
         return false
@@ -375,31 +375,6 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
             unit={unit}
             handleUnitCalibration={handleUnitCalibration}
           ></UnitCalibration>
-          {/* <IonModal isOpen={isCalibrating} backdropDismiss={true} onDidDismiss={() => setIsCalibrating(false)}>
-            <IonHeader>
-              <IonToolbar>
-                <IonButtons slot="start">
-                  <IonButton
-                    onClick={() => {
-                      setIsCalibrating(false)
-                    }}
-                  >
-                    Dismiss
-                  </IonButton>
-                </IonButtons>
-                <IonTitle className="align-center">Unit Moist Calibration</IonTitle>
-              </IonToolbar>
-            </IonHeader>
-            <IonContent className="ion-padding align-center">
-              <IonText>
-                <p>Current raw moist value: {rawMoistValue}</p>
-              </IonText>
-
-              <br />
-              <IonButton onClick={(event) => calibrateUnit(event, 'dry')}>Calibrate dry moist value</IonButton>
-              <IonButton onClick={(event) => calibrateUnit(event, 'wet')}>Calibrate wet moist value</IonButton>
-            </IonContent>
-          </IonModal> */}
         </IonContent>
       </IonModal>
     </>
