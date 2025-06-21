@@ -14,6 +14,8 @@ export interface IUnitState {
   counter?: number
   waterFlowRate: number
   totalWateredAmount: number
+  wetMoistValue: number
+  dryMoistValue: number
 }
 
 export interface IUserState {
@@ -51,6 +53,7 @@ export interface ILog {
   moistValue: number
   watered: boolean
   waterMethod: string
+  message: string
 }
 
 export interface ILogProps {
@@ -72,6 +75,13 @@ export interface IUnitProps {
 export interface IUnitSettingsProps {
   unit: IUnitState
   handleUnitChange: any
+  handleUnitCalibration: (event: React.MouseEvent, id: IUnitState['id'], moistValueType: string) => Promise<void>
+}
+
+export interface IUnitCalibrationProps {
+  isCalibrating: boolean
+  setIsCalibrating: React.Dispatch<React.SetStateAction<boolean>>
+  unit: IUnitState
   handleUnitCalibration: (event: React.MouseEvent, id: IUnitState['id'], moistValueType: string) => Promise<void>
 }
 

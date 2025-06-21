@@ -138,7 +138,9 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
                   <IonCol>
                     <IonItem lines="none">
                       <IonText>
-                        <p className="logItem">{log.waterMethod}</p>
+                        <p className="logItem">
+                          {log.waterMethod}: {log.message}
+                        </p>
                       </IonText>
                     </IonItem>
                   </IonCol>

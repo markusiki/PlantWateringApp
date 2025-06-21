@@ -12,10 +12,14 @@ import {
   useIonAlert,
   IonCheckbox,
   IonItemGroup,
+  IonLabel,
+  IonText,
 } from '@ionic/react'
 import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 import './UnitSettings.css'
+import unitService from '../services/units'
+import UnitCalibration from './UnitCalibration'
 
 const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, handleUnitCalibration }) => {
   const [settings, setSettings] = useState<IUnitSettingsState>({
@@ -29,8 +33,8 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
     minWaterInterval: 0,
     waterFlowRate: '',
   })
-
-  const modal = useRef<HTMLIonModalElement>(null)
+  const [isCalibrating, setIsCalibrating] = useState(false)
+  const unitSettingsModal = useRef<HTMLIonModalElement>(null)
   const [presentAlert] = useIonAlert()
 
   useEffect(() => {
@@ -57,6 +61,25 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
     unit.waterFlowRate,
   ])
 
+  /*  useEffect(() => {
+    if (isCalibrating) {
+      intervalRef.current = setInterval(getRawMoistValue, 2000)
+    } else if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [isCalibrating])
+
+  useEffect(() => {
+    rawMoistValueRef.current = rawMoistValue
+  }, [rawMoistValue])
+ */
   const validateInputs = () => {
     if (settings.name.length > 100 || settings.name.length < 1) {
       presentAlert({
@@ -141,7 +164,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
     if (validInputs) {
       const settingsToSave = { ...settings, waterFlowRate: parseFloat(settings.waterFlowRate) }
       handleUnitChange(event, settingsToSave, unit.id)
-      modal.current?.dismiss()
+      unitSettingsModal.current?.dismiss()
     }
   }
 
@@ -155,22 +178,41 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
     }
   }
 
-  const calibrateUnit = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
+  /*   const getRawMoistValue = async () => {
+    try {
+      const response = await unitService.getRawMoistValue(unit.id)
+      setRawMoistValue(response.moistValue)
+      console.log(response)
+    } catch (error) {
+      console.log(error)
+    }
+  } */
+
+  /*const calibrateUnit = async (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, moistType: string) => {
+    event.preventDefault()
+    const currentMoistValue = rawMoistValueRef.current
+    console.log(currentMoistValue)
+    console.log(rawMoistValue)
     presentAlert({
-      header: 'Calibrate wet moist value',
+      header: `Calibrate ${moistType} moist value`,
       message:
-        "Place unit's moisture sensor in a very wet soil, let it settle for a couple of seconds, and click calibrate.",
+        moistType === 'wet'
+          ? "Place unit's moisture sensor in a very wet soil, let it settle for a couple of seconds, and click calibrate."
+          : "Place unit's moisture sensor in a very dry soil, and click calibrate.",
       cssClass: 'calibration-alert',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
           text: 'Calibrate',
           role: 'confirm',
-          handler: async () => await handleUnitCalibration(event, unit.id, 'wetMoistValue'),
+          handler: async () => {
+            await handleUnitCalibration(event, unit.id, moistType)
+          },
         },
       ],
     })
-    presentAlert({
+
+    /*     presentAlert({
       header: 'Calibrate dry moist value',
       message: "Place unit's moisture sensor in a very dry soil, and click calibrate.",
       cssClass: 'calibration-alert',
@@ -182,16 +224,16 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
           handler: async () => await handleUnitCalibration(event, unit.id, 'dryMoistValue'),
         },
       ],
-    })
-  }
+    }) 
+  } */
 
   return (
     <>
-      <IonModal trigger={`${unit.id}-settings`} ref={modal}>
+      <IonModal trigger={`${unit.id}-settings`} ref={unitSettingsModal}>
         <IonHeader>
           <IonToolbar>
             <IonButtons>
-              <IonButton onClick={() => modal.current?.dismiss()}>Cancel</IonButton>
+              <IonButton onClick={() => unitSettingsModal.current?.dismiss()}>Cancel</IonButton>
             </IonButtons>
             <IonTitle slot="secondary">Settings</IonTitle>
             <IonButtons slot="end">
@@ -326,8 +368,38 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
               </IonItemGroup>
             ) : null}
           </IonList>
+          <IonButton onClick={() => setIsCalibrating(true)}>Calibrate Unit</IonButton>
+          <UnitCalibration
+            isCalibrating={isCalibrating}
+            setIsCalibrating={setIsCalibrating}
+            unit={unit}
+            handleUnitCalibration={handleUnitCalibration}
+          ></UnitCalibration>
+          {/* <IonModal isOpen={isCalibrating} backdropDismiss={true} onDidDismiss={() => setIsCalibrating(false)}>
+            <IonHeader>
+              <IonToolbar>
+                <IonButtons slot="start">
+                  <IonButton
+                    onClick={() => {
+                      setIsCalibrating(false)
+                    }}
+                  >
+                    Dismiss
+                  </IonButton>
+                </IonButtons>
+                <IonTitle className="align-center">Unit Moist Calibration</IonTitle>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding align-center">
+              <IonText>
+                <p>Current raw moist value: {rawMoistValue}</p>
+              </IonText>
 
-          <IonButton onClick={calibrateUnit}>Calibrate unit</IonButton>
+              <br />
+              <IonButton onClick={(event) => calibrateUnit(event, 'dry')}>Calibrate dry moist value</IonButton>
+              <IonButton onClick={(event) => calibrateUnit(event, 'wet')}>Calibrate wet moist value</IonButton>
+            </IonContent>
+          </IonModal> */}
         </IonContent>
       </IonModal>
     </>

@@ -2,3 +2,7 @@
   --width: 400px;
   --height: 200px;
 }
+
+.calibration-padding {
+  align-content: center;
+}
