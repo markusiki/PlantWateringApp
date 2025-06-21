@@ -24,10 +24,19 @@ const deleteLogs = async (id: string) => {
 }
 
 const calibrateUnit = async (id: string, moistValueType: string) => {
-  const response = await axios.put(`${baseUrl}/calibrate/${moistValueType}/${id}`, {}, serviceHelper.getConfig())
+  const response = await axios.put(
+    `${baseUrl}/calibrate/${moistValueType}MoistValue/${id}`,
+    {},
+    serviceHelper.getConfig()
+  )
   return response
 }
 
-const unitServices = { getAll, changeSettings, waterPlant, deleteLogs, calibrateUnit }
+const getRawMoistValue = async (id: string) => {
+  const response = await axios.get(`${baseUrl}/rawMoistValue/${id}`, serviceHelper.getConfig())
+  return response
+}
+
+const unitServices = { getAll, changeSettings, waterPlant, deleteLogs, calibrateUnit, getRawMoistValue }
 
 export default unitServices
