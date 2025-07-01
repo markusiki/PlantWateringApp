@@ -19,15 +19,17 @@ loginRouter.post('/', async (req: CustomRequest, res, next) => {
     })
   }
 
+  console.log(user)
+
   const userForToken = {
     id: user._id,
     username: user.username,
-    wormhole_slug: user.devices.wormhole_slug,
+    wormhole_url: user.devices.wormhole_url,
   }
 
   const token = jwt.sign(userForToken, config.SECRET!, { expiresIn: '1h' })
   req.token = token
-
+  console.log('logged in')
   next()
 })
 

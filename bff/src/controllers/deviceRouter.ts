@@ -4,7 +4,6 @@ import iotService from '../utils/iotService'
 import { IChangeUserBody, IRegisterBody, IUser } from '../interfaces'
 import bcrypt from 'bcrypt'
 import { HydratedDocument } from 'mongoose'
-import { userExtractor } from '../utils/middleware'
 
 const deviceRouter = express.Router()
 
@@ -37,7 +36,7 @@ deviceRouter.post('/register', async (req, res) => {
       pwhash: pwhash,
       devices: {
         serial: serialHash,
-        wormhole_slug: response.wormhole_slug,
+        wormhole_url: response.wormhole_url,
       },
     })
 

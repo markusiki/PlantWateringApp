@@ -6,7 +6,7 @@ const userSchema = new Schema<IUser>({
   pwhash: String,
   devices: {
     serial: String,
-    wormhole_slug: String,
+    wormhole_url: String,
   },
 })
 

@@ -6,14 +6,14 @@ export interface IUser {
   pwhash: string
   devices: {
     serial: string
-    wormhole_slug: string
+    wormhole_url: string
   }
 }
 
 export interface IUserForToken {
   id: Types.ObjectId
   username: string
-  wormhole_slug: string
+  wormhole_url: string
 }
 
 export interface CustomRequest extends Request {

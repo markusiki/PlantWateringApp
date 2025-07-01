@@ -11,15 +11,10 @@ const IOTSERVICE_CREDENTIALS = {
 }
 const SECRET = process.env.SECRET
 
-const getTargetURI = (wormhole_slug: string) => {
-  return `https://${wormhole_slug}.${process.env.WORMHOLE_HOST}`
-}
-
 export default {
   PORT,
   MONGODB_URI,
   IOTSERVICE_URI,
   IOTSERVICE_CREDENTIALS,
   SECRET,
-  getTargetURI,
 }

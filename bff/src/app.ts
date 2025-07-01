@@ -28,9 +28,9 @@ iotService
 
 const proxyOptions: Options = {
   changeOrigin: true,
-  secure: false,
+  secure: true,
   router: (req: any) => {
-    const target = config.getTargetURI(req.user?.wormhole_slug!)
+    const target = req.user?.wormhole_url
     return target
   },
   on: {
