@@ -147,8 +147,7 @@ const Home: React.FC = () => {
   }
 
   const refresh = async () => {
-    await fetchDeviceSettings()
-    await fetchUnits()
+    await Promise.all([fetchDeviceSettings(), fetchUnits()])
   }
 
   const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
