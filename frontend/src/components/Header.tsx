@@ -15,7 +15,8 @@ import { IHeaderProps } from '../interfaces'
 import './Header.css'
 
 const Header: React.FC<IHeaderProps> = ({ isBackendConnected, refresh, deviceSettings }) => {
-  const waterTankLevel = Math.round((deviceSettings.waterAmount / deviceSettings.tankVolume) * 100)
+  const waterTankLevel =
+    deviceSettings.tankVolume > 0 ? Math.round((deviceSettings.waterAmount / deviceSettings.tankVolume) * 100) : 0
   return (
     <IonHeader>
       <IonToolbar>
