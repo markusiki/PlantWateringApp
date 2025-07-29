@@ -24,6 +24,7 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 
 const Home: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [loginSpinner, setLoginSpinner] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -73,6 +74,9 @@ const Home: React.FC = () => {
 
   const handleLogin = async (event: React.MouseEvent) => {
     event.preventDefault()
+    const loginSpinnerTimeout = setTimeout(() => {
+      setLoginSpinner(true)
+    }, 3000)
     try {
       const response = await userService.login({ username, password })
       if (response?.status === 200 && response.headers['content-type'] === 'application/json') {
@@ -93,6 +97,9 @@ const Home: React.FC = () => {
       } else {
         toast(error.response.data.message, 1500)
       }
+    } finally {
+      clearTimeout(loginSpinnerTimeout)
+      setLoginSpinner(false)
     }
   }
 
@@ -262,6 +269,7 @@ const Home: React.FC = () => {
                 password={password}
                 setPassword={setPassword}
                 handleLogin={handleLogin}
+                loginSpinner={loginSpinner}
               />
             )}
           ></Route>
