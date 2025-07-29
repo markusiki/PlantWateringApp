@@ -31,6 +31,9 @@ const proxyOptions: Options = {
   secure: true,
   router: (req: any) => {
     const target = req.user?.wormhole_url
+    /* if (target.includes('plant-api-demo-backend')) {
+      callDemoServer(target)
+    } */
     return target
   },
   on: {
@@ -57,6 +60,18 @@ app.use(morgan('combined'))
 app.use(tokenExtractor)
 app.use('/api/device', deviceRouter)
 app.use('/api/login', loginRouter)
-app.use('/', userExtractor, proxy)
+app.all(
+  '/api/*',
+  (req, res, next) => {
+    console.log('matched: ', req.path)
+    next()
+  },
+  userExtractor,
+  proxy,
+)
+
+app.use('/', (req, res) => {
+  res.redirect('/')
+})
 
 export default app
