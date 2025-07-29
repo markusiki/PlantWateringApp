@@ -2,7 +2,7 @@
 
 This project is for controlling and monitoring an automatic plant watering process, run by Raspberry Pi. It aims to help users maintain optimal soil moisture levels for their plants by automating the watering process. The system uses soil moisture sensors to monitor the moisture levels and a water pump and solenoid valves to deliver water to the plants as needed.
 
-The project consists of a React/TypeScript frontend and a Python/Flask backend. The frontend provides a user-friendly interface for monitoring and controlling the watering system, while the backend handles the logic for reading sensor data, controlling the water pump and solenoid valves, and managing user authentication.
+The project consists of a React/TypeScript frontend, a Python/Flask backend, and a Node.js BFF (Backend for Frontend) layer. The frontend provides a user-friendly interface for monitoring and controlling the watering system, while the backend handles the logic for reading sensor data, controlling the water pump and solenoid valves, and managing user authentication. The BFF layer serves as an intermediary that handles authentication tokens, user management, and provides a secure proxy to the IoT devices.
 
 The system supports different watering methods:
 - **Manual Watering**: Users can manually trigger watering for each plant.
@@ -24,10 +24,25 @@ The app has a login page for user authentication. The authentication has been im
 
 The app consists of the following main functionalities:
 
-1. Water Now - Manually water each plant.
-2. Logs - Check the watering logs.
-3. Unit settings - Settings for plant name, moisture level limit, watering time, enable and set automatic min watering interval by moisture level, enable and set automatic max watering interval by moisture level.
-4. Device settings - Settings for soil measure interval and to enable automatic watering.
+1. **Water Now** - Manually water each plant with real-time countdown timer.
+2. **Logs** - Check the watering logs with detailed information including date, status, moisture value, and watering method.
+3. **Unit Settings** - Comprehensive settings for each plant unit:
+   - Plant name customization
+   - Moisture level limit configuration
+   - Watering time (0-600 seconds)
+   - Water flow rate settings (l/s)
+   - Enable/disable automatic watering
+   - Automatic min/max watering intervals by moisture level
+   - Sensor calibration (wet and dry calibration points)
+4. **Device Settings** - Global device configuration:
+   - Soil moisture measurement interval (1-30 days)
+   - Number of active units (1-4)
+   - Time program enable/disable
+   - Water tank volume and current water amount monitoring
+5. **Water Tank Management** - Real-time monitoring of water tank levels with visual indicators.
+6. **Sensor Calibration** - Advanced moisture sensor calibration system for accurate readings.
+7. **Device Power Management** - Remote device shutdown capability.
+8. **Real-time Status Monitoring** - Live connection status and sensor readings.
 
 ## Hardware
 
