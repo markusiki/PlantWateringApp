@@ -19,8 +19,6 @@ loginRouter.post('/', async (req: CustomRequest, res, next) => {
     })
   }
 
-  console.log(user)
-
   const userForToken = {
     id: user._id,
     username: user.username,
@@ -29,7 +27,6 @@ loginRouter.post('/', async (req: CustomRequest, res, next) => {
 
   const token = jwt.sign(userForToken, config.SECRET!, { expiresIn: '1h' })
   req.token = token
-  console.log('logged in')
   next()
 })
 
