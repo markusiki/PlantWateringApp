@@ -185,14 +185,14 @@ const Unit: React.FC<IUnitProps> = ({
               </IonText>
             </IonCol>
           </IonRow>
-          <IonRow className="ion-align-items-center">
-            <IonCol className="ion-text-center">
+          <IonRow className="ion-justify-content-center">
+            <IonCol sizeSm="5" className="ion-text-center">
               <IonButton id={`${unit.id}-log`} shape="round" expand="block" color="danger">
                 Log
               </IonButton>
               <Log unit={unit} deleteLogs={deleteLogs}></Log>
             </IonCol>
-            <IonCol className="ion-text-center">
+            <IonCol sizeSm="5" className="ion-text-center">
               <IonButton
                 id={`confirm-water-${unit.id}`}
                 shape="round"
