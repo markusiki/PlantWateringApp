@@ -70,7 +70,7 @@ const Login: React.FC<ILoginProps> = ({ username, setUsername, password, setPass
                   <IonLoading
                     isOpen={loginSpinner}
                     message={
-                      'We are logging you in—just a moment! If you are accessing the demo version, it might take a little longer than usual. Thanks for your patience!'
+                      'We are logging you in — just a moment! If you are accessing the demo version, it might take a little longer than usual. Thanks for your patience!'
                     }
                   ></IonLoading>
                 </IonCardContent>
