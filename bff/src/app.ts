@@ -38,6 +38,7 @@ const proxyOptions: Options = {
   secure: true,
   router: (req: any) => {
     const target = `${req.user?.wormhole_url}/api`
+    pingDemoServer(req.user?.wormhole_url)
 
     return target
   },
@@ -57,7 +58,7 @@ const proxyOptions: Options = {
       req._proxyRetryCount = (req._proxyRetryCount || 0) + 1
 
       if (req._proxyRetryCount <= 3 && target?.toString().includes('plant-api-demo-backend')) {
-        req._proxyRetried = await pingDemoServer(target.toString())
+        req._proxyRetried = await pingDemoServer(req.user?.wormhole_url)
         const retryProxy = createProxyMiddleware(proxyOptions)
         retryProxy(req, res, () => {
           res.status(502).send('Cannot connect to demo server')
