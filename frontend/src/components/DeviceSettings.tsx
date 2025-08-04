@@ -56,10 +56,10 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
       })
       return false
     }
-    if (settings.waterAmount < 1 || settings.waterAmount > 100000 || settings.waterAmount > settings.tankVolume) {
+    if (settings.waterAmount < 0 || settings.waterAmount > 100000 || settings.waterAmount > settings.tankVolume) {
       presentAlert({
         header: 'Invalid input',
-        message: 'Water amount must be between 1 and 100 000 and smaller than tank volume!',
+        message: 'Water amount must be between 0 and 100 000 and not bigger than tank volume!',
         buttons: ['Dismiss'],
       })
       return false
@@ -169,7 +169,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 type="number"
                 inputMode="numeric"
                 max={100000}
-                min={1}
+                min={0}
                 helperText="Set the water amount in the tank in liters."
                 onInput={(event) =>
                   setSettings({
