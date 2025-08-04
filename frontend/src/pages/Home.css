@@ -9,6 +9,10 @@ ion-card {
   text-align: center;
 }
 
+.align-end {
+  text-align: end;
+}
+
 .moist-percent {
   text-align: center;
   font-size: small;
@@ -22,12 +26,6 @@ ion-card {
 .justify-center {
   display: flex;
   justify-content: center;
-}
-
-.last-time-watered {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  text-align: center;
 }
 
 ion-col {
