@@ -6,15 +6,12 @@ import {
   IonButtons,
   IonButton,
   IonContent,
-  IonList,
-  IonItem,
-  IonText,
   IonIcon,
   IonRow,
   IonCol,
   IonGrid,
-  IonListHeader,
   useIonAlert,
+  IonLabel,
 } from '@ionic/react'
 import { ILogProps } from '../interfaces'
 import { useRef } from 'react'
@@ -49,6 +46,8 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
     })
     modal.current?.dismiss()
   }
+
+  const headers = ['Date', 'Moist Value', 'Unit Status', 'Watered', 'Watering Method', 'Message']
   return (
     <>
       <IonModal trigger={`${unit.id}-log`} ref={modal}>
@@ -67,87 +66,40 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-        <IonContent className="ion-padding">
-          <IonList>
-            <IonGrid>
-              <IonRow className="log">
-                <IonCol>
-                  <IonListHeader>
-                    <IonText>
-                      <p className="logLabel">Date</p>
-                    </IonText>
-                  </IonListHeader>
+        <IonContent>
+          <IonGrid>
+            <div>
+              <IonRow className="log-header">
+                {headers.map((header, index) => (
+                  <IonCol key={index} size="2" className="py-3">
+                    <IonLabel className="log-label">{header}</IonLabel>
+                  </IonCol>
+                ))}
+              </IonRow>
+            </div>
+            {unit.logs.map((log, index) => (
+              <IonRow key={index} className="log-list">
+                <IonCol className="justify-center" size="2">
+                  <p className="log-item">{log.date}</p>
                 </IonCol>
-                <IonCol>
-                  <IonListHeader>
-                    <IonText>
-                      <p className="logLabel">Moist Value</p>
-                    </IonText>
-                  </IonListHeader>
+                <IonCol className="justify-center" size="2">
+                  <p className="log-item">{log.moistValue}</p>
                 </IonCol>
-                <IonCol>
-                  <IonListHeader>
-                    <IonText>
-                      <p className="logLabel">Status</p>
-                    </IonText>
-                  </IonListHeader>
+                <IonCol size="2" className="justify-center">
+                  <p className="log-item">{log.status}</p>
                 </IonCol>
-                <IonCol>
-                  <IonListHeader>
-                    <IonText>
-                      <p className="logLabel">Watered</p>
-                    </IonText>
-                  </IonListHeader>
+                <IonCol size="2" className="justify-center">
+                  {log.watered ? <p className="log-item">Yes</p> : <p className="log-item">No</p>}
                 </IonCol>
-                <IonCol>
-                  <IonListHeader>
-                    <IonText>
-                      <p className="logLabel">Watering Method</p>
-                    </IonText>
-                  </IonListHeader>
+                <IonCol size="2" className="justify-center">
+                  {log.waterMethod ? <p className="log-item">{log.waterMethod}</p> : null}
+                </IonCol>
+                <IonCol size="2" className="justify-center">
+                  {log.message ? <p className="log-item">{log.message}</p> : null}
                 </IonCol>
               </IonRow>
-              {unit.logs.map((log, index) => (
-                <IonRow key={index} className="ion-justify-content-start log">
-                  <IonCol>
-                    <IonItem lines="none">
-                      <IonText>
-                        <p className="logItem">{log.date}</p>
-                      </IonText>
-                    </IonItem>
-                  </IonCol>
-                  <IonCol>
-                    <IonItem lines="none">
-                      <IonText>
-                        <p className="logItem">{log.moistValue}</p>
-                      </IonText>
-                    </IonItem>
-                  </IonCol>
-                  <IonCol>
-                    <IonItem lines="none">
-                      <IonText>
-                        <p className="logItem">{log.status}</p>
-                      </IonText>
-                    </IonItem>
-                  </IonCol>
-                  <IonCol>
-                    <IonItem lines="none">
-                      <IonText>{log.watered ? <p className="logItem">Yes</p> : <p className="logItem">No</p>}</IonText>
-                    </IonItem>
-                  </IonCol>
-                  <IonCol>
-                    <IonItem lines="none">
-                      <IonText>
-                        <p className="logItem">
-                          {log.waterMethod}: {log.message}
-                        </p>
-                      </IonText>
-                    </IonItem>
-                  </IonCol>
-                </IonRow>
-              ))}
-            </IonGrid>
-          </IonList>
+            ))}
+          </IonGrid>
         </IonContent>
       </IonModal>
     </>

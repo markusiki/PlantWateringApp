@@ -1,25 +1,29 @@
-ion-grid {
-  --ion-grid-column-padding: 0px;
-  --ion-grid-padding: 0px;
+.log-header {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  margin-top: 1em;
+  padding-bottom: 0.6em;
+  border-bottom: 2px groove;  
 }
 
-.log {
+.log-label {
+  font-size: 0.7em;
+  font-weight: bold;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.log-list {
   border-bottom: 1px groove;
 }
 
-.logLabel {
-  font-size: 0.9em;
-  font-weight: bold;
-  text-align: start;
-}
-
-.logItem {
-  font-size: 0.65em;
-  opacity: 0.8;
-  text-align: start;
-}
-
-ion-item {
-  --inner-padding-start: 0px;
-  --inner-padding-end: 0px;
+.log-item {
+  padding: 10%;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  font-size: 0.6em;
+  opacity: 0.8;   
 }
