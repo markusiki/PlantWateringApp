@@ -55,6 +55,7 @@ export interface ILog {
   watered: boolean
   waterMethod: string
   message: string
+  waterAmount: number
 }
 
 export interface ILogProps {
@@ -62,21 +63,22 @@ export interface ILogProps {
   deleteLogs: (event: React.MouseEvent, id: string) => Promise<void>
 }
 
-export interface IUnitProps {
+export interface IUnitProps extends IUnitSettingsProps {
   unit: IUnitState
   setUnits: React.Dispatch<React.SetStateAction<IUnitState[]>>
-  handleUnitChange: any
   waterNow: (id: string) => Promise<boolean>
   deleteLogs: (event: React.MouseEvent, id: string) => Promise<void>
   waterNowDisabled: boolean
   setWaterNowDisabled: React.Dispatch<React.SetStateAction<boolean>>
   handleUnitCalibration: (event: React.MouseEvent, id: IUnitState['id'], moistValueType: string) => Promise<void>
+  handleClearWaterCounter: (id: IUnitState['id']) => Promise<void>
 }
 
 export interface IUnitSettingsProps {
   unit: IUnitState
-  handleUnitChange: any
+  handleUnitChange: (event: React.MouseEvent, unitSettings: IUnitToUpdate) => Promise<void>
   handleUnitCalibration: (event: React.MouseEvent, id: IUnitState['id'], moistValueType: string) => Promise<void>
+  handleClearWaterCounter: (id: IUnitState['id']) => Promise<void>
 }
 
 export interface IUnitCalibrationProps {
@@ -110,11 +112,9 @@ export interface IDeviceSettingsProps {
   handleDeviceSettingsChange: (event: React.MouseEvent, settings: IDeviceSettingsState) => Promise<void>
 }
 
-export interface IUnitToUpdate {
-  name: string
-  moistLimit: number
-  waterTime: number
+export interface IUnitToUpdate extends Omit<IUnitSettingsState, 'waterFlowRate'> {
   id: string
+  waterFlowRate: number
 }
 
 export interface ILoadingSpinnerProps {
