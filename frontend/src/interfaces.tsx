@@ -116,3 +116,8 @@ export interface IUnitToUpdate {
   waterTime: number
   id: string
 }
+
+export interface ILoadingSpinnerProps {
+  isOpen: boolean
+  message: string
+}

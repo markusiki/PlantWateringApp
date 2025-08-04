@@ -18,6 +18,7 @@ import {
   IonSpinner,
 } from '@ionic/react'
 import { ILoginProps } from '../interfaces'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 const Login: React.FC<ILoginProps> = ({ username, setUsername, password, setPassword, handleLogin, loginSpinner }) => {
   const handleLoginButton = (event: React.MouseEvent<Element, MouseEvent>) => {
@@ -67,12 +68,12 @@ const Login: React.FC<ILoginProps> = ({ username, setUsername, password, setPass
                     </IonItem>
                   </IonList>
                   <IonButton onClick={handleLoginButton}>Login</IonButton>
-                  <IonLoading
+                  <LoadingSpinner
                     isOpen={loginSpinner}
                     message={
                       'We are logging you in — just a moment! If you are accessing the demo version, it might take a little longer than usual. Thanks for your patience!'
                     }
-                  ></IonLoading>
+                  ></LoadingSpinner>
                 </IonCardContent>
               </IonCard>
             </IonCol>
