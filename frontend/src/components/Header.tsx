@@ -17,6 +17,7 @@ import './Header.css'
 const Header: React.FC<IHeaderProps> = ({ isBackendConnected, refresh, deviceSettings }) => {
   const waterTankLevel =
     deviceSettings.tankVolume > 0 ? Math.round((deviceSettings.waterAmount / deviceSettings.tankVolume) * 100) : 0
+
   return (
     <IonHeader>
       <IonToolbar>
@@ -33,12 +34,20 @@ const Header: React.FC<IHeaderProps> = ({ isBackendConnected, refresh, deviceSet
               </IonCol>
 
               <IonRow className="ion-justify-content-between">
-                <IonCol size="12" sizeSm="12" sizeMd="6">
+                <IonCol size="12" sizeSm="12" sizeMd="4">
                   <IonText>Status: </IonText>
                   {isBackendConnected ? (
                     <IonText color={'success'}>Connected</IonText>
                   ) : (
                     <IonText color={'danger'}>Disconnected</IonText>
+                  )}
+                </IonCol>
+                <IonCol size="12" sizeSm="12" sizeMd="4">
+                  <IonText>Time program: </IonText>
+                  {deviceSettings.runTimeProgram ? (
+                    <IonText color={'success'}>Enabled</IonText>
+                  ) : (
+                    <IonText color={'warning'}>Disabled</IonText>
                   )}
                 </IonCol>
                 <IonCol size="12" sizeSm="12" sizeMd="auto">
