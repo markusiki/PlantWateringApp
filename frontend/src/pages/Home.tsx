@@ -11,7 +11,7 @@ import {
 } from '@ionic/react'
 import './Home.css'
 import React, { useEffect, useState } from 'react'
-import { IUnitState, IDeviceSettingsState, IUnitSettingsState } from '../interfaces'
+import { IUnitState, IDeviceSettingsState, IUnitSettingsState, IUnitToUpdate } from '../interfaces'
 import serviceHelper from '../services/helpers'
 import userService from '../services/user'
 import unitService from '../services/units'
@@ -221,11 +221,10 @@ const Home: React.FC = () => {
     }
   }
 
-  const handleUnitChange = async (event: React.MouseEvent, unitSettings: IUnitSettingsState, id: IUnitState['id']) => {
+  const handleUnitChange = async (event: React.MouseEvent, unitSettings: IUnitToUpdate) => {
     event.preventDefault()
     try {
-      const unitToUpdate = { ...unitSettings, id: id }
-      const returnedUnit = await unitService.changeSettings(unitToUpdate)
+      const returnedUnit = await unitService.changeSettings(unitSettings)
       if (returnedUnit?.status === 200) {
         setUnits(units.map((unit) => (unit.id !== returnedUnit.data.id ? unit : returnedUnit.data)))
       }
@@ -241,6 +240,20 @@ const Home: React.FC = () => {
     event.preventDefault()
     try {
       const returnedUnit = await unitService.calibrateUnit(id, moistValueType)
+      if (returnedUnit?.status === 200) {
+        setUnits(units.map((unit) => (unit.id !== returnedUnit.data.id ? unit : returnedUnit.data)))
+      }
+    } catch (error: any) {
+      const status = error?.response.status
+      if (status === 401 || status === 422) {
+        deauthorize()
+      }
+    }
+  }
+
+  const handleClearWaterCounter = async (id: IUnitState['id']) => {
+    try {
+      const returnedUnit = await unitService.deleteWaterCounter(id)
       if (returnedUnit?.status === 200) {
         setUnits(units.map((unit) => (unit.id !== returnedUnit.data.id ? unit : returnedUnit.data)))
       }
@@ -302,6 +315,7 @@ const Home: React.FC = () => {
                         waterNowDisabled={waterNowDisabeled}
                         setWaterNowDisabled={setWaterNowDisabled}
                         handleUnitCalibration={handleUnitCalibration}
+                        handleClearWaterCounter={handleClearWaterCounter}
                       />
                     ))}
                   </IonContent>
