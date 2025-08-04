@@ -38,8 +38,6 @@ const proxyOptions: Options = {
   secure: true,
   router: (req: any) => {
     const target = `${req.user?.wormhole_url}/api`
-    pingDemoServer(req.user?.wormhole_url)
-
     return target
   },
   on: {
