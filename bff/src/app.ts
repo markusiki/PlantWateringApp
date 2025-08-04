@@ -48,7 +48,19 @@ const proxyOptions: Options = {
         proxyReq.write(bodyData)
       }
     },
-    proxyRes: (proxyRes, req: any, res: any) => {
+    proxyRes: async (proxyRes, req: any, res: any) => {
+      req._proxyRetryCount = (req._proxyRetryCount || 0) + 1
+      if (
+        proxyRes.statusCode === 502 &&
+        req._proxyRetryCount <= 3 &&
+        req.user.wormhole_url.includes('plant-api-demo-backend')
+      ) {
+        req._proxyRetried = await pingDemoServer(req.user?.wormhole_url)
+        const retryProxy = createProxyMiddleware(proxyOptions)
+        retryProxy(req, res, () => {
+          res.status(502).send('Cannot connect to demo server')
+        })
+      }
       const proxyCookies = proxyRes.headers['set-cookie'] || []
       proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
     },
