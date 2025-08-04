@@ -7,6 +7,7 @@ import morgan from 'morgan'
 import deviceRouter from './controllers/deviceRouter'
 import loginRouter from './controllers/login'
 import { tokenExtractor, userExtractor } from './utils/middleware'
+import axios from 'axios'
 
 mongoose
   .connect(config.MONGODB_URI!)
@@ -26,14 +27,18 @@ iotService
     console.error('error connection to IOT Service', error.message)
   })
 
+const pingDemoServer = async (url: string) => {
+  try {
+    await axios.get(url)
+  } catch (error) {}
+}
+
 const proxyOptions: Options = {
   changeOrigin: true,
   secure: true,
   router: (req: any) => {
-    const target = req.user?.wormhole_url
-    /* if (target.includes('plant-api-demo-backend')) {
-      callDemoServer(target)
-    } */
+    const target = `${req.user?.wormhole_url}/api`
+
     return target
   },
   on: {
@@ -48,6 +53,19 @@ const proxyOptions: Options = {
       const proxyCookies = proxyRes.headers['set-cookie'] || []
       proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
     },
+    error: async (err, req: any, res: any, target) => {
+      req._proxyRetryCount = (req._proxyRetryCount || 0) + 1
+
+      if (req._proxyRetryCount <= 3 && target?.toString().includes('plant-api-demo-backend')) {
+        req._proxyRetried = await pingDemoServer(target.toString())
+        const retryProxy = createProxyMiddleware(proxyOptions)
+        retryProxy(req, res, () => {
+          res.status(502).send('Cannot connect to demo server')
+        })
+      } else {
+        res.status(502).send()
+      }
+    },
   },
 }
 
@@ -60,16 +78,7 @@ app.use(morgan('combined'))
 app.use(tokenExtractor)
 app.use('/api/device', deviceRouter)
 app.use('/api/login', loginRouter)
-app.all(
-  '/api/*',
-  (req, res, next) => {
-    console.log('matched: ', req.path)
-    next()
-  },
-  userExtractor,
-  proxy,
-)
-
+app.use('/api', userExtractor, proxy)
 app.use('/', (req, res) => {
   res.redirect('/')
 })
