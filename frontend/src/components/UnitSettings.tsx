@@ -14,14 +14,20 @@ import {
   IonItemGroup,
   IonLabel,
   IonText,
+  IonAlert,
 } from '@ionic/react'
-import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
+import { IUnitSettingsProps, IUnitSettingsState, IUnitToUpdate } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 import './UnitSettings.css'
 import unitService from '../services/units'
 import UnitCalibration from './UnitCalibration'
 
-const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, handleUnitCalibration }) => {
+const UnitSettings: React.FC<IUnitSettingsProps> = ({
+  unit,
+  handleUnitChange,
+  handleUnitCalibration,
+  handleClearWaterCounter,
+}) => {
   const [settings, setSettings] = useState<IUnitSettingsState>({
     name: '',
     moistLimit: 0,
@@ -61,25 +67,6 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
     unit.waterFlowRate,
   ])
 
-  /*  useEffect(() => {
-    if (isCalibrating) {
-      intervalRef.current = setInterval(getRawMoistValue, 2000)
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [isCalibrating])
-
-  useEffect(() => {
-    rawMoistValueRef.current = rawMoistValue
-  }, [rawMoistValue])
- */
   const validateInputs = () => {
     if (settings.name.length > 100 || settings.name.length < 1) {
       presentAlert({
@@ -159,11 +146,11 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
     }
   }
 
-  const confirm = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
+  const confirm = (event: React.MouseEvent) => {
     const validInputs = validateInputs()
     if (validInputs) {
-      const settingsToSave = { ...settings, waterFlowRate: parseFloat(settings.waterFlowRate) }
-      handleUnitChange(event, settingsToSave, unit.id)
+      const settingsToSave = { ...settings, waterFlowRate: parseFloat(settings.waterFlowRate), id: unit.id }
+      handleUnitChange(event, settingsToSave)
       unitSettingsModal.current?.dismiss()
     }
   }
@@ -326,6 +313,28 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({ unit, handleUnitChange, ha
             unit={unit}
             handleUnitCalibration={handleUnitCalibration}
           ></UnitCalibration>
+          <IonButton id="clear-water-counter" color={'warning'}>
+            Clear water counter
+          </IonButton>
+          <IonAlert
+            header="Confirm"
+            message={`Are you sure that you want to clear water counter?`}
+            trigger={'clear-water-counter'}
+            buttons={[
+              {
+                text: 'CANCEL',
+                role: 'cancel',
+              },
+              {
+                text: 'CLEAR COUNTER',
+                role: 'confirm',
+                handler: () => {
+                  handleClearWaterCounter(unit.id)
+                  unitSettingsModal.current?.dismiss()
+                },
+              },
+            ]}
+          ></IonAlert>
         </IonContent>
       </IonModal>
     </>
