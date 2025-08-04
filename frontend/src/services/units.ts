@@ -37,6 +37,19 @@ const getRawMoistValue = async (id: string) => {
   return response
 }
 
-const unitServices = { getAll, changeSettings, waterPlant, deleteLogs, calibrateUnit, getRawMoistValue }
+const deleteWaterCounter = async (id: string) => {
+  const response = await axios.put(`${baseUrl}/counter/${id}`, serviceHelper.getConfig())
+  return response
+}
+
+const unitServices = {
+  getAll,
+  changeSettings,
+  waterPlant,
+  deleteLogs,
+  calibrateUnit,
+  getRawMoistValue,
+  deleteWaterCounter,
+}
 
 export default unitServices
