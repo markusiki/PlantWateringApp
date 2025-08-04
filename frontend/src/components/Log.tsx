@@ -47,7 +47,7 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
     modal.current?.dismiss()
   }
 
-  const headers = ['Date', 'Moist Value', 'Unit Status', 'Watered', 'Watering Method', 'Message']
+  const headers = ['Date', 'Moist Value', 'Unit Status', 'Watered: Amount', 'Watering Method', 'Message']
   return (
     <>
       <IonModal trigger={`${unit.id}-log`} ref={modal}>
@@ -89,7 +89,7 @@ const Log: React.FC<ILogProps> = ({ unit, deleteLogs }) => {
                   <p className="log-item">{log.status}</p>
                 </IonCol>
                 <IonCol size="2" className="justify-center">
-                  {log.watered ? <p className="log-item">Yes</p> : <p className="log-item">No</p>}
+                  {log.watered ? <p className="log-item">Yes: {log.waterAmount} l</p> : <p className="log-item">No</p>}
                 </IonCol>
                 <IonCol size="2" className="justify-center">
                   {log.waterMethod ? <p className="log-item">{log.waterMethod}</p> : null}
