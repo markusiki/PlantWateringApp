@@ -25,6 +25,7 @@ const Unit: React.FC<IUnitProps> = ({
   waterNowDisabled,
   setWaterNowDisabled,
   handleUnitCalibration,
+  handleClearWaterCounter,
 }) => {
   let counterEnabled = false
 
@@ -96,6 +97,13 @@ const Unit: React.FC<IUnitProps> = ({
     }
   }
 
+  const getAutoWateringStatus = () => {
+    if (unit.enableAutoWatering) {
+      return <IonText color={'success'}>Enabled</IonText>
+    }
+    return <IonText color={'warning'}>Disabled</IonText>
+  }
+
   return (
     <>
       <IonCard key={unit.id}>
@@ -117,27 +125,31 @@ const Unit: React.FC<IUnitProps> = ({
                 unit={unit}
                 handleUnitChange={handleUnitChange}
                 handleUnitCalibration={handleUnitCalibration}
+                handleClearWaterCounter={handleClearWaterCounter}
               />
             </IonCol>
           </IonRow>
-          <IonRow>
-            {unit.status === 'OK' ? (
-              <IonCol>
-                <p className="align-center">
+          <IonRow className="ion-justify-content-center">
+            <IonCol size="auto">
+              {unit.status === 'OK' ? (
+                <p>
                   Status: <IonText color="success">{unit.status}</IonText>
                 </p>
-              </IonCol>
-            ) : (
-              <IonCol>
-                <p className="align-center">
+              ) : (
+                <p>
                   Status: <IonText color="danger">{unit.status}</IonText>
                 </p>
-              </IonCol>
-            )}
+              )}
+            </IonCol>
           </IonRow>
-          <IonRow>
-            <IonCol>
-              <p className="align-center">Moist Value:{unit.moistValue}</p>
+          <IonRow className="ion-justify-content-center">
+            <IonCol size="auto">
+              <p>Automatic watering: {getAutoWateringStatus()} </p>
+            </IonCol>
+          </IonRow>
+          <IonRow className="ion-justify-content-center">
+            <IonCol size="auto">
+              <p>Moist Value:{unit.moistValue}</p>
             </IonCol>
           </IonRow>
           <IonRow className="ion-justify-content-center">
@@ -174,13 +186,22 @@ const Unit: React.FC<IUnitProps> = ({
               </IonRow>
             </IonCol>
           </IonRow>
-          <IonRow>
-            <IonCol>
+          <IonRow className="ion-justify-content-evenly ion-margin-top">
+            <IonCol size="auto">
               <IonText>
-                <p className="last-time-watered">
+                <p>
                   Last time watered:
                   <br />
                   {unit.logs.find((log) => log.watered === true)?.date}
+                </p>
+              </IonText>
+            </IonCol>
+            <IonCol size="auto">
+              <IonText className="ion-text-center">
+                <p>
+                  Total amount watered:
+                  <br />
+                  {unit.totalWateredAmount} liters
                 </p>
               </IonText>
             </IonCol>
