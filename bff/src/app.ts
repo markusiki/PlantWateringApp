@@ -29,6 +29,7 @@ iotService
 
 const pingDemoServer = async (url: string) => {
   try {
+    console.log('pingDemoServer: ', url)
     await axios.get(url)
   } catch (error) {}
 }
@@ -42,6 +43,7 @@ const proxyOptions: Options = {
   },
   on: {
     proxyReq: (proxyReq, req: any, res) => {
+      console.log('proxyreq')
       if (req.body) {
         const bodyData = JSON.stringify(req.body)
         proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
@@ -50,11 +52,16 @@ const proxyOptions: Options = {
     },
     proxyRes: async (proxyRes, req: any, res: any) => {
       req._proxyRetryCount = (req._proxyRetryCount || 0) + 1
+      console.log('proxyres')
+      console.log('status: ', proxyRes.statusCode)
+      console.log(req.user.wormhole_url.includes('plant-api-demo-backend'))
+      console.log('retries: ', req._proxyRetryCount)
       if (
         proxyRes.statusCode === 502 &&
         req._proxyRetryCount <= 3 &&
         req.user.wormhole_url.includes('plant-api-demo-backend')
       ) {
+        console.log('pinging: ', req.user.wormhole_url)
         req._proxyRetried = await pingDemoServer(req.user?.wormhole_url)
         const retryProxy = createProxyMiddleware(proxyOptions)
         retryProxy(req, res, () => {
@@ -65,9 +72,11 @@ const proxyOptions: Options = {
       proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
     },
     error: async (err, req: any, res: any, target) => {
+      console.log('error')
       req._proxyRetryCount = (req._proxyRetryCount || 0) + 1
 
-      if (req._proxyRetryCount <= 3 && target?.toString().includes('plant-api-demo-backend')) {
+      if (req._proxyRetryCount <= 3 && req.user.wormhole_url.includes('plant-api-demo-backend')) {
+        console.log('error pinging: ', req.user.wormhole_url)
         req._proxyRetried = await pingDemoServer(req.user?.wormhole_url)
         const retryProxy = createProxyMiddleware(proxyOptions)
         retryProxy(req, res, () => {
