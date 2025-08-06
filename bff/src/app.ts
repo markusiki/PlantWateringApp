@@ -8,7 +8,7 @@ import deviceRouter from './controllers/deviceRouter'
 import loginRouter from './controllers/login'
 import { tokenExtractor, userExtractor } from './utils/middleware'
 import axios from 'axios'
-import { resolve } from 'node:path'
+import { IncomingMessage } from 'http'
 
 mongoose
   .connect(config.MONGODB_URI!)
@@ -35,6 +35,30 @@ const pingDemoServer = async () => {
   return response
 }
 
+const handleDemoProxy = async (proxyRes: IncomingMessage, req: any, res: any) => {
+  req._proxyRetryCount = (req._proxyRetryCount || 0) + 1
+  console.log('proxyres')
+  console.log('status: ', proxyRes.statusCode)
+  console.log(req.user.wormhole_url.includes('plant-api-demo-backend'))
+  console.log('retries: ', req._proxyRetryCount)
+  if (req._proxyRetryCount <= 3) {
+    console.log('pinging...')
+    const retryProxy = createProxyMiddleware(proxyOptions)
+    try {
+      const response = await pingDemoServer()
+      console.log('response data: ', response.data)
+      console.log('retrying proxy...')
+      // wait for demo server to spin up
+      setTimeout(() => {
+        retryProxy(req, res)
+      }, 3000)
+    } catch (error) {
+      console.log(error)
+      res.status(502).send('Cannot connect to demo server')
+    }
+  }
+}
+
 const proxyOptions: Options = {
   changeOrigin: true,
   secure: true,
@@ -52,28 +76,11 @@ const proxyOptions: Options = {
       }
     },
     proxyRes: async (proxyRes, req: any, res: any) => {
-      req._proxyRetryCount = (req._proxyRetryCount || 0) + 1
-      console.log('proxyres')
-      console.log('status: ', proxyRes.statusCode)
-      console.log(req.user.wormhole_url.includes('plant-api-demo-backend'))
-      console.log('retries: ', req._proxyRetryCount)
-      if (
-        proxyRes.statusCode !== 200 &&
-        req._proxyRetryCount <= 3 &&
-        req.user.wormhole_url.includes('plant-api-demo-backend')
-      ) {
-        console.log('pinging...')
-        const retryProxy = createProxyMiddleware(proxyOptions)
-        try {
-          const response = await pingDemoServer()
-          console.log('response data: ', response.data)
-          console.log('retrying proxy...')
-          retryProxy(req, res)
-        } catch (error) {
-          console.log(error)
-          res.status(502).send('Cannot connect to demo server')
-        }
+      if (proxyRes.statusCode !== 200 && req.user.wormhole_url.includes('plant-api-demo-backend')) {
+        await handleDemoProxy(proxyRes, req, res)
       }
+
+      console.log('setting headers')
       const proxyCookies = proxyRes.headers['set-cookie'] || []
       proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
     },
