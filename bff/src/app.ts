@@ -29,14 +29,10 @@ iotService
   })
 
 const pingDemoServer = async () => {
-  try {
-    console.log('pingDemoServer: ', config.PING_URI)
-    const response = await axios.get(config.PING_URI!)
-    console.log('pinged!')
-    return response
-  } catch (error) {
-    console.log('Error pinging demo server')
-  }
+  console.log('pingDemoServer: ', config.PING_URI)
+  const response = await axios.get(config.PING_URI!)
+  console.log('pinged!')
+  return response
 }
 
 const proxyOptions: Options = {
@@ -69,9 +65,12 @@ const proxyOptions: Options = {
         console.log('pinging...')
         const retryProxy = createProxyMiddleware(proxyOptions)
         try {
-          await pingDemoServer()
-          await retryProxy(req, res)
+          const response = await pingDemoServer()
+          console.log('response data: ', response.data)
+          console.log('retrying proxy...')
+          retryProxy(req, res)
         } catch (error) {
+          console.log(error)
           res.status(502).send('Cannot connect to demo server')
         }
       }
