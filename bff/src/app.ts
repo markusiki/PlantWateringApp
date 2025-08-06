@@ -2,13 +2,13 @@ import mongoose from 'mongoose'
 import config from './utils/config'
 import express from 'express'
 import iotService from './utils/iotService'
-import { createProxyMiddleware, Options } from 'http-proxy-middleware'
+import { createProxyMiddleware, Options, responseInterceptor } from 'http-proxy-middleware'
 import morgan from 'morgan'
 import deviceRouter from './controllers/deviceRouter'
 import loginRouter from './controllers/login'
 import { tokenExtractor, userExtractor } from './utils/middleware'
 import axios from 'axios'
-import { IncomingMessage } from 'http'
+import { IncomingMessage, ServerResponse } from 'http'
 
 mongoose
   .connect(config.MONGODB_URI!)
@@ -35,23 +35,24 @@ const pingDemoServer = async () => {
   return response
 }
 
-const handleDemoProxy = async (proxyRes: IncomingMessage, req: any, res: any) => {
-  req._proxyRetryCount = (req._proxyRetryCount || 0) + 1
+const handleDemoProxyPing = async (proxyRes: IncomingMessage, req: any, res: any) => {
   console.log('proxyres')
   console.log('status: ', proxyRes.statusCode)
   console.log(req.user.wormhole_url.includes('plant-api-demo-backend'))
   console.log('retries: ', req._proxyRetryCount)
-  if (req._proxyRetryCount <= 3) {
-    console.log('pinging...')
-    const retryProxy = createProxyMiddleware(proxyOptions)
+  if (!req._proxyRetried) {
+    req._proxyRetried = true
     try {
+      console.log('pinging...')
       const response = await pingDemoServer()
       console.log('response data: ', response.data)
       console.log('retrying proxy...')
       // wait for demo server to spin up
       setTimeout(() => {
+        const retryProxy = createProxyMiddleware(proxyOptions)
         retryProxy(req, res)
       }, 3000)
+      console.log('spinned up')
     } catch (error) {
       console.log(error)
       res.status(502).send('Cannot connect to demo server')
@@ -62,6 +63,7 @@ const handleDemoProxy = async (proxyRes: IncomingMessage, req: any, res: any) =>
 const proxyOptions: Options = {
   changeOrigin: true,
   secure: true,
+  selfHandleResponse: true,
   router: (req: any) => {
     const target = `${req.user?.wormhole_url}/api`
     return target
@@ -75,15 +77,23 @@ const proxyOptions: Options = {
         proxyReq.write(bodyData)
       }
     },
-    proxyRes: async (proxyRes, req: any, res: any) => {
-      if (proxyRes.statusCode !== 200 && req.user.wormhole_url.includes('plant-api-demo-backend')) {
-        await handleDemoProxy(proxyRes, req, res)
+    proxyRes: responseInterceptor(async (responseBuffer, proxyRes, req: any, res: ServerResponse) => {
+      if (
+        proxyRes.statusCode !== 200 &&
+        proxyRes.statusCode !== 401 &&
+        req.user.wormhole_url.includes('plant-api-demo-backend')
+      ) {
+        await handleDemoProxyPing(proxyRes, req, res)
       }
 
       console.log('setting headers')
       const proxyCookies = proxyRes.headers['set-cookie'] || []
-      proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
-    },
+      // proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`] */
+
+      res.setHeader('set-cookie', [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`])
+
+      return responseBuffer
+    }),
   },
 }
 
