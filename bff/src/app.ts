@@ -27,10 +27,10 @@ iotService
     console.error('error connection to IOT Service', error.message)
   })
 
-const pingDemoServer = async (url: string) => {
+const pingDemoServer = async () => {
   try {
-    console.log('pingDemoServer: ', url)
-    await axios.get(url)
+    console.log('pingDemoServer: ', config.PING_URI)
+    await axios.get(config.PING_URI!)
   } catch (error) {}
 }
 
@@ -62,7 +62,7 @@ const proxyOptions: Options = {
         req.user.wormhole_url.includes('plant-api-demo-backend')
       ) {
         console.log('pinging: ', req.user.wormhole_url)
-        req._proxyRetried = await pingDemoServer(req.user?.wormhole_url)
+        req._proxyRetried = await pingDemoServer()
         const retryProxy = createProxyMiddleware(proxyOptions)
         retryProxy(req, res, () => {
           res.status(502).send('Cannot connect to demo server')
@@ -77,7 +77,7 @@ const proxyOptions: Options = {
 
       if (req._proxyRetryCount <= 3 && req.user.wormhole_url.includes('plant-api-demo-backend')) {
         console.log('error pinging: ', req.user.wormhole_url)
-        req._proxyRetried = await pingDemoServer(req.user?.wormhole_url)
+        req._proxyRetried = await pingDemoServer()
         const retryProxy = createProxyMiddleware(proxyOptions)
         retryProxy(req, res, () => {
           res.status(502).send('Cannot connect to demo server')

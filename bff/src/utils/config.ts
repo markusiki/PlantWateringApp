@@ -10,6 +10,7 @@ const IOTSERVICE_CREDENTIALS = {
   password: process.env.IOTSERVICE_PASSWORD,
 }
 const SECRET = process.env.SECRET
+const PING_URI = process.env.PING_URI
 
 export default {
   PORT,
@@ -17,4 +18,5 @@ export default {
   IOTSERVICE_URI,
   IOTSERVICE_CREDENTIALS,
   SECRET,
+  PING_URI,
 }
