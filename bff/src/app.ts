@@ -8,6 +8,7 @@ import deviceRouter from './controllers/deviceRouter'
 import loginRouter from './controllers/login'
 import { tokenExtractor, userExtractor } from './utils/middleware'
 import axios from 'axios'
+import { resolve } from 'node:path'
 
 mongoose
   .connect(config.MONGODB_URI!)
@@ -30,8 +31,9 @@ iotService
 const pingDemoServer = async () => {
   try {
     console.log('pingDemoServer: ', config.PING_URI)
-    await axios.get(config.PING_URI!)
+    const response = await axios.get(config.PING_URI!)
     console.log('pinged!')
+    return response
   } catch (error) {
     console.log('Error pinging demo server')
   }
@@ -65,11 +67,13 @@ const proxyOptions: Options = {
         req.user.wormhole_url.includes('plant-api-demo-backend')
       ) {
         console.log('pinging...')
-        req._proxyRetried = await pingDemoServer()
         const retryProxy = createProxyMiddleware(proxyOptions)
-        retryProxy(req, res, () => {
+        try {
+          await pingDemoServer()
+          await retryProxy(req, res)
+        } catch (error) {
           res.status(502).send('Cannot connect to demo server')
-        })
+        }
       }
       const proxyCookies = proxyRes.headers['set-cookie'] || []
       proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
