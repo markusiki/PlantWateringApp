@@ -31,7 +31,10 @@ const pingDemoServer = async () => {
   try {
     console.log('pingDemoServer: ', config.PING_URI)
     await axios.get(config.PING_URI!)
-  } catch (error) {}
+    console.log('pinged!')
+  } catch (error) {
+    console.log('Error pinging demo server')
+  }
 }
 
 const proxyOptions: Options = {
@@ -57,11 +60,11 @@ const proxyOptions: Options = {
       console.log(req.user.wormhole_url.includes('plant-api-demo-backend'))
       console.log('retries: ', req._proxyRetryCount)
       if (
-        proxyRes.statusCode === 502 &&
+        proxyRes.statusCode !== 200 &&
         req._proxyRetryCount <= 3 &&
         req.user.wormhole_url.includes('plant-api-demo-backend')
       ) {
-        console.log('pinging: ', req.user.wormhole_url)
+        console.log('pinging...')
         req._proxyRetried = await pingDemoServer()
         const retryProxy = createProxyMiddleware(proxyOptions)
         retryProxy(req, res, () => {
@@ -70,21 +73,6 @@ const proxyOptions: Options = {
       }
       const proxyCookies = proxyRes.headers['set-cookie'] || []
       proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
-    },
-    error: async (err, req: any, res: any, target) => {
-      console.log('error')
-      req._proxyRetryCount = (req._proxyRetryCount || 0) + 1
-
-      if (req._proxyRetryCount <= 3 && req.user.wormhole_url.includes('plant-api-demo-backend')) {
-        console.log('error pinging: ', req.user.wormhole_url)
-        req._proxyRetried = await pingDemoServer()
-        const retryProxy = createProxyMiddleware(proxyOptions)
-        retryProxy(req, res, () => {
-          res.status(502).send('Cannot connect to demo server')
-        })
-      } else {
-        res.status(502).send()
-      }
     },
   },
 }
