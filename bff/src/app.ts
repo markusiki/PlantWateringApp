@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import config from './utils/config'
-import express from 'express'
+import express, { Request } from 'express'
 import iotService from './utils/iotService'
 import { createProxyMiddleware, Options, responseInterceptor } from 'http-proxy-middleware'
 import morgan from 'morgan'
@@ -45,7 +45,15 @@ const proxyOptions: Options = {
     },
     proxyRes: async (proxyRes, req: any, res: any) => {
       const proxyCookies = proxyRes.headers['set-cookie'] || []
-      proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
+      if (req.path === '/login') {
+        proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
+      }
+      if (req.path === '/logout') {
+        proxyRes.headers['set-cookie'] = [
+          ...proxyCookies,
+          `bff_access_token=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; HttpOnly`,
+        ]
+      }
     },
   },
 }
