@@ -10,7 +10,7 @@ import {
   useIonToast,
 } from '@ionic/react'
 import './Home.css'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { IUnitState, IDeviceSettingsState, IUnitSettingsState, IUnitToUpdate } from '../interfaces'
 import serviceHelper from '../services/helpers'
 import userService from '../services/user'
@@ -37,6 +37,7 @@ const Home: React.FC = () => {
     tankVolume: 0,
     waterAmount: 0,
   })
+  const refresherRef = useRef<NodeJS.Timeout>()
 
   const [waterNowDisabeled, setWaterNowDisabled] = useState(false)
 
@@ -65,6 +66,16 @@ const Home: React.FC = () => {
       serviceHelper.setUser(loggedUser)
     }
   }, [])
+
+  useEffect(() => {
+    const setRefresher = () => {
+      refresherRef.current = setInterval(refresh, 10000)
+    }
+    clearInterval(refresherRef.current)
+    if (isLoggedIn) {
+      setRefresher()
+    }
+  }, [isLoggedIn])
 
   const deauthorize = () => {
     setUnits([])
