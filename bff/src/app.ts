@@ -30,7 +30,6 @@ iotService
 const proxyOptions: Options = {
   changeOrigin: true,
   secure: true,
-  selfHandleResponse: true,
   router: (req: any) => {
     const target = `${req.user?.wormhole_url}/api`
     return target
@@ -59,7 +58,7 @@ app.use(express.static('build'))
 app.use(morgan('combined'))
 app.use(tokenExtractor)
 app.use('/api/device', deviceRouter)
-app.use('/api/login', loginRouter, proxyPinger)
+app.use('/api/login', loginRouter, userExtractor, proxyPinger)
 app.use('/api', userExtractor, proxy)
 app.use('/', (req, res) => {
   res.redirect('/')
