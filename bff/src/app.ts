@@ -7,7 +7,7 @@ import morgan from 'morgan'
 import deviceRouter from './controllers/deviceRouter'
 import loginRouter from './controllers/login'
 import { tokenExtractor, userExtractor } from './utils/middleware'
-import axios from 'axios'
+import { proxyStatusChecker } from './utils/proxyStatusChecker'
 
 mongoose
   .connect(config.MONGODB_URI!)
@@ -27,12 +27,6 @@ iotService
     console.error('error connection to IOT Service', error.message)
   })
 
-const pingDemoServer = async (url: string) => {
-  try {
-    await axios.get(url)
-  } catch (error) {}
-}
-
 const proxyOptions: Options = {
   changeOrigin: true,
   secure: true,
@@ -49,33 +43,8 @@ const proxyOptions: Options = {
       }
     },
     proxyRes: async (proxyRes, req: any, res: any) => {
-      req._proxyRetryCount = (req._proxyRetryCount || 0) + 1
-      if (
-        proxyRes.statusCode === 502 &&
-        req._proxyRetryCount <= 3 &&
-        req.user.wormhole_url.includes('plant-api-demo-backend')
-      ) {
-        req._proxyRetried = await pingDemoServer(req.user?.wormhole_url)
-        const retryProxy = createProxyMiddleware(proxyOptions)
-        retryProxy(req, res, () => {
-          res.status(502).send('Cannot connect to demo server')
-        })
-      }
       const proxyCookies = proxyRes.headers['set-cookie'] || []
       proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
-    },
-    error: async (err, req: any, res: any, target) => {
-      req._proxyRetryCount = (req._proxyRetryCount || 0) + 1
-
-      if (req._proxyRetryCount <= 3 && target?.toString().includes('plant-api-demo-backend')) {
-        req._proxyRetried = await pingDemoServer(req.user?.wormhole_url)
-        const retryProxy = createProxyMiddleware(proxyOptions)
-        retryProxy(req, res, () => {
-          res.status(502).send('Cannot connect to demo server')
-        })
-      } else {
-        res.status(502).send()
-      }
     },
   },
 }
@@ -89,7 +58,7 @@ app.use(morgan('combined'))
 app.use(tokenExtractor)
 app.use('/api/device', deviceRouter)
 app.use('/api/login', loginRouter)
-app.use('/api', userExtractor, proxy)
+app.use('/api', userExtractor, proxyStatusChecker, proxy)
 app.use('/', (req, res) => {
   res.redirect('/')
 })
