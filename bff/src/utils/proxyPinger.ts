@@ -6,6 +6,7 @@ import config from './config'
 export const proxyPinger = async (req: CustomRequest, res: Response, next: NextFunction) => {
   const maxAttempts = 30
   let attempt = 0
+  let reDeployed = false
 
   const tryDeploy = async () => {
     try {
@@ -19,7 +20,7 @@ export const proxyPinger = async (req: CustomRequest, res: Response, next: NextF
     }
   }
 
-  const tryPing = async (tryAgain = true) => {
+  const tryPing = async () => {
     try {
       const response = await axios.get(`${req.user?.wormhole_url}/service/status`)
       console.log(`Attempt ${attempt + 1}:`, response.status)
@@ -37,14 +38,20 @@ export const proxyPinger = async (req: CustomRequest, res: Response, next: NextF
     if (attempt < maxAttempts) {
       setTimeout(tryPing, 2000) // wait 2 second before next attempt
     } else {
-      console.log('Max attempts reached. Pining deploy.')
-      if (tryAgain) {
+      console.log('Max attempts reached')
+      if (!reDeployed) {
+        attempt = 0
+        console.log('reDeployed: ', reDeployed)
+        console.log('pingign deploy')
         await tryDeploy()
-        await tryPing(false)
-        return res.status(502).json({ error: 'Demo server not responding' })
+        reDeployed = true
+        await tryPing()
+      } else {
+        console.log('reDeployed: ', reDeployed)
+        res.status(502).json({ error: 'Demo server not responding' })
       }
     }
   }
 
-  tryPing()
+  await tryPing()
 }
