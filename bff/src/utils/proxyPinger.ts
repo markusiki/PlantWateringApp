@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express'
 import { CustomRequest } from '../interfaces'
 import axios from 'axios'
 import config from './config'
+import { error } from 'node:console'
 
 export const proxyPinger = async (req: CustomRequest, res: Response, next: NextFunction) => {
   const maxAttempts = 30
@@ -15,23 +16,23 @@ export const proxyPinger = async (req: CustomRequest, res: Response, next: NextF
       if (response.status === 200) {
         console.log('deploy complete')
       }
-    } catch (error) {
-      console.error('deploy failed')
+    } catch (error: any) {
+      console.error('deploy failed ', error.response.status)
     }
   }
 
   const tryPing = async () => {
     try {
       const response = await axios.get(`${req.user?.wormhole_url}/service/status`)
-      console.log(`Attempt ${attempt + 1}:`, response.status)
+      console.log(`Attempt ${attempt + 1} succeeded`)
 
       if (response.status === 200) {
         console.log('stop pinging')
         next()
         return
       }
-    } catch (error) {
-      console.error(`Attempt ${attempt + 1} failed:`, error)
+    } catch (error: any) {
+      console.error(`Ping attempt ${attempt + 1} failed: `, error.response.status)
     }
 
     attempt++
