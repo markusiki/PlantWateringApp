@@ -7,7 +7,7 @@ import morgan from 'morgan'
 import deviceRouter from './controllers/deviceRouter'
 import loginRouter from './controllers/login'
 import { tokenExtractor, userExtractor } from './utils/middleware'
-import { proxyPinger } from './utils/proxyPinger'
+import { demoServerPinger } from './utils/demoServerPinger'
 
 mongoose
   .connect(config.MONGODB_URI!)
@@ -66,7 +66,7 @@ app.use(express.static('build'))
 app.use(morgan('combined'))
 app.use(tokenExtractor)
 app.use('/api/device', deviceRouter)
-app.use('/api/login', loginRouter, userExtractor, proxyPinger)
+app.use('/api/login', loginRouter, userExtractor, demoServerPinger)
 app.use('/api', userExtractor, proxy)
 app.use('/', (req, res) => {
   res.redirect('/')
