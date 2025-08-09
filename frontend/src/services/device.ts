@@ -15,6 +15,7 @@ const updateSettings = async (deviceSettings: IDeviceSettingsState) => {
 
 const shutdown = async () => {
   const response = await axios.post(`${baseUrl}/shutdown`, {}, serviceHelpers.getConfig())
+  return response
 }
 
 const deviceService = { getAll, updateSettings, shutdown }
