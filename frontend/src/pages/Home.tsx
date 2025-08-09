@@ -1,17 +1,15 @@
 import {
-  IonApp,
   IonContent,
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonRouterOutlet,
   RefresherEventDetail,
   useIonRouter,
   useIonToast,
 } from '@ionic/react'
 import './Home.css'
 import React, { useEffect, useRef, useState } from 'react'
-import { IUnitState, IDeviceSettingsState, IUnitSettingsState, IUnitToUpdate } from '../interfaces'
+import { IUnitState, IDeviceSettingsState, IUnitToUpdate } from '../interfaces'
 import serviceHelper from '../services/helpers'
 import userService from '../services/user'
 import unitService from '../services/units'
@@ -69,7 +67,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const setRefresher = () => {
-      refresherRef.current = setInterval(refresh, 10000)
+      refresherRef.current = setInterval(refresh, 30000)
     }
     clearInterval(refresherRef.current)
     if (isLoggedIn) {
@@ -118,7 +116,7 @@ const Home: React.FC = () => {
     event.preventDefault()
     try {
       const response = await userService.logout()
-      toast(response.data.message, 1500)
+      toast(response.data.message, 3000)
     } catch (error) {
     } finally {
       deauthorize()
@@ -128,7 +126,10 @@ const Home: React.FC = () => {
   const handleShutdown = async () => {
     try {
       const response = await deviceService.shutdown()
-    } catch (error: any) {}
+      toast(response.data.message, 3000)
+    } catch (error: any) {
+      toast('Error, cannot shutdown', 3000)
+    }
   }
 
   const fetchDeviceSettings = async () => {
