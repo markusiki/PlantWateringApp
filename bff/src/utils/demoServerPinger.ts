@@ -10,11 +10,7 @@ export const demoServerPinger = async (req: CustomRequest, res: Response, next: 
 
   const tryDeploy = async () => {
     try {
-      const response = await axios.get(config.PING_URI!)
-
-      if (response.status === 200) {
-        console.log('deploy complete')
-      }
+      await axios.get(config.PING_URI!)
     } catch (error: any) {
       console.error('deploy failed ', error.response?.status)
     }
@@ -23,10 +19,8 @@ export const demoServerPinger = async (req: CustomRequest, res: Response, next: 
   const tryPing = async () => {
     try {
       const response = await axios.get(`${req.user?.wormhole_url}/service/status`)
-      console.log(`Attempt ${attempt + 1} succeeded`)
 
       if (response.status === 200) {
-        console.log('stop pinging')
         next()
         return
       }
@@ -39,16 +33,13 @@ export const demoServerPinger = async (req: CustomRequest, res: Response, next: 
     if (attempt < maxAttempts) {
       setTimeout(tryPing, 3000) // wait 2 second before next attempt
     } else {
-      console.log('Max attempts reached')
       if (!reDeployed) {
         attempt = 0
-        console.log('reDeployed: ', reDeployed)
-        console.log('pingign deploy')
+
         await tryDeploy()
         reDeployed = true
         await tryPing()
       } else {
-        console.log('reDeployed: ', reDeployed)
         res.status(502).json({ error: 'Demo server not responding' })
       }
     }

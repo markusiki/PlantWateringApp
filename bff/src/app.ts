@@ -36,7 +36,6 @@ const proxyOptions: Options = {
   },
   on: {
     proxyReq: (proxyReq, req: any, res) => {
-      console.log('proxyreq')
       if (req.body) {
         const bodyData = JSON.stringify(req.body)
         proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
