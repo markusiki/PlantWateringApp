@@ -87,14 +87,14 @@ def timeProgram():
                     ):
                         status = waterNow(unit["id"])
                         message = (
-                            "minimum watering interval"
+                            "Minimum watering interval"
                             if status["message"] == ""
                             else status["message"]
                         )
                         updateLog(
                             **unitLog,
                             watered=status["isWatered"],
-                            waterMethod="auto",
+                            waterMethod="Auto",
                             message=message
                         )
 
@@ -105,25 +105,25 @@ def timeProgram():
                             unit["enableMaxWaterInterval"] == True
                             and unit["maxWaterInterval"] >= wateredLastTime
                         ):
-                            updateLog(**unitLog, message="max watering interval")
+                            updateLog(**unitLog, message="Max watering interval not yet reached")
                             continue
                         if not unit["status"].startswith("ERROR"):
                             status = waterNow(unit["id"])
                             message = (
-                                "moist level" if status["message"] == "" else status["message"]
+                                "Moist level" if status["message"] == "" else status["message"]
                             )
                             updateLog(
                                 **unitLog,
                                 watered=status["isWatered"],
-                                waterMethod="auto",
+                                waterMethod="Auto",
                                 message=message
                             )
                         else:
                             updateLog(**unitLog, message="Unit in error, not watered.")
                     else:
-                        updateLog(**unitLog, message="The irrigation conditions were not met.")
+                        updateLog(**unitLog, message="No watering needed.")
                 else:
-                    updateLog(**unitLog, message="Automatic watering not enabled.")
+                    updateLog(**unitLog, message="Automatic watering for the unit not enabled.")
             timer()
 
 

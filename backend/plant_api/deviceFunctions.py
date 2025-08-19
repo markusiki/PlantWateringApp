@@ -106,7 +106,7 @@ def waterNow(id, manual=False):
     if manual and wateringStatus["watering"]:
         return {
             "isWatered": False,
-            "message": f"{wateringStatus['method']} watering of unit {wateringStatus['id']} in process.",
+            "message": f"{wateringStatus['method']} watering of unit{wateringStatus['id']} in process.",
         }
     if not manual and wateringStatus["watering"]:
         if wateringStatus["id"] == id:
