@@ -75,6 +75,7 @@ def waterUnit(unitId):
 def deleteLogs(unitId):
     try:
         deleteLog(unitId)
+        clearWaterCounter(unitId)
         unit = getById(unitId, innerUse=False)
         return unit
     except Exception:
@@ -90,7 +91,8 @@ def clearCounters(unitId):
         return unit
     except Exception:
         return jsonify({"message": "Internal server error"}), 500
-    
+
+
 @unitsRouter.get("/rawMoistValue/<string:unitId>")
 @jwt_required()
 def getRawMoistValue(unitId):
