@@ -104,7 +104,10 @@ def updateMoistValues():
 def waterNow(id, manual=False):
     global wateringStatus
     if manual and wateringStatus["watering"]:
-        return {"isWatered": False, "message": f"{wateringStatus['method']} watering of unit {wateringStatus['id']} in process."}
+        return {
+            "isWatered": False,
+            "message": f"{wateringStatus['method']} watering of unit{wateringStatus['id']} in process.",
+        }
     if not manual and wateringStatus["watering"]:
         if wateringStatus["id"] == id:
             return {"isWatered": False, "message": f"Manual waterign of {id} in process."}
@@ -124,7 +127,10 @@ def waterNow(id, manual=False):
     wateringStatus["watering"] = False
     wateringStatus["method"] = ""
     wateringStatus["id"] = ""
-    return {"isWatered": True, "message": f"Watering of unit {id} completed successfully." if manual else ""}
+    return {
+        "isWatered": True,
+        "message": "",
+    }
 
 
 def calculateStandardDeviation(values):
