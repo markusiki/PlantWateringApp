@@ -141,6 +141,11 @@ def analyzeMoistValue(unit, moistValue):
             else "ERROR: The soil may be floading."
         )
         unit["moistValue"] = upperLimit
+
+    elif moistValue["moistValue"] < 1000:
+        unit["status"] = "ERROR: The moisture sensor may be defective."
+        unit["moistValue"] = lowerLimit
+
     elif moistValue["moistValue"] < lowerLimit:
         unit["status"] = (
             "ERROR: Watering unit may not be connected or the soil is floading."
@@ -148,6 +153,7 @@ def analyzeMoistValue(unit, moistValue):
             else "ERROR: Watering unit may not be connected."
         )
         unit["moistValue"] = lowerLimit
+
     else:
         unit["status"] = "OK" if moistValue["status"] == "OK" else moistValue["status"]
         unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
