@@ -104,8 +104,8 @@ def updateLog(id="", status="", moistValue=0, watered=False, waterMethod="", mes
     index = findById(id)
     unit = units[index]
     if watered:
-        wateringAmount = round(unit["waterFlowRate"] * unit["waterTime"], 3)
-        unit["totalWateredAmount"] += wateringAmount
+        wateringAmount = unit["waterFlowRate"] * unit["waterTime"]
+        unit["totalWateredAmount"] = round((unit["totalWateredAmount"] + wateringAmount), 3)
         updateWaterAmount(wateringAmount)
     logs = unit["logs"]
     newLog = {
@@ -115,6 +115,7 @@ def updateLog(id="", status="", moistValue=0, watered=False, waterMethod="", mes
         "watered": watered,
         "waterMethod": waterMethod,
         "message": message,
+        "waterAmount": wateringAmount if watered else 0,
     }
     logs.insert(0, newLog)
     saveToDb(units)
