@@ -45,5 +45,9 @@ export const demoServerPinger = async (req: CustomRequest, res: Response, next: 
     }
   }
 
-  await tryPing()
+  if (req.user!.wormhole_url.includes('plant-api-demo-backend')) {
+    await tryPing()
+  } else {
+    next()
+  }
 }
