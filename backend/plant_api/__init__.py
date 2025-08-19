@@ -14,7 +14,7 @@ def create_app(test_config=None):
     app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
     app.config["JWT_COOKIE_CSRF_PROTECT"] = True
     app.config["JWT_CSRF_METHODS"] = ["POST", "PUT", "PATCH", "DELETE", "GET"]
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=60)
     app.config["TESTING"] = (
         test_config is not None and test_config.get("TESTING", False)
     ) or os.getenv("FLASK_TESTING", "False") == "True"
