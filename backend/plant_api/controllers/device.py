@@ -9,17 +9,18 @@ from ..deviceFunctions import setUnitObjects
 
 deviceRouter = Blueprint("deviceRouter", __name__)
 
+
 @deviceRouter.post("/shutdown")
 @jwt_required()
 def shutdown():
     try:
         os.system("sudo shutdown -h now &")
         return jsonify({"message": "System shutting down"})
-    
+
     except Exception as error:
         return jsonify({"message": "Internal server error"}), 500
-    
-        
+
+
 @deviceRouter.get("")
 @jwt_required()
 def getAllDevice():
