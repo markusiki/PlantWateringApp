@@ -26,6 +26,7 @@ def changeSettings(body):
     settings["numberOfUnits"] = body["numberOfUnits"]
     settings["tankVolume"] = body["tankVolume"]
     settings["waterAmount"] = body["waterAmount"]
+    settings["useFlowSensor"] = body["useFlowSensor"]
     saveToDb(settings)
     changedSettings = getAll()
     return changedSettings
