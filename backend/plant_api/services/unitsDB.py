@@ -98,24 +98,42 @@ def modifyUnitToDB(unitToChange, index):
     return changedUnit
 
 
-def updateLog(id="", status="", moistValue=0, watered=False, waterMethod="", message=""):
+def updateLog(
+    id="",
+    status="",
+    moistValue=0,
+    isWatered=False,
+    message="",
+    wateredAmount=0,
+    flowRate=0,
+    waterMethod="",
+):
     timeStamp = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
     units = getUnits()
     index = findById(id)
     unit = units[index]
-    if watered:
-        wateringAmount = unit["waterFlowRate"] * unit["waterTime"]
-        unit["totalWateredAmount"] = round((unit["totalWateredAmount"] + wateringAmount), 3)
-        updateWaterAmount(wateringAmount)
+    useFlowSensor = getData("useFlowSensor")
+    if not useFlowSensor:
+        wateredAmount = unit["waterFlowRate"] * unit["waterTime"]
+    if isWatered:
+        unit["totalWateredAmount"] = round((unit["totalWateredAmount"] + wateredAmount), 3)
+        if flowRate > 0:
+            unit["waterFlowRate"] = flowRate
+        else:
+            errorMessage = "ERROR: Flow sensor did not measure any water flow."
+            status = errorMessage
+            unit["status"] = errorMessage
+
+        updateWaterAmount(wateredAmount)
     logs = unit["logs"]
     newLog = {
         "date": timeStamp,
         "moistValue": convertMoistValue(unit, moistValue),
         "status": status,
-        "watered": watered,
+        "watered": isWatered,
         "waterMethod": waterMethod,
         "message": message,
-        "waterAmount": wateringAmount if watered else 0,
+        "waterAmount": wateredAmount if isWatered else 0,
     }
     logs.insert(0, newLog)
     saveToDb(units)
