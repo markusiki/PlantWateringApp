@@ -57,12 +57,8 @@ def waterUnit(unitId):
         status = waterNow(unitId, manual=True)
         if status["isWatered"] == False:
             return jsonify({"message": f"Cannot handle the request: {status['message']}"}), 400
-        updateLog(
-            **moistValue,
-            watered=status["isWatered"],
-            waterMethod="manual",
-            message=status["message"],
-        )
+        logKwargs = {**moistValue, **status}
+        updateLog(**logKwargs, waterMethod="manual")
         unit = getById(unitId, innerUse=False)
         waterAmount = getData("waterAmount")
         return jsonify({"unit": unit, "waterAmount": waterAmount})
