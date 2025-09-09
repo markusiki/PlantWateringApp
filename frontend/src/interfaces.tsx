@@ -72,6 +72,7 @@ export interface IUnitProps extends IUnitSettingsProps {
   setWaterNowDisabled: React.Dispatch<React.SetStateAction<boolean>>
   handleUnitCalibration: (event: React.MouseEvent, id: IUnitState['id'], moistValueType: string) => Promise<void>
   handleClearWaterCounter: (id: IUnitState['id']) => Promise<void>
+  deviceSettings: IDeviceSettingsState
 }
 
 export interface IUnitSettingsProps {
@@ -79,6 +80,7 @@ export interface IUnitSettingsProps {
   handleUnitChange: (event: React.MouseEvent, unitSettings: IUnitToUpdate) => Promise<void>
   handleUnitCalibration: (event: React.MouseEvent, id: IUnitState['id'], moistValueType: string) => Promise<void>
   handleClearWaterCounter: (id: IUnitState['id']) => Promise<void>
+  deviceSettings: IDeviceSettingsState
 }
 
 export interface IUnitCalibrationProps {
