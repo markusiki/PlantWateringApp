@@ -329,6 +329,7 @@ const Home: React.FC = () => {
                         setWaterNowDisabled={setWaterNowDisabled}
                         handleUnitCalibration={handleUnitCalibration}
                         handleClearWaterCounter={handleClearWaterCounter}
+                        deviceSettings={deviceSettings}
                       />
                     ))}
                   </IonContent>
