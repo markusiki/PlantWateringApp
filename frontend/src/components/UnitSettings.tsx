@@ -27,6 +27,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
   handleUnitChange,
   handleUnitCalibration,
   handleClearWaterCounter,
+  deviceSettings,
 }) => {
   const [settings, setSettings] = useState<IUnitSettingsState>({
     name: '',
@@ -217,6 +218,22 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
 
             <IonItem>
               <IonInput
+                disabled={deviceSettings.useFlowSensor}
+                label="Water flow rate"
+                value={settings.waterFlowRate}
+                name="waterFlowRate"
+                labelPlacement="stacked"
+                type="number"
+                helperText={
+                  !deviceSettings.useFlowSensor
+                    ? 'Set water flow rate in l/s (e.g 0.105)'
+                    : 'Set automatically by water flow sensor.'
+                }
+                onInput={handleChange}
+              />
+            </IonItem>
+            <IonItem>
+              <IonInput
                 label="Watering time"
                 value={settings.waterTime}
                 name="waterTime"
@@ -225,17 +242,6 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
                 helperText="Set watering time in seconds (0 - 600)"
                 min={0}
                 max={600}
-                onInput={handleChange}
-              />
-            </IonItem>
-            <IonItem>
-              <IonInput
-                label="Water flow rate"
-                value={settings.waterFlowRate}
-                name="waterFlowRate"
-                labelPlacement="stacked"
-                type="number"
-                helperText="Set water flow rate in l/s (e.g 0.105)"
                 onInput={handleChange}
               />
             </IonItem>
