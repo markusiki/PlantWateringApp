@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from 'react'
 const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handleDeviceSettingsChange }) => {
   const [settings, setSettings] = useState<IDeviceSettingsState>({
     runTimeProgram: false,
+    useFlowSensor: false,
     moistMeasureInterval: 1,
     numberOfUnits: 4,
     tankVolume: 0,
@@ -103,6 +104,16 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 onIonChange={(event: any) => setSettings({ ...settings, runTimeProgram: event.detail.checked })}
               >
                 Enable time program
+              </IonCheckbox>
+            </IonItem>
+            <IonItem>
+              <IonCheckbox
+                justify="space-between"
+                checked={settings.useFlowSensor}
+                name="runTimeProgram"
+                onIonChange={(event: any) => setSettings({ ...settings, useFlowSensor: event.detail.checked })}
+              >
+                Use flow sensor
               </IonCheckbox>
             </IonItem>
             <IonItem>
