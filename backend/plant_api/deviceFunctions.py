@@ -9,6 +9,8 @@ from .services.unitsDB import getUnits, findById
 from .services.deviceSettings import getData
 from statistics import pstdev
 
+FLOW_SENSOR_GPIO = 16
+
 # Initialize the I2C interface
 i2c = busio.I2C(board.SCL, board.SDA)
 
@@ -54,8 +56,27 @@ class Sprinkler_unit:
         return
 
 
-pump = Pump(17)
+class FlowMeter:
+    def __init__(self):
+        self.pin = gpiozero.DigitalInputDevice(pin=FLOW_SENSOR_GPIO)
+        self.pin.when_activated = self.countPulse
+        self.pulseCount = 0
 
+    def countPulse(self):
+        self.pulseCount += 1
+
+    def clearCounter(self):
+        self.pulseCount = 0
+
+    def getData(self, duration):
+        waterAmount = round(self.pulseCount / 450, 3)
+        flowRate = round(waterAmount / duration, 3)
+        self.clearCounter()
+        return {"waterAmount": waterAmount, "flowRate": flowRate}
+
+
+pump = Pump(17)
+flowMeter = FlowMeter()
 
 sprinkler_unit_objects = []
 units = getUnits()
@@ -124,12 +145,15 @@ def waterNow(id, manual=False):
     wateringStatus["method"] = "Manual" if manual else "Auto"
     wateringStatus["id"] = id
     water(unit.valve, unit.waterTime)
+    flowMeterData = flowMeter.getData(unit.waterTime)
     wateringStatus["watering"] = False
     wateringStatus["method"] = ""
     wateringStatus["id"] = ""
     return {
         "isWatered": True,
         "message": "",
+        "wateredAmount": flowMeterData["waterAmount"],
+        "flowRate": flowMeterData["flowRate"],
     }
 
 
