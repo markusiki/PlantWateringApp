@@ -86,16 +86,15 @@ def timeProgram():
                         and unit["minWaterInterval"] <= wateredLastTime
                     ):
                         status = waterNow(unit["id"])
-                        message = (
+                        status["message"] = (
                             "Minimum watering interval"
                             if status["message"] == ""
                             else status["message"]
                         )
+                        logKwargs = {**unitLog, **status}
                         updateLog(
-                            **unitLog,
-                            watered=status["isWatered"],
+                            **logKwargs,
                             waterMethod="Auto",
-                            message=message
                         )
 
                     elif (inverseScaling and unit["moistValue"] > unit["moistLimit"]) or (
@@ -109,14 +108,13 @@ def timeProgram():
                             continue
                         if not unit["status"].startswith("ERROR"):
                             status = waterNow(unit["id"])
-                            message = (
+                            status["message"] = (
                                 "Moist level" if status["message"] == "" else status["message"]
                             )
+                            logKwargs = {**unitLog, **status}
                             updateLog(
-                                **unitLog,
-                                watered=status["isWatered"],
+                                **logKwargs,
                                 waterMethod="Auto",
-                                message=message
                             )
                         else:
                             updateLog(**unitLog, message="Unit in error, not watered.")
