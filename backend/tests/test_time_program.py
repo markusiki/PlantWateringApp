@@ -18,6 +18,11 @@ def run_around_tests(app, set_time_program):
     # Before each test
     create_test_units_db(path_to_unitsDB)
     create_test_device_db(path_to_deviceDB)
+
+    device_settings = get_device_settings(app)
+    device_settings["tankVolume"] = 100
+    device_settings["waterAmount"] = 100
+    save_to_device_db(app, device_settings)
     yield
     # After each test
     device_settings = get_device_settings(app)
@@ -44,6 +49,7 @@ def test_auto_watering_min_watering_interval(app, set_time_program):
     device_settings = get_device_settings(app)
     device_settings["runTimeProgram"] = True
     device_settings["moistMeasureInterval"] = 3
+
     save_to_device_db(app, device_settings)
 
     for unit in units:
@@ -210,7 +216,7 @@ def test_time_program_only_waters_number_of_units_defined_by_numberOfUnits(app, 
     device_settings["numberOfUnits"] = 3
     save_to_device_db(app, device_settings)
 
-    sleep(5)
+    sleep(6)
     units = get_all_units(app)
     assert len(units[0]["logs"]) == 2
     assert len(units[1]["logs"]) == 2
@@ -223,8 +229,9 @@ def test_moist_measure_interval_can_be_changed_while_timeprogram_is_running(app,
     units = get_all_units(app)
     for unit in units:
         unit["moistLimit"] = 19000
-        unit["moistLevel"] = 15000
+        unit["moistValue"] = 15000
         unit["enableMinWaterInterval"] = False
+        unit["enableAutoWatering"] = True
     save_to_units_db(app, units)
 
     device_settings = get_device_settings(app)
@@ -279,6 +286,10 @@ def test_auto_watering_does_not_water_if_the_same_unit_is_being_watered_manually
 ):
     units = get_all_units(app)
     units[0]["waterTime"] = 5
+    for unit in units:
+        unit["enableAutoWatering"] = True
+        unit["enableMinWaterInterval"] = True
+        unit["minWaterInterval"] = 1
 
     save_to_units_db(app, units)
 
@@ -305,5 +316,4 @@ def test_auto_watering_does_not_water_if_the_same_unit_is_being_watered_manually
             assert unit["logs"][1]["message"] == "Manual waterign of Unit1 in process."
         else:
             assert unit["logs"][0]["watered"] == True
-            print(unit["logs"][0]["message"])
             assert unit["logs"][0]["message"] == "Minimum watering interval"

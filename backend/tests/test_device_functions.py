@@ -18,11 +18,17 @@ def run_around_tests(app):
     create_test_units_db(path_to_unitsDB)
     create_test_device_db(path_to_deviceDB)
 
+
 def test_water_now_waters_unit(app, water_now):
+    device_settings = get_device_settings(app)
+    device_settings["waterAmount"] = 10
+    device_settings["tankVolume"] = 10
+    save_to_device_db(app, device_settings)
     units = get_all_units(app)
     status = water_now(units[0]["id"])
     assert status["isWatered"]
     assert status["message"] == ""
+
 
 def test_water_now_does_not_water_if_no_water_left(app, update_object, water_now):
     settings = get_device_settings(app)
@@ -34,6 +40,6 @@ def test_water_now_does_not_water_if_no_water_left(app, update_object, water_now
     update_object(units[0]["id"], 0)
 
     status = water_now(units[0]["id"])
-    
+
     assert status["isWatered"] == False
-    assert status["message"] == "Not enough water" 
+    assert status["message"] == "Not enough water"
