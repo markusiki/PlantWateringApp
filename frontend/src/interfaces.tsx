@@ -102,6 +102,7 @@ export interface IUnitSettingsState {
 
 export interface IDeviceSettingsState {
   runTimeProgram: boolean
+  useFlowSensor: boolean
   moistMeasureInterval: number
   numberOfUnits: number
   tankVolume: number

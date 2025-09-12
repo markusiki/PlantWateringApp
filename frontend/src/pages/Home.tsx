@@ -30,6 +30,7 @@ const Home: React.FC = () => {
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false)
   const [deviceSettings, setDeviceSettings] = useState<IDeviceSettingsState>({
     runTimeProgram: false,
+    useFlowSensor: false,
     moistMeasureInterval: 1,
     numberOfUnits: 4,
     tankVolume: 0,
