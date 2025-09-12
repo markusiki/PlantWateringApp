@@ -43,13 +43,9 @@ def create_app(test_config=None):
     setUnitObjects()
 
     if app.testing:
-        from plant_api.deviceFunctions import setTestingMode
-        from plant_api.timeProgram import (
-            setTestingMode as setTimeProgramTestingMode,
-        )
+        from plant_api.timeProgram import setTestingMode
 
         setTestingMode(app)
-        setTimeProgramTestingMode(app)
 
     from .controllers.login import loginRouter
     from .controllers.logout import logoutRouter

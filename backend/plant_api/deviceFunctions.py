@@ -17,14 +17,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 # Create an ADS1115 object
 ads = ADS.ADS1115(i2c)
 
-testing = False
 wateringStatus = {"watering": False, "method": "", "id": ""}
-
-
-def setTestingMode(app):
-    global testing
-    with app.app_context():
-        testing = current_app.testing
 
 
 class Pump:
@@ -222,8 +215,8 @@ def measureSoil(id):
 
 def water(unit):
     unit.valve.on()
-    if not testing:
-        pump.pumpOn()
+
+    pump.pumpOn()
     if unit.wateringMode == "time":
         sleep(unit.waterTime)
     else:
@@ -234,9 +227,7 @@ def water(unit):
             # stop if no water
             if flowMeter.getCurrentFlowRate() == 0:
                 break
-
-    if not testing:
-        pump.pumpOff()
+    pump.pumpOff()
     unit.valve.off()
 
 
