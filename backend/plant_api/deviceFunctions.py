@@ -1,5 +1,5 @@
-from flask import current_app
 from time import sleep
+from datetime import datetime
 import gpiozero
 import board
 import busio
@@ -9,7 +9,8 @@ from .services.unitsDB import getUnits, findById
 from .services.deviceSettings import getData
 from statistics import pstdev
 
-FLOW_SENSOR_GPIO = 16
+FLOW_SENSOR_GPIO = 5
+PUMP_SENSOR_GPIO = 17
 
 # Initialize the I2C interface
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -21,8 +22,10 @@ wateringStatus = {"watering": False, "method": "", "id": ""}
 
 
 class Pump:
-    def __init__(self, power):
-        self.power = gpiozero.OutputDevice(pin=power, active_high=False, initial_value=False)
+    def __init__(self):
+        self.power = gpiozero.OutputDevice(
+            pin=PUMP_SENSOR_GPIO, active_high=False, initial_value=False
+        )
 
     def pumpOn(self):
         self.power.on()
@@ -68,33 +71,46 @@ class FlowMeter:
     def __init__(self):
         self.pin = gpiozero.DigitalInputDevice(pin=FLOW_SENSOR_GPIO)
         self.pin.when_activated = self.countPulse
-        self.pulseCount = 0
         self.pulsesPerLitre = 450
+        self.pulseCount = 0
+        self.flowRates = []
 
     def countPulse(self):
         self.pulseCount += 1
 
-    def clearCounter(self):
+    def clearCounters(self):
         self.pulseCount = 0
+        self.flowRates = []
 
-    def getData(self, duration):
-        waterAmount = round(self.pulseCount / self.pulsesPerLitre, 3)
-        flowRate = round(waterAmount / duration, 3)
-        self.clearCounter()
-        return {"waterAmount": waterAmount, "flowRate": flowRate}
+    def getData(self):
+        waterAmount = round(self.pulseCount / self.pulsesPerLitre, 2)
+        avgFlowRate = (
+            round(sum(self.flowRates) / len(self.flowRates), 2) if len(self.flowRates) else 0
+        )
+        lastFlowRate = self.flowRates[-1] if len(self.flowRates) > 0 else 0
+        print(self.flowRates)
+        print("pulse count: ", self.pulseCount)
+        self.clearCounters()
+        return {
+            "waterAmount": waterAmount,
+            "avgFlowRate": avgFlowRate,
+            "lastFlowRate": lastFlowRate,
+        }
 
     def getCurrentWateredAmount(self):
-        return round(self.pulseCount / self.pulsesPerLitre, 3)
+        return round(self.pulseCount / self.pulsesPerLitre, 2)
 
     def getCurrentFlowRate(self):
         measureTime = 0.1
         count_a = self.pulseCount
         sleep(measureTime)
         count_b = self.pulseCount
-        return round(count_b - count_a / measureTime, 3)
+        flowRate = round((count_b - count_a) / self.pulsesPerLitre / measureTime, 2)
+        self.flowRates.append(flowRate)
+        return flowRate
 
 
-pump = Pump(17)
+pump = Pump()
 flowMeter = FlowMeter()
 
 sprinkler_unit_objects = []
@@ -169,16 +185,22 @@ def waterNow(id, manual=False):
     wateringStatus["id"] = id
     water(unit)
     useFlowSensor = getData("useFlowSensor")
+    message = ""
     if useFlowSensor:
-        flowMeterData = flowMeter.getData(unit.waterTime)
+        flowMeterData = flowMeter.getData()
+        if flowMeterData["lastFlowRate"] == 0:
+            message = "Run out of water while watering."
+        if flowMeterData["avgFlowRate"] == 0:
+            message = "Flow sensor did not detect any water flow."
+
     wateringStatus["watering"] = False
     wateringStatus["method"] = ""
     wateringStatus["id"] = ""
     return {
         "isWatered": True,
-        "message": "",
+        "message": message,
         "wateredAmount": flowMeterData["waterAmount"] if useFlowSensor else 0,
-        "flowRate": flowMeterData["flowRate"] if useFlowSensor else 0,
+        "flowRate": flowMeterData["avgFlowRate"] if useFlowSensor else 0,
     }
 
 
@@ -214,19 +236,26 @@ def measureSoil(id):
 
 
 def water(unit):
+    print("water")
     unit.valve.on()
 
     pump.pumpOn()
+    start = datetime.now().second
     if unit.wateringMode == "time":
         sleep(unit.waterTime)
     else:
+        print("amount")
         while True:
-            if unit.waterAmount < flowMeter.getCurrentWateredAmount():
+            if flowMeter.getCurrentWateredAmount() >= unit.waterAmount:
+                end = datetime.now().second
+                print("Actual watering duration in deviceFunction:", end - start)
                 break
 
             # stop if no water
             if flowMeter.getCurrentFlowRate() == 0:
-                break
+                sleep(2)
+                if flowMeter.getCurrentFlowRate() == 0:
+                    break
     pump.pumpOff()
     unit.valve.off()
 
