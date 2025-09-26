@@ -86,7 +86,7 @@ def modifyUnitToDB(unitToChange, index):
     unit["name"] = unitToChange["name"]
     unit["moistLimit"] = convertMoistValue(unit, int(unitToChange["moistLimit"]))
     unit["waterTime"] = int(unitToChange["waterTime"])
-    unit["waterAmount"] = int(unitToChange["waterAmount"])
+    unit["waterAmount"] = float(unitToChange["waterAmount"])
     unit["enableAutoWatering"] = unitToChange["enableAutoWatering"]
     unit["enableMaxWaterInterval"] = unitToChange["enableMaxWaterInterval"]
     unit["enableMinWaterInterval"] = unitToChange["enableMinWaterInterval"]
@@ -122,12 +122,9 @@ def updateLog(
         if useFlowSensor:
             if flowRate > 0:
                 unit["waterFlowRate"] = flowRate
-            else:
-                errorMessage = "ERROR: Flow sensor did not measure any water flow."
-                status = errorMessage
-                unit["status"] = errorMessage
 
         updateWaterAmount(wateredAmount)
+
     logs = unit["logs"]
     newLog = {
         "date": timeStamp,
