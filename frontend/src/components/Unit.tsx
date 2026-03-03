@@ -84,17 +84,22 @@ const Unit: React.FC<IUnitProps> = ({
 
       await new Promise((resolve) => setTimeout(resolve, 1000))
     }
-    setWaterNowDisabled(false)
+
     setUnits((prevUnits) =>
       prevUnits.map((prevUnit) => (prevUnit.id !== unitToCount.id ? prevUnit : { ...prevUnit, counter: 0 }))
     )
   }
 
   const handleWaterNow = async (unit: IUnitState) => {
-    setCounter(unit)
+    if (!unit.waterTime) {
+      setWaterNowDisabled(true)
+    } else {
+      setCounter(unit)
+    }
     const isCompleted = await waterNow(unit.id)
     if (isCompleted) {
       counterEnabled = false
+      setWaterNowDisabled(false)
     }
   }
 
