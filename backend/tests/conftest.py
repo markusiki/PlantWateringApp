@@ -8,6 +8,10 @@ from .test_helpers.create_db import (
     create_test_users_db,
     create_test_device_db,
 )
+from gpiozero import Device
+from gpiozero.pins.mock import MockFactory, MockPWMPin
+
+Device.pin_factory = MockFactory(pin_class=MockPWMPin)
 
 
 db_dir = os.path.join(os.path.dirname(__file__), "databases")
@@ -41,6 +45,37 @@ def app():
     # clean up / reset resources here
 
 
+@pytest.fixture()
+def no_default_factory(request):
+    save_pin_factory = Device.pin_factory
+    Device.pin_factory = None
+    try:
+        yield None
+    finally:
+        Device.pin_factory = save_pin_factory
+
+
+@pytest.fixture(scope="function")
+def mock_factory(request):
+    save_factory = Device.pin_factory
+    Device.pin_factory = MockFactory()
+    try:
+        yield Device.pin_factory
+        # This reset() may seem redundant given we're re-constructing the
+        # factory for each function that requires it but MockFactory (via
+        # LocalFactory) stores some info at the class level which reset()
+        # clears.
+    finally:
+        if Device.pin_factory is not None:
+            Device.pin_factory.reset()
+        Device.pin_factory = save_factory
+
+
+@pytest.fixture()
+def pwm(request, mock_factory):
+    mock_factory.pin_class = MockPWMPin
+
+
 @pytest.fixture(scope="module")
 def client(app):
     return app.test_client()
@@ -72,13 +107,15 @@ def set_time_program(app):
 
         return setTimeProgram
 
+
 @pytest.fixture()
 def water_now(app):
     with app.app_context():
         from plant_api.deviceFunctions import waterNow
 
         return waterNow
-    
+
+
 @pytest.fixture()
 def update_object(app):
     with app.app_context():
@@ -86,5 +123,18 @@ def update_object(app):
 
         return updateSprinklerUnitObject
 
-        
-    
+
+@pytest.fixture()
+def get_flow_meter(app):
+    with app.app_context():
+        from plant_api.deviceFunctions import flowMeter
+
+        return flowMeter
+
+
+@pytest.fixture()
+def get_pump(app):
+    with app.app_context():
+        from plant_api.deviceFunctions import pump
+
+        return pump

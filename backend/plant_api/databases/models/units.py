@@ -6,6 +6,7 @@ units_model = [
         "moistValue": 15000,
         "moistLimit": 18000,
         "waterTime": 1,
+        "waterAmount": 0,
         "logs": [],
         "sensor": "ADS.P0",
         "valve": 27,
@@ -19,6 +20,7 @@ units_model = [
         "wetMoistValue": 8000,
         "dryMoistValue": 18200,
         "maxPstdev": 200,
+        "wateringMode": "time",
     },
     {
         "id": "Unit2",
@@ -27,6 +29,7 @@ units_model = [
         "moistValue": 15000,
         "moistLimit": 18000,
         "waterTime": 1,
+        "waterAmount": 0,
         "logs": [],
         "sensor": "ADS.P1",
         "valve": 22,
@@ -40,6 +43,7 @@ units_model = [
         "wetMoistValue": 8000,
         "dryMoistValue": 18200,
         "maxPstdev": 200,
+        "wateringMode": "time",
     },
     {
         "id": "Unit3",
@@ -48,6 +52,7 @@ units_model = [
         "moistValue": 15000,
         "moistLimit": 18000,
         "waterTime": 1,
+        "waterAmount": 0,
         "logs": [],
         "sensor": "ADS.P2",
         "valve": 10,
@@ -61,6 +66,7 @@ units_model = [
         "wetMoistValue": 8000,
         "dryMoistValue": 18200,
         "maxPstdev": 200,
+        "wateringMode": "time",
     },
     {
         "id": "Unit4",
@@ -69,6 +75,7 @@ units_model = [
         "moistValue": 15000,
         "moistLimit": 18000,
         "waterTime": 1,
+        "waterAmount": 0,
         "logs": [],
         "sensor": "ADS.P3",
         "valve": 9,
@@ -82,5 +89,6 @@ units_model = [
         "wetMoistValue": 8000,
         "dryMoistValue": 18200,
         "maxPstdev": 200,
+        "wateringMode": "time",
     },
 ]
