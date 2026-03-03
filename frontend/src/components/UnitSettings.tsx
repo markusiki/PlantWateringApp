@@ -15,6 +15,15 @@ import {
   IonLabel,
   IonText,
   IonAlert,
+  IonSegment,
+  IonSegmentContent,
+  IonSegmentButton,
+  IonSegmentView,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonSelect,
+  IonSelectOption,
 } from '@ionic/react'
 import { IUnitSettingsProps, IUnitSettingsState, IUnitToUpdate } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
@@ -30,15 +39,18 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
   deviceSettings,
 }) => {
   const [settings, setSettings] = useState<IUnitSettingsState>({
+    id: '',
     name: '',
     moistLimit: 0,
     waterTime: 0,
+    waterAmount: 0,
     enableAutoWatering: false,
     enableMaxWaterInterval: false,
     enableMinWaterInterval: false,
     maxWaterInterval: 0,
     minWaterInterval: 0,
     waterFlowRate: '',
+    wateringMode: 'time',
   })
   const [isCalibrating, setIsCalibrating] = useState(false)
   const unitSettingsModal = useRef<HTMLIonModalElement>(null)
@@ -46,29 +58,22 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
 
   useEffect(() => {
     setSettings({
+      id: unit.id,
       name: unit.name,
       moistLimit: unit.moistLimit,
       waterTime: unit.waterTime,
+      waterAmount: unit.waterAmount,
       enableAutoWatering: unit.enableAutoWatering,
       enableMaxWaterInterval: unit.enableMaxWaterInterval,
       enableMinWaterInterval: unit.enableMinWaterInterval,
       maxWaterInterval: unit.maxWaterInterval,
       minWaterInterval: unit.minWaterInterval,
       waterFlowRate: unit.waterFlowRate.toString(),
+      wateringMode: unit.wateringMode,
     })
-  }, [
-    unit.enableAutoWatering,
-    unit.enableMaxWaterInterval,
-    unit.enableMinWaterInterval,
-    unit.maxWaterInterval,
-    unit.minWaterInterval,
-    unit.moistLimit,
-    unit.name,
-    unit.waterTime,
-    unit.waterFlowRate,
-  ])
+  }, [unit])
 
-  const validateInputs = () => {
+  const validateInputs = (settings: IUnitSettingsState) => {
     if (settings.name.length > 100 || settings.name.length < 1) {
       presentAlert({
         header: 'Invalid input',
@@ -85,38 +90,42 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
       })
       return false
     }
+
     if (settings.waterTime < 0 || settings.waterTime > 600) {
       presentAlert({
         header: 'Invalid input',
-        message: 'Water time must be between 0 and 600!',
+        message:
+          settings.wateringMode === 'time' ? 'Water time must be between 0 and 600!' : 'Too big watering amount!',
         buttons: ['Dismiss'],
       })
       return false
     }
-    if (!parseFloat(settings.waterFlowRate)) {
-      presentAlert({
-        header: 'Invalid input',
-        message: 'Water flow rate must be a number!',
-        buttons: ['Dismiss'],
-      })
-      return false
-    } else {
-      if (parseFloat(settings.waterFlowRate) < 0 || parseFloat(settings.waterFlowRate) > 2) {
+    if (!deviceSettings.useFlowSensor) {
+      if (!parseFloat(settings.waterFlowRate)) {
         presentAlert({
           header: 'Invalid input',
-          message: 'Water flow rate must between 0 and 2',
+          message: 'Water flow rate must be a number!',
+          buttons: ['Dismiss'],
+        })
+        return false
+      } else {
+        if (parseFloat(settings.waterFlowRate) < 0 || parseFloat(settings.waterFlowRate) > 2) {
+          presentAlert({
+            header: 'Invalid input',
+            message: 'Water flow rate must between 0 and 2',
+            buttons: ['Dismiss'],
+          })
+          return false
+        }
+      }
+      if (settings.waterFlowRate.length > 5) {
+        presentAlert({
+          header: 'Invalid input',
+          message: 'Water flow rate can have max 3 decimals!',
           buttons: ['Dismiss'],
         })
         return false
       }
-    }
-    if (settings.waterFlowRate.length > 5) {
-      presentAlert({
-        header: 'Invalid input',
-        message: 'Water flow rate can have max 3 decimals!',
-        buttons: ['Dismiss'],
-      })
-      return false
     }
     if (
       settings.minWaterInterval < 1 ||
@@ -147,20 +156,38 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
     }
   }
 
+  const syncWaterTimeAndAmount = () => {
+    if (parseFloat(settings.waterFlowRate) > 0) {
+      console.log('sync')
+      if (settings.wateringMode === 'amount') {
+        console.log('amount')
+        return { ...settings, waterTime: settings.waterAmount / parseFloat(settings.waterFlowRate) }
+      } else {
+        console.log('time')
+        return { ...settings, waterAmount: settings.waterTime * parseFloat(settings.waterFlowRate) }
+      }
+    }
+    return settings
+  }
+
   const confirm = (event: React.MouseEvent) => {
-    const validInputs = validateInputs()
+    const syncedSettings = syncWaterTimeAndAmount()
+    console.log(syncedSettings)
+    const validInputs = validateInputs(syncedSettings)
     if (validInputs) {
-      const settingsToSave = { ...settings, waterFlowRate: parseFloat(settings.waterFlowRate), id: unit.id }
+      const settingsToSave = { ...syncedSettings, waterFlowRate: parseFloat(settings.waterFlowRate) }
       handleUnitChange(event, settingsToSave)
       unitSettingsModal.current?.dismiss()
     }
   }
 
   const handleChange = (event: any) => {
-    if (event.target.name === 'name' || event.target.name === 'waterFlowRate') {
+    if (event.target.name === 'name' || event.target.name === 'waterFlowRate' || event.target.name === 'wateringMode') {
       setSettings({ ...settings, [event.target.name]: event.target.value })
     } else if (event.target.localName === 'ion-checkbox') {
       setSettings({ ...settings, [event.target.name]: event.detail.checked })
+    } else if (event.target.name === 'waterAmount') {
+      setSettings({ ...settings, [event.target.name]: parseFloat(event.target.value) })
     } else {
       setSettings({ ...settings, [event.target.name]: parseInt(event.target.value) })
     }
@@ -234,16 +261,32 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
             </IonItem>
             <IonItem>
               <IonInput
-                label="Watering time"
-                value={settings.waterTime}
-                name="waterTime"
+                label="Watering time or amount"
+                value={settings.wateringMode === 'time' ? settings.waterTime : settings.waterAmount}
+                name={settings.wateringMode === 'time' ? 'waterTime' : 'waterAmount'}
                 labelPlacement="stacked"
                 type="number"
-                helperText="Set watering time in seconds (0 - 600)"
+                helperText={
+                  settings.wateringMode === 'time'
+                    ? 'Set watering time in seconds (0 - 600)'
+                    : 'Set watering amount in liters (0 - 600)'
+                }
                 min={0}
                 max={600}
                 onInput={handleChange}
-              />
+              >
+                <IonSelect
+                  slot="end"
+                  aria-label="Watering Unit"
+                  name="wateringMode"
+                  value={settings.wateringMode}
+                  interface="popover"
+                  onIonChange={handleChange}
+                >
+                  <IonSelectOption value="time">Seconds</IonSelectOption>
+                  <IonSelectOption value="amount">Liters</IonSelectOption>
+                </IonSelect>
+              </IonInput>
             </IonItem>
             <IonItem>
               <IonCheckbox
