@@ -5,7 +5,7 @@ import sys
 from ..services.deviceSettings import getAll, changeSettings
 from ..schemas import DeviceSchema
 from ..timeProgram import setTimeProgram
-from ..deviceFunctions import setUnitObjects
+from ..deviceFunctions import setUnitObjects, updateFlowSensor
 
 deviceRouter = Blueprint("deviceRouter", __name__)
 
@@ -38,8 +38,9 @@ def changeDeciveSettings():
         body = request.get_json()
         DeviceSchema().load(body)
         response = changeSettings(body)
-        setTimeProgram()
+        updateFlowSensor()
         setUnitObjects()
+        setTimeProgram()
         return response, 200
     except Exception as error:
         return jsonify({"message": "Internal server error"}), 500

@@ -33,3 +33,6 @@ class DeviceSchema(Schema):
         metadata={"required": True}, validate=validate.Range(min=0, max=100000)
     )
     useFlowSensor = fields.Bool(metadata={"required": True})
+    flowSensorPulsesPerLiter = fields.Int(
+        metadata={"required": True}, validate=validate.Range(min=300, max=500)
+    )

@@ -68,10 +68,10 @@ class Sprinkler_unit:
 
 
 class FlowMeter:
-    def __init__(self):
+    def __init__(self, pulsesPerLitre):
         self.pin = gpiozero.DigitalInputDevice(pin=FLOW_SENSOR_GPIO)
         self.pin.when_activated = self.countPulse
-        self.pulsesPerLitre = 404
+        self.pulsesPerLitre = pulsesPerLitre
         self.pulseCount = 0
         self.flowRates = []
 
@@ -109,7 +109,7 @@ class FlowMeter:
 
 
 pump = Pump()
-flowMeter = FlowMeter()
+flowMeter = FlowMeter(getData("flowSensorPulsesPerLiter"))
 
 sprinkler_unit_objects = []
 units = getUnits()
@@ -150,6 +150,10 @@ def updateSprinklerUnitObject(id, index):
                 updatedUnit["wateringMode"],
             )
     return {"message": "saved"}
+
+
+def updateFlowSensor():
+    flowMeter.pulsesPerLitre = getData("flowSensorPulsesPerLiter")
 
 
 def updateMoistValues():

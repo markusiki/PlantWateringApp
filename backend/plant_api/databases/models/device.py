@@ -5,4 +5,5 @@ device_model = {
     "tankVolume": 0,
     "waterAmount": 0,
     "useFlowSensor": False,
+    "flowSensorPulsesPerLiter": 404,
 }
