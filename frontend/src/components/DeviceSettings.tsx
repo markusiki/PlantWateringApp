@@ -23,6 +23,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
     numberOfUnits: 4,
     tankVolume: 0,
     waterAmount: 0,
+    flowSensorPulsesPerLiter: 0,
   })
 
   useEffect(() => {
@@ -64,6 +65,14 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
         buttons: ['Dismiss'],
       })
       return false
+    }
+    if (settings.flowSensorPulsesPerLiter < 300 || settings.flowSensorPulsesPerLiter > 500) {
+      presentAlert({
+        header: 'Invalid input',
+        message: 'Flow sensor pulses per liter must be between 300 and 500!',
+        buttons: ['Dismiss'],
+      })
+      return false
     } else {
       return true
     }
@@ -78,13 +87,18 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
     }
   }
 
+  const cancel = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
+    setSettings(deviceSettings)
+    modal.current?.dismiss()
+  }
+
   return (
     <>
       <IonModal trigger={'settings'} ref={modal}>
         <IonHeader>
           <IonToolbar>
             <IonButtons>
-              <IonButton onClick={() => modal.current?.dismiss()}>Cancel</IonButton>
+              <IonButton onClick={cancel}>Cancel</IonButton>
             </IonButtons>
             <IonTitle slot="secondary">Device Settings</IonTitle>
             <IonButtons slot="end">
@@ -116,6 +130,27 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 Use flow sensor
               </IonCheckbox>
             </IonItem>
+            {settings.useFlowSensor && (
+              <IonItem>
+                <IonInput
+                  label="Flow sensor pulses per liter:"
+                  labelPlacement="stacked"
+                  value={settings.flowSensorPulsesPerLiter}
+                  name="flowSensorPulsesPerLiter"
+                  type="number"
+                  inputMode="numeric"
+                  helperText="Set the flow sensor pulses per liter between 300 and 500. Default value is 404."
+                  max={500}
+                  min={300}
+                  onInput={(event) =>
+                    setSettings({
+                      ...settings,
+                      flowSensorPulsesPerLiter: parseInt((event.target as HTMLInputElement).value),
+                    })
+                  }
+                />
+              </IonItem>
+            )}
             <IonItem>
               <IonInput
                 label="Soil moisture measure interval (days):"
@@ -185,7 +220,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 onInput={(event) =>
                   setSettings({
                     ...settings,
-                    waterAmount: parseInt((event.target as HTMLInputElement).value),
+                    waterAmount: parseFloat((event.target as HTMLInputElement).value),
                   })
                 }
               />
