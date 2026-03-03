@@ -71,7 +71,7 @@ class FlowMeter:
     def __init__(self):
         self.pin = gpiozero.DigitalInputDevice(pin=FLOW_SENSOR_GPIO)
         self.pin.when_activated = self.countPulse
-        self.pulsesPerLitre = 450
+        self.pulsesPerLitre = 404
         self.pulseCount = 0
         self.flowRates = []
 
@@ -88,8 +88,6 @@ class FlowMeter:
             round(sum(self.flowRates) / len(self.flowRates), 2) if len(self.flowRates) else 0
         )
         lastFlowRate = self.flowRates[-1] if len(self.flowRates) > 0 else 0
-        print(self.flowRates)
-        print("pulse count: ", self.pulseCount)
         self.clearCounters()
         return {
             "waterAmount": waterAmount,
@@ -101,7 +99,7 @@ class FlowMeter:
         return round(self.pulseCount / self.pulsesPerLitre, 2)
 
     def getCurrentFlowRate(self):
-        measureTime = 0.1
+        measureTime = 0.5
         count_a = self.pulseCount
         sleep(measureTime)
         count_b = self.pulseCount
@@ -236,19 +234,13 @@ def measureSoil(id):
 
 
 def water(unit):
-    print("water")
     unit.valve.on()
-
     pump.pumpOn()
-    start = datetime.now().second
     if unit.wateringMode == "time":
         sleep(unit.waterTime)
     else:
-        print("amount")
         while True:
             if flowMeter.getCurrentWateredAmount() >= unit.waterAmount:
-                end = datetime.now().second
-                print("Actual watering duration in deviceFunction:", end - start)
                 break
 
             # stop if no water
