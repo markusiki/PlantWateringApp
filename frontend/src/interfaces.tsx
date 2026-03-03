@@ -5,6 +5,7 @@ export interface IUnitState {
   moistValue: number
   moistLimit: number
   waterTime: number
+  waterAmount: number
   enableAutoWatering: boolean
   enableMaxWaterInterval: boolean
   enableMinWaterInterval: boolean
@@ -16,6 +17,7 @@ export interface IUnitState {
   totalWateredAmount: number
   wetMoistValue: number
   dryMoistValue: number
+  wateringMode: 'time' | 'amount'
 }
 
 export interface IUserState {
@@ -91,15 +93,18 @@ export interface IUnitCalibrationProps {
 }
 
 export interface IUnitSettingsState {
+  id: string
   name: string
   moistLimit: number
   waterTime: number
+  waterAmount: number
   enableAutoWatering: boolean
   enableMaxWaterInterval: boolean
   enableMinWaterInterval: boolean
   maxWaterInterval: number
   minWaterInterval: number
   waterFlowRate: string
+  wateringMode: 'time' | 'amount'
 }
 
 export interface IDeviceSettingsState {
@@ -109,7 +114,9 @@ export interface IDeviceSettingsState {
   numberOfUnits: number
   tankVolume: number
   waterAmount: number
+  flowSensorPulsesPerLiter: number
 }
+
 export interface IDeviceSettingsProps {
   deviceSettings: IDeviceSettingsState
   handleDeviceSettingsChange: (event: React.MouseEvent, settings: IDeviceSettingsState) => Promise<void>

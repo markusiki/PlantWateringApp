@@ -35,6 +35,7 @@ const Home: React.FC = () => {
     numberOfUnits: 4,
     tankVolume: 0,
     waterAmount: 0,
+    flowSensorPulsesPerLiter: 0,
   })
   const refresherRef = useRef<NodeJS.Timeout>()
 
@@ -104,8 +105,10 @@ const Home: React.FC = () => {
         toast('Service unavailable. Please contact the admin.')
       } else if (error.status === 503) {
         toast('Wormhole is closed. Please contact the admin.')
-      } else {
-        toast(error.response.data.message, 1500)
+      } else if (error.status === 401 || error.status === 500) {
+        {
+          toast(error.response.data.message!, 1500)
+        }
       }
     } finally {
       clearTimeout(loginSpinnerTimeout)
