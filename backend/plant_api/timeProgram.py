@@ -66,63 +66,70 @@ def timer():
 
 def timeProgram():
     while True:
-        if runTimeProgram:
-            if not testing:
-                moistValues = updateMoistValues()
-                updateMoistValuesToDB(moistValues)
-            units = getUnits()
+        try:
+            if runTimeProgram:
+                if not testing:
+                    moistValues = updateMoistValues()
+                    updateMoistValuesToDB(moistValues)
+                units = getUnits()
 
-            for unit in units[: getData("numberOfUnits")]:
-                unitLog = {
-                    "id": unit["id"],
-                    "status": unit["status"],
-                    "moistValue": unit["moistValue"],
-                }
-                inverseScaling = unit["dryMoistValue"] > unit["wetMoistValue"]
-                if unit["enableAutoWatering"]:
-                    wateredLastTime = lastTimeWatered(unit)
-                    if (
-                        unit["enableMinWaterInterval"] == True
-                        and unit["minWaterInterval"] <= wateredLastTime
-                    ):
-                        status = waterNow(unit["id"])
-                        status["message"] = (
-                            "Minimum watering interval"
-                            if status["message"] == ""
-                            else status["message"]
-                        )
-                        logKwargs = {**unitLog, **status}
-                        updateLog(
-                            **logKwargs,
-                            waterMethod="Auto",
-                        )
-
-                    elif (inverseScaling and unit["moistValue"] > unit["moistLimit"]) or (
-                        not inverseScaling and unit["moistValue"] < unit["moistLimit"]
-                    ):
+                for unit in units[: getData("numberOfUnits")]:
+                    unitLog = {
+                        "id": unit["id"],
+                        "status": unit["status"],
+                        "moistValue": unit["moistValue"],
+                    }
+                    inverseScaling = unit["dryMoistValue"] > unit["wetMoistValue"]
+                    if unit["enableAutoWatering"]:
+                        wateredLastTime = lastTimeWatered(unit)
                         if (
-                            unit["enableMaxWaterInterval"] == True
-                            and unit["maxWaterInterval"] >= wateredLastTime
+                            unit["enableMinWaterInterval"] == True
+                            and unit["minWaterInterval"] <= wateredLastTime
                         ):
-                            updateLog(**unitLog, message="Max watering interval not yet reached")
-                            continue
-                        if not unit["status"].startswith("ERROR"):
                             status = waterNow(unit["id"])
                             status["message"] = (
-                                "Moist level" if status["message"] == "" else status["message"]
+                                "Minimum watering interval"
+                                if status["message"] == ""
+                                else status["message"]
                             )
                             logKwargs = {**unitLog, **status}
                             updateLog(
                                 **logKwargs,
                                 waterMethod="Auto",
                             )
+
+                        elif (inverseScaling and unit["moistValue"] > unit["moistLimit"]) or (
+                            not inverseScaling and unit["moistValue"] < unit["moistLimit"]
+                        ):
+                            if (
+                                unit["enableMaxWaterInterval"] == True
+                                and unit["maxWaterInterval"] >= wateredLastTime
+                            ):
+                                updateLog(
+                                    **unitLog, message="Max watering interval not yet reached"
+                                )
+                                continue
+                            if not unit["status"].startswith("ERROR"):
+                                status = waterNow(unit["id"])
+                                status["message"] = (
+                                    "Moist level" if status["message"] == "" else status["message"]
+                                )
+                                logKwargs = {**unitLog, **status}
+                                updateLog(
+                                    **logKwargs,
+                                    waterMethod="Auto",
+                                )
+                            else:
+                                updateLog(**unitLog, message="Unit in error, not watered.")
                         else:
-                            updateLog(**unitLog, message="Unit in error, not watered.")
+                            updateLog(**unitLog, message="No watering needed.")
                     else:
-                        updateLog(**unitLog, message="No watering needed.")
-                else:
-                    updateLog(**unitLog, message="Automatic watering for the unit not enabled.")
-            timer()
+                        updateLog(**unitLog, message="Automatic watering for the unit not enabled.")
+                timer()
+        except Exception as e:
+            import traceback
+
+            traceback.print_exc()
 
 
 timeProgramThread = threading.Thread(target=timeProgram, daemon=True)
