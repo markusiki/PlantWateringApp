@@ -1,4 +1,6 @@
 import pytest
+
+from tests.conftest import auth
 from .test_helpers.db import (
     get_all_units,
     convert_moist_value,
@@ -12,7 +14,7 @@ base_url = "/api/units"
 
 @pytest.fixture(autouse=True)
 def login(auth):
-    response = auth.login()
+    auth.login()
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -72,7 +74,6 @@ def test_change_unit_settings(client, auth, app):
     }
 
     response = client.put(base_url, json=modified_unit, headers=auth.get_headers())
-    print(response)
     returned_unit = response.get_json()
     assert returned_unit["id"] == modified_unit["id"]
     assert returned_unit["name"] == modified_unit["name"]
@@ -107,7 +108,6 @@ def test_water_unit(app, client, auth):
     assert units_in_db[0]["logs"] == []
     response = client.post(f"{base_url}/Unit1", headers=auth.get_headers())
     response_data = response.get_json()
-    print(response_data)
     unit = response_data["unit"]
     assert len(unit["logs"]) == 1
     assert unit["logs"][0]["watered"] is True
