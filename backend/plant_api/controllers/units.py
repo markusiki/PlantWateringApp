@@ -1,6 +1,7 @@
 from flask import jsonify, request, Blueprint
 from flask_jwt_extended import jwt_required
 from ..services.unitsDB import (
+    getUnitsData,
     updateMoistValuesToDB,
     getUnits,
     findById,
@@ -31,6 +32,18 @@ def getAll():
         return jsonify({"message": "Internal server error", "error": error}), 500
 
 
+@unitsRouter.get("/moistValues")
+@jwt_required()
+def getMoistValues():
+    try:
+        moistValues = updateMoistValues()
+        updateMoistValuesToDB(moistValues)
+        response = getUnitsData("moistValue")
+        return response
+    except Exception as error:
+        return jsonify({"message": "Internal server error", "error": error}), 500
+
+
 @unitsRouter.put("")
 @jwt_required()
 def changeUnit():
@@ -41,7 +54,7 @@ def changeUnit():
         response = modifyUnitToDB(body, index)
         updateSprinklerUnitObject(body["id"], index)
         return response
-    except Exception:
+    except Exception as error:
         return jsonify({"message": "Internal server error"}), 500
 
 

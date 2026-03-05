@@ -60,6 +60,14 @@ def getUnits(innerUse=True):
         return units[:numberOfUnits]
 
 
+def getUnitsData(data):
+    units = getUnits()
+    dataList = []
+    for unit in units:
+        dataList.append({"id": unit["id"], data: unit[data]})
+    return dataList
+
+
 def findById(id):
     units = getUnits()
     index = -1
