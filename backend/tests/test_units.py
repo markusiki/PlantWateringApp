@@ -1,5 +1,4 @@
 import pytest
-from .conftest import path_to_unitsDB, path_to_deviceDB
 from .test_helpers.db import (
     get_all_units,
     convert_moist_value,
@@ -7,7 +6,6 @@ from .test_helpers.db import (
     get_device_settings,
     save_to_device_db,
 )
-from .test_helpers.create_db import create_test_units_db, create_test_device_db
 
 base_url = "/api/units"
 
@@ -19,8 +17,6 @@ def login(auth):
 
 @pytest.fixture(autouse=True, scope="function")
 def before_tests(app):
-    create_test_units_db(path_to_unitsDB)
-    create_test_device_db(path_to_deviceDB)
     device_settings = get_device_settings(app)
     device_settings["tankVolume"] = 100
     device_settings["waterAmount"] = 100

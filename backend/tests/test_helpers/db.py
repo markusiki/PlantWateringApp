@@ -44,3 +44,10 @@ def save_to_device_db(app, settings):
         from plant_api.services.deviceSettings import saveToDb
 
         saveToDb(settings)
+
+
+def check_and_update_db(app, path):
+    with app.app_context():
+        from plant_api.services.dbHelper import checkAndUpdateDB
+
+        checkAndUpdateDB(path)
