@@ -38,7 +38,7 @@ def getMoistValues():
     try:
         moistValues = updateMoistValues()
         updateMoistValuesToDB(moistValues)
-        response = getUnitsData("moistValue")
+        response = getUnitsData("moistValue", innerUse=False)
         return response
     except Exception as error:
         return jsonify({"message": "Internal server error", "error": error}), 500
