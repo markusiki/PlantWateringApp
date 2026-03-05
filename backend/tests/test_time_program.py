@@ -1,14 +1,11 @@
 import pytest
-from .conftest import path_to_unitsDB, path_to_deviceDB
 from .test_helpers.db import (
     get_all_units,
     save_to_units_db,
     get_device_settings,
     save_to_device_db,
-    save_log_to_units_db,
 )
 from time import sleep
-from .test_helpers.create_db import create_test_units_db, create_test_device_db
 from datetime import datetime
 from threading import Timer
 
@@ -16,9 +13,6 @@ from threading import Timer
 @pytest.fixture(scope="function", autouse=True)
 def run_around_tests(app, set_time_program):
     # Before each test
-    create_test_units_db(path_to_unitsDB)
-    create_test_device_db(path_to_deviceDB)
-
     device_settings = get_device_settings(app)
     device_settings["tankVolume"] = 100
     device_settings["waterAmount"] = 100
@@ -29,6 +23,7 @@ def run_around_tests(app, set_time_program):
     device_settings["runTimeProgram"] = False
     save_to_device_db(app, device_settings)
     set_time_program()
+    sleep(5)
 
 
 def last_time_measured(unit):
@@ -57,7 +52,7 @@ def test_auto_watering_min_watering_interval(app, set_time_program):
 
     set_time_program()
 
-    sleep(6)
+    sleep(7)
     units = get_all_units(app)
     for unit in units:
         assert len(unit["logs"]) == 1
@@ -107,7 +102,7 @@ def test_auto_watering_moist_level(app, set_time_program):
 
     set_time_program()
 
-    sleep(6)
+    sleep(7)
     units = get_all_units(app)
     for unit in units:
         assert len(unit["logs"]) == 1
@@ -216,7 +211,7 @@ def test_time_program_only_waters_number_of_units_defined_by_numberOfUnits(app, 
     device_settings["numberOfUnits"] = 3
     save_to_device_db(app, device_settings)
 
-    sleep(6)
+    sleep(7)
     units = get_all_units(app)
     assert len(units[0]["logs"]) == 2
     assert len(units[1]["logs"]) == 2
@@ -241,7 +236,7 @@ def test_moist_measure_interval_can_be_changed_while_timeprogram_is_running(app,
 
     set_time_program()
 
-    sleep(2)
+    sleep(1)
     units = get_all_units(app)
     for unit in units:
         assert len(unit["logs"]) == 1
@@ -302,10 +297,9 @@ def test_auto_watering_does_not_water_if_the_same_unit_is_being_watered_manually
     timer.start()
 
     auth.login()
-    # response_put = client.put("/api/units", json=unit, headers=auth.get_headers())
-    # print("put_response: ", response_put.get_json())
-    reponse_post = client.post("/api/units/Unit1", headers=auth.get_headers())
-    print("post_response: ", reponse_post.get_json())
+
+    # Water unit manually using POST request while time program is running to prevent auto watering of the same unit
+    client.post("/api/units/Unit1", headers=auth.get_headers())
 
     sleep(6)
 
@@ -313,7 +307,7 @@ def test_auto_watering_does_not_water_if_the_same_unit_is_being_watered_manually
     for unit in units:
         if unit["id"] == "Unit1":
             assert unit["logs"][1]["watered"] == False
-            assert unit["logs"][1]["message"] == "Manual waterign of Unit1 in process."
+            assert unit["logs"][1]["message"] == "Manual watering of Unit1 in process."
         else:
             assert unit["logs"][0]["watered"] == True
             assert unit["logs"][0]["message"] == "Minimum watering interval"
