@@ -57,6 +57,16 @@ def test_get_all_units(app, client, auth):
         assert not unit.get("valve", False)
 
 
+def test_get_moist_values(app, client, auth):
+    response = client.get(f"{base_url}/moistValues", headers=auth.get_headers())
+    assert response.status_code == 200
+    response_data = response.get_json()
+    assert len(response_data) is 4
+    for unit in response_data:
+        assert unit["id"]
+        assert unit["moistValue"] >= 0
+
+
 def test_change_unit_settings(client, auth, app):
     modified_unit = {
         "id": "Unit2",

@@ -12,24 +12,15 @@ import {
   useIonAlert,
   IonCheckbox,
   IonItemGroup,
-  IonLabel,
-  IonText,
   IonAlert,
-  IonSegment,
-  IonSegmentContent,
-  IonSegmentButton,
-  IonSegmentView,
-  IonGrid,
-  IonRow,
-  IonCol,
   IonSelect,
   IonSelectOption,
 } from '@ionic/react'
-import { IUnitSettingsProps, IUnitSettingsState, IUnitToUpdate } from '../interfaces'
+import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 import './UnitSettings.css'
-import unitService from '../services/units'
 import UnitCalibration from './UnitCalibration'
+import Unit from './Unit'
 
 const UnitSettings: React.FC<IUnitSettingsProps> = ({
   unit,
@@ -71,7 +62,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
       waterFlowRate: unit.waterFlowRate.toString(),
       wateringMode: unit.wateringMode,
     })
-  }, [unit])
+  }, [unit.id])
 
   const validateInputs = (settings: IUnitSettingsState) => {
     if (settings.name.length > 100 || settings.name.length < 1) {

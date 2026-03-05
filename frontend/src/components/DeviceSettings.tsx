@@ -28,7 +28,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
 
   useEffect(() => {
     setSettings(deviceSettings)
-  }, [deviceSettings])
+  }, [])
 
   const modal = useRef<HTMLIonModalElement>(null)
   const [presentAlert] = useIonAlert()

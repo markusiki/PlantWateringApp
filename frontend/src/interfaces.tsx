@@ -131,3 +131,8 @@ export interface ILoadingSpinnerProps {
   isOpen: boolean
   message: string
 }
+
+export interface IMoistValueResponse {
+  id: string
+  moistValue: number
+}
