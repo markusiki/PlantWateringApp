@@ -24,7 +24,7 @@ path_to_usersDB = os.path.join(os.path.dirname(__file__), "databases/users.test.
 path_to_deviceDB = os.path.join(os.path.dirname(__file__), "databases/deviceSettings.test.json")
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def app():
     create_test_users_db(path_to_usersDB)
     create_test_units_db(path_to_unitsDB)
@@ -41,8 +41,6 @@ def app():
     JWTManager(app)
 
     yield app
-
-    # clean up / reset resources here
 
 
 @pytest.fixture()
@@ -76,7 +74,7 @@ def pwm(request, mock_factory):
     mock_factory.pin_class = MockPWMPin
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def client(app):
     return app.test_client()
 
@@ -95,7 +93,7 @@ class AuthActions(object):
         return {"X-CSRF-TOKEN": self._client.get_cookie(key="csrf_access_token").value}
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def auth(client):
     return AuthActions(client)
 
