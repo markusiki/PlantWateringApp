@@ -1,10 +1,15 @@
-import axios from 'axios'
-import { IUnitToUpdate } from '../interfaces'
+import axios, { AxiosResponse } from 'axios'
+import { IMoistValueResponse, IUnitToUpdate } from '../interfaces'
 import serviceHelper from './helpers'
 const baseUrl = `/api/units`
 
 const getAll = async () => {
   const response = await axios.get(baseUrl, serviceHelper.getConfig())
+  return response
+}
+
+const getMoistValues = async () => {
+  const response = await axios.get<IMoistValueResponse[]>(`${baseUrl}/moistValues`, serviceHelper.getConfig())
   return response
 }
 
@@ -27,7 +32,7 @@ const calibrateUnit = async (id: string, moistValueType: string) => {
   const response = await axios.put(
     `${baseUrl}/calibrate/${moistValueType}MoistValue/${id}`,
     {},
-    serviceHelper.getConfig()
+    serviceHelper.getConfig(),
   )
   return response
 }
@@ -44,6 +49,7 @@ const deleteWaterCounter = async (id: string) => {
 
 const unitServices = {
   getAll,
+  getMoistValues,
   changeSettings,
   waterPlant,
   deleteLogs,
