@@ -35,6 +35,7 @@ def test_change_device_settings(client, auth):
         "tankVolume": 10,
         "waterAmount": 50,
         "useFlowSensor": True,
+        "flowSensorPulsesPerLiter": 450,
     }
     response = client.put(base_url, json=changed_device, headers=auth.get_headers())
     returned_settings = response.get_json()
@@ -43,3 +44,6 @@ def test_change_device_settings(client, auth):
     assert returned_settings["numberOfUnits"] == changed_device["numberOfUnits"]
     assert returned_settings["waterAmount"] == changed_device["waterAmount"]
     assert returned_settings["useFlowSensor"] == changed_device["useFlowSensor"]
+    assert (
+        returned_settings["flowSensorPulsesPerLiter"] == changed_device["flowSensorPulsesPerLiter"]
+    )
