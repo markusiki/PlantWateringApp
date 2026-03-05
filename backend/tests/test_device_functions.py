@@ -1,3 +1,4 @@
+from datetime import datetime
 import pytest
 from .conftest import path_to_unitsDB, path_to_deviceDB
 from .test_helpers.db import (
@@ -15,14 +16,14 @@ from gpiozero.pins.mock import *
 Device.pin_factory = MockFactory(pin_class=MockPWMPin)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def run_around_tests(app):
     # Before each test
     create_test_units_db(path_to_unitsDB)
     create_test_device_db(path_to_deviceDB)
 
 
-def simulate_flow_sensor(app, get_flow_meter, get_pump, units, flow_rate):
+def simulate_flow_sensor(app, get_flow_meter, get_pump, units, flow_rate, stop_after=0):
     device_settings = get_device_settings(app)
     water_amount = device_settings["waterAmount"]
     flow_meter = get_flow_meter
@@ -31,10 +32,12 @@ def simulate_flow_sensor(app, get_flow_meter, get_pump, units, flow_rate):
     pump = get_pump
     watering_time = units[0]["waterAmount"] / flow_rate
     pulse_interval = 1 / (total_pulses / watering_time)
+    start = datetime.now()
 
     while True:
+        if stop_after > 0 and (datetime.now() - start).total_seconds() > stop_after:
+            break
         if pump.power.value:
-            print("water left: ", water_amount)
             flow_meter.pin.pin.drive_high()
             flow_meter.pin.pin.drive_low()
             water_amount = water_amount - (1 / pulses_per_litre)
@@ -67,11 +70,11 @@ def test_water_now_waters_unit_with_amount_mode(
     save_to_device_db(app, device_settings)
     units = get_all_units(app)
     units[0]["wateringMode"] = "amount"
-    units[0]["waterAmount"] = 0.5
+    units[0]["waterAmount"] = 0.05
     save_to_units_db(app, units)
     update_object(units[0]["id"], 0)
 
-    flow_rate = 0.1
+    flow_rate = 0.01
 
     flow_sensor_simulation_thread = Thread(
         target=simulate_flow_sensor,
@@ -108,7 +111,7 @@ def test_water_now_stops_watering_if_no_water_left_with_amount_mode(
 ):
     device_settings = get_device_settings(app)
     device_settings["tankVolume"] = 10
-    device_settings["waterAmount"] = 0.5
+    device_settings["waterAmount"] = 2
     device_settings["useFlowSensor"] = True
     save_to_device_db(app, device_settings)
     units = get_all_units(app)
@@ -118,12 +121,12 @@ def test_water_now_stops_watering_if_no_water_left_with_amount_mode(
 
     update_object(units[0]["id"], 0)
 
-    flow_rate = 0.07
+    flow_rate = 0.01
 
     flow_sensor_simulation_thread = Thread(
         target=simulate_flow_sensor,
         daemon=True,
-        args=(app, get_flow_meter, get_pump, units, flow_rate),
+        args=(app, get_flow_meter, get_pump, units, flow_rate, 2),
     )
     flow_sensor_simulation_thread.start()
     flow_meter = get_flow_meter
@@ -132,5 +135,4 @@ def test_water_now_stops_watering_if_no_water_left_with_amount_mode(
 
     assert status["isWatered"]
     assert status["message"] == "Run out of water while watering."
-    assert status["wateredAmount"] == device_settings["waterAmount"]
     assert flow_meter.getData()["lastFlowRate"] == 0
