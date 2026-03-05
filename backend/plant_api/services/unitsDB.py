@@ -1,5 +1,5 @@
 from flask import current_app
-from .dbHelper import openDB, dumpDB
+from .dbHelper import checkAndUpdateDB, openDB, dumpDB
 from datetime import datetime
 from .deviceSettings import getData, updateWaterAmount
 
@@ -35,6 +35,8 @@ def setUnitsDB(app):
     with app.app_context():
         path = current_app.config["UNITS_DB"]
         testing = current_app.testing
+
+        checkAndUpdateDB(path)
 
 
 def getUnits(innerUse=True):
