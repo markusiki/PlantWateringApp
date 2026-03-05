@@ -172,7 +172,7 @@ def waterNow(id, manual=False):
         }
     if not manual and wateringStatus["watering"]:
         if wateringStatus["id"] == id:
-            return {"isWatered": False, "message": f"Manual waterign of {id} in process."}
+            return {"isWatered": False, "message": f"Manual watering of {id} in process."}
         else:
             while wateringStatus["watering"]:
                 sleep(1)
