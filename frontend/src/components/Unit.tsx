@@ -9,7 +9,7 @@ import {
   IonIcon,
   IonText,
   IonProgressBar,
-  IonAlert,
+  IonAlert
 } from '@ionic/react'
 import Log from './Log'
 import UnitSettings from './UnitSettings'
@@ -26,7 +26,7 @@ const Unit: React.FC<IUnitProps> = ({
   setWaterNowDisabled,
   handleUnitCalibration,
   handleClearWaterCounter,
-  deviceSettings,
+  deviceSettings
 }) => {
   let counterEnabled = false
 
@@ -237,15 +237,15 @@ const Unit: React.FC<IUnitProps> = ({
                 buttons={[
                   {
                     text: 'CANCEL',
-                    role: 'cancel',
+                    role: 'cancel'
                   },
                   {
                     text: 'WATER NOW',
                     role: 'confirm',
                     handler: () => {
                       handleWaterNow(unit)
-                    },
-                  },
+                    }
+                  }
                 ]}
               ></IonAlert>
             </IonCol>
