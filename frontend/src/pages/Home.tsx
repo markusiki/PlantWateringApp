@@ -69,7 +69,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const setRefresher = () => {
-      refresherRef.current = setInterval(refresh, 30000)
+      refresherRef.current = setInterval(refreshMoistValues, 30000)
     }
     clearInterval(refresherRef.current)
     if (isLoggedIn) {
@@ -163,6 +163,25 @@ const Home: React.FC = () => {
     } catch (error: any) {
       const status = error?.response.status
       setIsBackendConnected(false)
+      if (status === 401 || status === 422) {
+        deauthorize()
+      }
+    }
+  }
+
+  const refreshMoistValues = async () => {
+    try {
+      const response = await unitService.getMoistValues()
+      if (response?.status === 200 && response.headers['content-type'] === 'application/json') {
+        setUnits((prev) =>
+          prev.map((unit) => {
+            const updatedUnit = response.data.find((u) => u.id === unit.id)
+            return updatedUnit ? { ...unit, moistValue: updatedUnit.moistValue } : unit
+          }),
+        )
+      }
+    } catch (error: any) {
+      const status = error?.response.status
       if (status === 401 || status === 422) {
         deauthorize()
       }
