@@ -3,14 +3,11 @@ import pytest
 user = {"username": "test", "password": "test"}
 
 
-def test_login(client, auth):
+def test_login_logout(client, auth):
     response = auth.login()
     assert client.get_cookie(key="csrf_access_token") is not None
     assert response.status_code == 200
 
-
-def test_logout(client, auth):
-    assert client.get_cookie(key="csrf_access_token") is not None
     response = auth.logout()
     assert response.status_code == 200
     assert client.get_cookie(key="csrf_access_token") is None
