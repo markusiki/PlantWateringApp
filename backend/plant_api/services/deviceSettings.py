@@ -1,5 +1,5 @@
 from flask import current_app
-from .dbHelper import openDB, dumpDB
+from .dbHelper import checkAndUpdateDB, openDB, dumpDB
 
 path = ""
 
@@ -8,6 +8,8 @@ def setDeviceDB(app):
     global path
     with app.app_context():
         path = current_app.config["DEVICE_DB"]
+
+        checkAndUpdateDB(path)
 
 
 def getAll():

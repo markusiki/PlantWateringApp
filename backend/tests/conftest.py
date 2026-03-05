@@ -4,12 +4,13 @@ import pytest
 from flask import jsonify
 from plant_api import create_app
 from .test_helpers.create_db import (
-    create_test_units_db,
-    create_test_users_db,
-    create_test_device_db,
+    create_db,
 )
 from gpiozero import Device
 from gpiozero.pins.mock import MockFactory, MockPWMPin
+from plant_api.databases.models.units import units_model as units
+from .test_helpers.users import users
+from plant_api.databases.models.device import device_model as device
 
 Device.pin_factory = MockFactory(pin_class=MockPWMPin)
 
@@ -19,22 +20,30 @@ db_dir = os.path.join(os.path.dirname(__file__), "databases")
 if not os.path.isdir(db_dir):
     os.makedirs(db_dir)
 
-path_to_unitsDB = os.path.join(os.path.dirname(__file__), "databases/unitsDB.test.json")
-path_to_usersDB = os.path.join(os.path.dirname(__file__), "databases/users.test.json")
-path_to_deviceDB = os.path.join(os.path.dirname(__file__), "databases/deviceSettings.test.json")
+path_to_unitsDB = os.path.join(os.path.dirname(__file__), "databases/unitsDB.json")
+path_to_usersDB = os.path.join(os.path.dirname(__file__), "databases/users.json")
+path_to_deviceDB = os.path.join(os.path.dirname(__file__), "databases/deviceSettings.json")
 
 
 @pytest.fixture(scope="function", autouse=True)
-def app():
-    create_test_users_db(path_to_usersDB)
-    create_test_units_db(path_to_unitsDB)
-    create_test_device_db(path_to_deviceDB)
+def app(request):
+    params = getattr(request, "param", {})
+    usersDB_path = params.get("users_db", path_to_usersDB)
+    unitsDB_path = params.get("units_db", path_to_unitsDB)
+    deviceDB_path = params.get("device_db", path_to_deviceDB)
+    users_model = params.get("users_model", users)
+    units_model = params.get("units_model", units)
+    device_model = params.get("device_model", device)
+
+    create_db(usersDB_path, users_model)
+    create_db(unitsDB_path, units_model)
+    create_db(deviceDB_path, device_model)
     app = create_app(
         {
             "TESTING": True,
-            "UNITS_DB": path_to_unitsDB,
-            "USERS_DB": path_to_usersDB,
-            "DEVICE_DB": path_to_deviceDB,
+            "UNITS_DB": unitsDB_path,
+            "USERS_DB": usersDB_path,
+            "DEVICE_DB": deviceDB_path,
         }
     )
 

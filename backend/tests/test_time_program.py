@@ -211,12 +211,15 @@ def test_time_program_only_waters_number_of_units_defined_by_numberOfUnits(app, 
     device_settings["numberOfUnits"] = 3
     save_to_device_db(app, device_settings)
 
-    sleep(7)
+    sleep(11)
     units = get_all_units(app)
     assert len(units[0]["logs"]) == 2
     assert len(units[1]["logs"]) == 2
     assert len(units[2]["logs"]) == 1
     assert len(units[3]["logs"]) == 0
+
+    device_settings["runTimeProgram"] = True
+    save_to_device_db(app, device_settings)
 
 
 def test_moist_measure_interval_can_be_changed_while_timeprogram_is_running(app, set_time_program):

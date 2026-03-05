@@ -1,7 +1,4 @@
 import pytest
-from .conftest import path_to_unitsDB, path_to_deviceDB
-from tests.test_helpers.create_db import create_test_device_db, create_test_units_db
-from .conftest import path_to_deviceDB
 from .test_helpers.db import get_device_settings
 
 base_url = "/api/device"
@@ -10,13 +7,6 @@ base_url = "/api/device"
 @pytest.fixture(autouse=True)
 def login(auth):
     response = auth.login()
-
-
-@pytest.fixture(autouse=True)
-def run_around_tests(app):
-    # Before each test
-    create_test_units_db(path_to_unitsDB)
-    create_test_device_db(path_to_deviceDB)
 
 
 def test_get_all_device(app, client, auth):

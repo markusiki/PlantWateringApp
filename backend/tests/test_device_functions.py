@@ -1,6 +1,4 @@
 from datetime import datetime
-import pytest
-from .conftest import path_to_unitsDB, path_to_deviceDB
 from .test_helpers.db import (
     get_all_units,
     save_to_units_db,
@@ -8,19 +6,11 @@ from .test_helpers.db import (
     save_to_device_db,
 )
 from time import sleep
-from .test_helpers.create_db import create_test_units_db, create_test_device_db
 from threading import Thread
 from gpiozero.pins.mock import *
 
 
 Device.pin_factory = MockFactory(pin_class=MockPWMPin)
-
-
-@pytest.fixture(scope="function", autouse=True)
-def run_around_tests(app):
-    # Before each test
-    create_test_units_db(path_to_unitsDB)
-    create_test_device_db(path_to_deviceDB)
 
 
 def simulate_flow_sensor(app, get_flow_meter, get_pump, units, flow_rate, stop_after=0):
