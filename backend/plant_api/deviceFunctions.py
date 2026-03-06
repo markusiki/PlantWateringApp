@@ -60,10 +60,10 @@ class Sprinkler_unit:
     def update(self, moistValue, moistLimit, waterTime, waterAmount, waterFlowRate, wateringMode):
         self.moistValue = moistValue
         self.moistLimit = moistLimit
-        self.waterTime = waterTime
-        self.waterAmount = waterAmount
         self.waterFlowRate = waterFlowRate
         self.wateringMode = wateringMode
+        self.waterTime = waterTime if wateringMode == "time" else waterAmount / waterFlowRate
+        self.waterAmount = waterAmount if wateringMode == "amount" else waterTime * waterFlowRate
         return
 
 
@@ -194,6 +194,8 @@ def waterNow(id, manual=False):
             message = "Run out of water while watering."
         if flowMeterData["avgFlowRate"] == 0:
             message = "Flow sensor did not detect any water flow."
+        else:
+            unit.waterFlowRate = flowMeterData["avgFlowRate"]
 
     wateringStatus["watering"] = False
     wateringStatus["method"] = ""
