@@ -15,15 +15,30 @@ import {
   IonLoading,
   IonPage,
   IonRow,
-  IonSpinner,
+  IonSpinner
 } from '@ionic/react'
 import { ILoginProps } from '../interfaces'
 import LoadingSpinner from '../components/LoadingSpinner'
 
-const Login: React.FC<ILoginProps> = ({ username, setUsername, password, setPassword, handleLogin, loginSpinner }) => {
+const Login: React.FC<ILoginProps> = ({
+  username,
+  setUsername,
+  password,
+  setPassword,
+  handleLogin,
+  isLoggingIn,
+  loginSpinner
+}) => {
   const handleLoginButton = (event: React.MouseEvent<Element, MouseEvent>) => {
     handleLogin(event)
   }
+
+  const handleLoginEnter = (event: React.KeyboardEvent<Element>) => {
+    if (event.key === 'Enter') {
+      handleLogin(event)
+    }
+  }
+
   return (
     <IonPage>
       <IonContent>
@@ -54,6 +69,7 @@ const Login: React.FC<ILoginProps> = ({ username, setUsername, password, setPass
                         type="text"
                         maxlength={40}
                         onInput={(event) => setUsername((event.target as HTMLInputElement).value)}
+                        onKeyDown={handleLoginEnter}
                       ></IonInput>
                     </IonItem>
                     <IonItem>
@@ -64,10 +80,13 @@ const Login: React.FC<ILoginProps> = ({ username, setUsername, password, setPass
                         type="password"
                         maxlength={50}
                         onInput={(event) => setPassword((event.target as HTMLInputElement).value)}
+                        onKeyDown={handleLoginEnter}
                       ></IonInput>
                     </IonItem>
                   </IonList>
-                  <IonButton onClick={handleLoginButton}>Login</IonButton>
+                  <IonButton onClick={handleLoginButton} disabled={isLoggingIn}>
+                    Login
+                  </IonButton>
                   <LoadingSpinner
                     isOpen={loginSpinner}
                     message={

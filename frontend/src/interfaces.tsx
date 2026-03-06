@@ -30,7 +30,8 @@ export interface ILoginProps {
   password: string
   setUsername: React.Dispatch<React.SetStateAction<string>>
   setPassword: React.Dispatch<React.SetStateAction<string>>
-  handleLogin: (event: React.MouseEvent) => Promise<void>
+  handleLogin: (event: React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>) => Promise<void>
+  isLoggingIn: boolean
   loginSpinner: boolean
 }
 

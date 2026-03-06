@@ -22,6 +22,7 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 
 const Home: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
   const [loginSpinner, setLoginSpinner] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
   const [username, setUsername] = useState<string>('')
@@ -83,11 +84,12 @@ const Home: React.FC = () => {
     window.localStorage.removeItem('user')
   }
 
-  const handleLogin = async (event: React.MouseEvent) => {
+  const handleLogin = async (event: React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>) => {
     event.preventDefault()
     const loginSpinnerTimeout = setTimeout(() => {
       setLoginSpinner(true)
     }, 3000)
+    setIsLoggingIn(true)
     try {
       const response = await userService.login({ username, password })
       if (response?.status === 200 && response.headers['content-type'] === 'application/json') {
@@ -111,6 +113,7 @@ const Home: React.FC = () => {
         }
       }
     } finally {
+      setIsLoggingIn(false)
       clearTimeout(loginSpinnerTimeout)
       setLoginSpinner(false)
     }
@@ -317,6 +320,7 @@ const Home: React.FC = () => {
                 password={password}
                 setPassword={setPassword}
                 handleLogin={handleLogin}
+                isLoggingIn={isLoggingIn}
                 loginSpinner={loginSpinner}
               />
             )}
