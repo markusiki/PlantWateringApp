@@ -10,7 +10,7 @@ import {
   IonItem,
   IonInput,
   IonCheckbox,
-  useIonAlert,
+  useIonAlert
 } from '@ionic/react'
 import { IDeviceSettingsProps, IDeviceSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
@@ -23,14 +23,16 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
     numberOfUnits: 4,
     tankVolume: 0,
     waterAmount: 0,
-    flowSensorPulsesPerLiter: 0,
+    flowSensorPulsesPerLiter: 0
   })
 
   useEffect(() => {
-    setSettings(deviceSettings)
-  }, [])
+    if (!modalRef.current?.isOpen) {
+      setSettings(deviceSettings)
+    }
+  }, [deviceSettings])
 
-  const modal = useRef<HTMLIonModalElement>(null)
+  const modalRef = useRef<HTMLIonModalElement>(null)
   const [presentAlert] = useIonAlert()
 
   const validateInputs = () => {
@@ -38,7 +40,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
       presentAlert({
         header: 'Invalid input',
         message: 'Moist measure interval must be between 1 and 30!',
-        buttons: ['Dismiss'],
+        buttons: ['Dismiss']
       })
       return false
     }
@@ -46,7 +48,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
       presentAlert({
         header: 'Invalid input',
         message: 'Number of units must be between 1 and 4!',
-        buttons: ['Dismiss'],
+        buttons: ['Dismiss']
       })
       return false
     }
@@ -54,7 +56,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
       presentAlert({
         header: 'Invalid input',
         message: 'Tank volume must be between 1 and 100 000 and bigger than water amount',
-        buttons: ['Dismiss'],
+        buttons: ['Dismiss']
       })
       return false
     }
@@ -62,7 +64,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
       presentAlert({
         header: 'Invalid input',
         message: 'Water amount must be between 0 and 100 000 and not bigger than tank volume!',
-        buttons: ['Dismiss'],
+        buttons: ['Dismiss']
       })
       return false
     }
@@ -70,7 +72,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
       presentAlert({
         header: 'Invalid input',
         message: 'Flow sensor pulses per liter must be between 300 and 500!',
-        buttons: ['Dismiss'],
+        buttons: ['Dismiss']
       })
       return false
     } else {
@@ -83,18 +85,23 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
 
     if (validInputs) {
       handleDeviceSettingsChange(event, settings)
-      modal.current?.dismiss()
+      modalRef.current?.dismiss()
     }
   }
 
   const cancel = (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>) => {
     setSettings(deviceSettings)
-    modal.current?.dismiss()
+    modalRef.current?.dismiss()
   }
 
   return (
     <>
-      <IonModal trigger={'settings'} ref={modal}>
+      <IonModal
+        trigger={'settings'}
+        ref={modalRef}
+        onDidPresent={() => (modalRef.current!.isOpen = true)}
+        onDidDismiss={() => (modalRef.current!.isOpen = false)}
+      >
         <IonHeader>
           <IonToolbar>
             <IonButtons>
@@ -145,7 +152,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                   onInput={(event) =>
                     setSettings({
                       ...settings,
-                      flowSensorPulsesPerLiter: parseInt((event.target as HTMLInputElement).value),
+                      flowSensorPulsesPerLiter: parseInt((event.target as HTMLInputElement).value)
                     })
                   }
                 />
@@ -164,7 +171,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 onInput={(event) =>
                   setSettings({
                     ...settings,
-                    moistMeasureInterval: parseInt((event.target as HTMLInputElement).value),
+                    moistMeasureInterval: parseInt((event.target as HTMLInputElement).value)
                   })
                 }
               />
@@ -182,7 +189,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 onInput={(event) =>
                   setSettings({
                     ...settings,
-                    numberOfUnits: parseInt((event.target as HTMLInputElement).value),
+                    numberOfUnits: parseInt((event.target as HTMLInputElement).value)
                   })
                 }
               />
@@ -201,7 +208,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 onInput={(event) =>
                   setSettings({
                     ...settings,
-                    tankVolume: parseInt((event.target as HTMLInputElement).value),
+                    tankVolume: parseInt((event.target as HTMLInputElement).value)
                   })
                 }
               />
@@ -220,7 +227,7 @@ const DeviceSettings: React.FC<IDeviceSettingsProps> = ({ deviceSettings, handle
                 onInput={(event) =>
                   setSettings({
                     ...settings,
-                    waterAmount: parseFloat((event.target as HTMLInputElement).value),
+                    waterAmount: parseFloat((event.target as HTMLInputElement).value)
                   })
                 }
               />

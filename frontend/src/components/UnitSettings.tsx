@@ -14,7 +14,7 @@ import {
   IonItemGroup,
   IonAlert,
   IonSelect,
-  IonSelectOption,
+  IonSelectOption
 } from '@ionic/react'
 import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
@@ -27,7 +27,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
   handleUnitChange,
   handleUnitCalibration,
   handleClearWaterCounter,
-  deviceSettings,
+  deviceSettings
 }) => {
   const [settings, setSettings] = useState<IUnitSettingsState>({
     id: '',
@@ -41,35 +41,37 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
     maxWaterInterval: 0,
     minWaterInterval: 0,
     waterFlowRate: '',
-    wateringMode: 'time',
+    wateringMode: 'time'
   })
   const [isCalibrating, setIsCalibrating] = useState(false)
   const unitSettingsModal = useRef<HTMLIonModalElement>(null)
   const [presentAlert] = useIonAlert()
 
   useEffect(() => {
-    setSettings({
-      id: unit.id,
-      name: unit.name,
-      moistLimit: unit.moistLimit,
-      waterTime: unit.waterTime,
-      waterAmount: unit.waterAmount,
-      enableAutoWatering: unit.enableAutoWatering,
-      enableMaxWaterInterval: unit.enableMaxWaterInterval,
-      enableMinWaterInterval: unit.enableMinWaterInterval,
-      maxWaterInterval: unit.maxWaterInterval,
-      minWaterInterval: unit.minWaterInterval,
-      waterFlowRate: unit.waterFlowRate.toString(),
-      wateringMode: unit.wateringMode,
-    })
-  }, [unit.id])
+    if (!unitSettingsModal.current?.isOpen) {
+      setSettings({
+        id: unit.id,
+        name: unit.name,
+        moistLimit: unit.moistLimit,
+        waterTime: unit.waterTime,
+        waterAmount: unit.waterAmount,
+        enableAutoWatering: unit.enableAutoWatering,
+        enableMaxWaterInterval: unit.enableMaxWaterInterval,
+        enableMinWaterInterval: unit.enableMinWaterInterval,
+        maxWaterInterval: unit.maxWaterInterval,
+        minWaterInterval: unit.minWaterInterval,
+        waterFlowRate: unit.waterFlowRate.toString(),
+        wateringMode: unit.wateringMode
+      })
+    }
+  }, [unit])
 
   const validateInputs = (settings: IUnitSettingsState) => {
     if (settings.name.length > 100 || settings.name.length < 1) {
       presentAlert({
         header: 'Invalid input',
         message: 'Plant name must be between 1 and 100 characters!',
-        buttons: ['Dismiss'],
+        buttons: ['Dismiss']
       })
       return false
     }
@@ -77,7 +79,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
       presentAlert({
         header: 'Invalid input',
         message: 'Moisture level limit must be between 0 and 100!',
-        buttons: ['Dismiss'],
+        buttons: ['Dismiss']
       })
       return false
     }
@@ -87,7 +89,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
         header: 'Invalid input',
         message:
           settings.wateringMode === 'time' ? 'Water time must be between 0 and 600!' : 'Too big watering amount!',
-        buttons: ['Dismiss'],
+        buttons: ['Dismiss']
       })
       return false
     }
@@ -96,7 +98,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
         presentAlert({
           header: 'Invalid input',
           message: 'Water flow rate must be a number!',
-          buttons: ['Dismiss'],
+          buttons: ['Dismiss']
         })
         return false
       } else {
@@ -104,7 +106,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
           presentAlert({
             header: 'Invalid input',
             message: 'Water flow rate must between 0 and 2',
-            buttons: ['Dismiss'],
+            buttons: ['Dismiss']
           })
           return false
         }
@@ -113,7 +115,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
         presentAlert({
           header: 'Invalid input',
           message: 'Water flow rate can have max 3 decimals!',
-          buttons: ['Dismiss'],
+          buttons: ['Dismiss']
         })
         return false
       }
@@ -127,7 +129,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
       presentAlert({
         header: 'Invalid input',
         message: 'Water Interval must be between 1 and 180!',
-        buttons: ['Dismiss'],
+        buttons: ['Dismiss']
       })
       return false
     }
@@ -139,7 +141,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
       presentAlert({
         header: 'Invalid input',
         message: 'Minimun water interval must be longer than maximum watering interval!',
-        buttons: ['Dismiss'],
+        buttons: ['Dismiss']
       })
       return false
     } else {
@@ -149,12 +151,9 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
 
   const syncWaterTimeAndAmount = () => {
     if (parseFloat(settings.waterFlowRate) > 0) {
-      console.log('sync')
       if (settings.wateringMode === 'amount') {
-        console.log('amount')
         return { ...settings, waterTime: settings.waterAmount / parseFloat(settings.waterFlowRate) }
       } else {
-        console.log('time')
         return { ...settings, waterAmount: settings.waterTime * parseFloat(settings.waterFlowRate) }
       }
     }
@@ -163,7 +162,6 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
 
   const confirm = (event: React.MouseEvent) => {
     const syncedSettings = syncWaterTimeAndAmount()
-    console.log(syncedSettings)
     const validInputs = validateInputs(syncedSettings)
     if (validInputs) {
       const settingsToSave = { ...syncedSettings, waterFlowRate: parseFloat(settings.waterFlowRate) }
@@ -172,13 +170,29 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
     }
   }
 
+  const handleCancel = () => {
+    unitSettingsModal.current?.dismiss()
+  }
+
   const handleChange = (event: any) => {
     if (event.target.name === 'name' || event.target.name === 'waterFlowRate' || event.target.name === 'wateringMode') {
       setSettings({ ...settings, [event.target.name]: event.target.value })
     } else if (event.target.localName === 'ion-checkbox') {
       setSettings({ ...settings, [event.target.name]: event.detail.checked })
     } else if (event.target.name === 'waterAmount') {
-      setSettings({ ...settings, [event.target.name]: parseFloat(event.target.value) })
+      const newWaterAmount = parseFloat(event.target.value)
+      setSettings({
+        ...settings,
+        waterAmount: newWaterAmount,
+        waterTime: newWaterAmount / parseFloat(settings.waterFlowRate)
+      })
+    } else if (event.target.name === 'waterTime') {
+      const newWaterTime = parseFloat(event.target.value)
+      setSettings({
+        ...settings,
+        waterTime: newWaterTime,
+        waterAmount: newWaterTime * parseFloat(settings.waterFlowRate)
+      })
     } else {
       setSettings({ ...settings, [event.target.name]: parseInt(event.target.value) })
     }
@@ -186,11 +200,16 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
 
   return (
     <>
-      <IonModal trigger={`${unit.id}-settings`} ref={unitSettingsModal}>
+      <IonModal
+        trigger={`${unit.id}-settings`}
+        ref={unitSettingsModal}
+        onDidPresent={() => (unitSettingsModal.current!.isOpen = true)}
+        onDidDismiss={() => (unitSettingsModal.current!.isOpen = false)}
+      >
         <IonHeader>
           <IonToolbar>
             <IonButtons>
-              <IonButton onClick={() => unitSettingsModal.current?.dismiss()}>Cancel</IonButton>
+              <IonButton onClick={handleCancel}>Cancel</IonButton>
             </IonButtons>
             <IonTitle slot="secondary">Settings</IonTitle>
             <IonButtons slot="end">
@@ -363,7 +382,7 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
             buttons={[
               {
                 text: 'CANCEL',
-                role: 'cancel',
+                role: 'cancel'
               },
               {
                 text: 'CLEAR COUNTER',
@@ -371,8 +390,8 @@ const UnitSettings: React.FC<IUnitSettingsProps> = ({
                 handler: () => {
                   handleClearWaterCounter(unit.id)
                   unitSettingsModal.current?.dismiss()
-                },
-              },
+                }
+              }
             ]}
           ></IonAlert>
         </IonContent>
