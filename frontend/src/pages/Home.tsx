@@ -5,7 +5,7 @@ import {
   IonRefresherContent,
   RefresherEventDetail,
   useIonRouter,
-  useIonToast,
+  useIonToast
 } from '@ionic/react'
 import './Home.css'
 import React, { useEffect, useRef, useState } from 'react'
@@ -35,7 +35,7 @@ const Home: React.FC = () => {
     numberOfUnits: 4,
     tankVolume: 0,
     waterAmount: 0,
-    flowSensorPulsesPerLiter: 0,
+    flowSensorPulsesPerLiter: 0
   })
   const refresherRef = useRef<NodeJS.Timeout>()
 
@@ -48,7 +48,7 @@ const Home: React.FC = () => {
     present({
       message: message,
       duration: duration,
-      position: 'middle',
+      position: 'middle'
     })
   }
 
@@ -69,7 +69,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const setRefresher = () => {
-      refresherRef.current = setInterval(refreshMoistValues, 30000)
+      refresherRef.current = setInterval(refreshMoistValues, 5000)
     }
     clearInterval(refresherRef.current)
     if (isLoggedIn) {
@@ -177,7 +177,7 @@ const Home: React.FC = () => {
           prev.map((unit) => {
             const updatedUnit = response.data.find((u) => u.id === unit.id)
             return updatedUnit ? { ...unit, moistValue: updatedUnit.moistValue } : unit
-          }),
+          })
         )
       }
     } catch (error: any) {
