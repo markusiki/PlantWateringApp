@@ -179,14 +179,14 @@ def waterNow(id, manual=False):
     index = findById(id)
     unit = sprinkler_units_in_use[index]
     waterAmountLeft = getData("waterAmount")
-    if (unit.waterFlowRate * unit.waterTime) >= waterAmountLeft:
+    useFlowSensor = getData("useFlowSensor")
+    if not useFlowSensor and (unit.waterFlowRate * unit.waterTime) >= waterAmountLeft:
         return {"isWatered": False, "message": "Not enough water"}
 
     wateringStatus["watering"] = True
     wateringStatus["method"] = "Manual" if manual else "Auto"
     wateringStatus["id"] = id
     water(unit)
-    useFlowSensor = getData("useFlowSensor")
     message = ""
     if useFlowSensor:
         flowMeterData = flowMeter.getData()
@@ -237,21 +237,37 @@ def measureSoil(id):
     }
 
 
+def isWaterFlowing():
+    if flowMeter.getCurrentFlowRate() == 0:
+        sleep(2)
+        if flowMeter.getCurrentFlowRate() == 0:
+            return False
+    return True
+
+
 def water(unit):
     unit.valve.on()
     pump.pumpOn()
-    if unit.wateringMode == "time":
-        sleep(unit.waterTime)
-    else:
-        while True:
-            if flowMeter.getCurrentWateredAmount() >= unit.waterAmount:
-                break
-
-            # stop if no water
-            if flowMeter.getCurrentFlowRate() == 0:
-                sleep(2)
-                if flowMeter.getCurrentFlowRate() == 0:
+    useFlowSensor = getData("useFlowSensor")
+    if useFlowSensor:
+        if unit.wateringMode == "time":
+            for _ in range(int(unit.waterTime)):
+                if not isWaterFlowing():
                     break
+                sleep(1)
+        elif unit.wateringMode == "amount":
+            while True:
+                if flowMeter.getCurrentWateredAmount() >= unit.waterAmount:
+                    break
+
+                if not isWaterFlowing():
+                    break
+    else:
+        if unit.wateringMode == "time":
+            sleep(unit.waterTime)
+        elif unit.wateringMode == "amount":
+            sleep(unit.waterAmount / unit.waterFlowRate)
+
     pump.pumpOff()
     unit.valve.off()
 
