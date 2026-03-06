@@ -70,7 +70,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const setRefresher = () => {
-      refresherRef.current = setInterval(refreshMoistValues, 5000)
+      refresherRef.current = setInterval(refreshMoistValues, 30000)
     }
     clearInterval(refresherRef.current)
     if (isLoggedIn) {
