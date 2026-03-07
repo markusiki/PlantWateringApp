@@ -93,17 +93,25 @@ def saveToDb(units):
 def modifyUnitToDB(unitToChange, index):
     units = getUnits()
     unit = units[index]
-    unit["name"] = unitToChange["name"]
-    unit["moistLimit"] = convertMoistValue(unit, int(unitToChange["moistLimit"]))
-    unit["waterTime"] = int(unitToChange["waterTime"])
-    unit["waterAmount"] = float(unitToChange["waterAmount"])
-    unit["enableAutoWatering"] = unitToChange["enableAutoWatering"]
-    unit["enableMaxWaterInterval"] = unitToChange["enableMaxWaterInterval"]
-    unit["enableMinWaterInterval"] = unitToChange["enableMinWaterInterval"]
-    unit["maxWaterInterval"] = unitToChange["maxWaterInterval"]
-    unit["minWaterInterval"] = unitToChange["minWaterInterval"]
-    unit["waterFlowRate"] = unitToChange["waterFlowRate"]
-    unit["wateringMode"] = unitToChange["wateringMode"]
+    wateringMode = unitToChange["wateringMode"]
+    for key, value in unitToChange.items():
+        if key == "moistLimit":
+            value = convertMoistValue(unit, int(value))
+        elif key == "waterTime":
+            value = (
+                int(value)
+                if wateringMode == "time"
+                else round(unitToChange["waterAmount"] / unitToChange["waterFlowRate"], 0)
+            )
+        elif key == "waterAmount":
+            value = (
+                float(value)
+                if wateringMode == "amount"
+                else round(unitToChange["waterTime"] * unitToChange["waterFlowRate"], 2)
+            )
+
+        unit[key] = value
+
     saveToDb(units)
     changedUnits = getUnits(innerUse=False)
     changedUnit = changedUnits[index]
@@ -129,9 +137,10 @@ def updateLog(
         wateredAmount = unit["waterFlowRate"] * unit["waterTime"]
     if isWatered:
         unit["totalWateredAmount"] = round((unit["totalWateredAmount"] + wateredAmount), 3)
-        if useFlowSensor:
-            if flowRate > 0:
-                unit["waterFlowRate"] = flowRate
+        if useFlowSensor and flowRate > 0:
+            unit["waterFlowRate"] = flowRate
+            if unit["wateringMode"] == "amount":
+                unit["waterTime"] = round(wateredAmount / flowRate, 0)
 
         updateWaterAmount(wateredAmount)
 

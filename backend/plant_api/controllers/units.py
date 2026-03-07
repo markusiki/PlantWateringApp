@@ -49,12 +49,12 @@ def getMoistValues():
 def changeUnit():
     try:
         body = request.get_json()
-        UnitsSchema().load(body)
+        UnitsSchema().load(body, partial=False, unknown="raise")
         index = findById(body["id"])
         response = modifyUnitToDB(body, index)
         updateSprinklerUnitObject(body["id"], index)
         return response
-    except Exception as error:
+    except Exception:
         return jsonify({"message": "Internal server error"}), 500
 
 
@@ -75,7 +75,7 @@ def waterUnit(unitId):
         unit = getById(unitId, innerUse=False)
         waterAmount = getData("waterAmount")
         return jsonify({"unit": unit, "waterAmount": waterAmount})
-    except Exception as error:
+    except Exception:
         return jsonify({"message": "Internal server error"}), 500
 
 

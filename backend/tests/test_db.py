@@ -2,7 +2,7 @@ import pytest
 import os
 import copy
 
-from tests.test_helpers.db import check_and_update_db, get_device_settings, get_all_units
+from tests.test_helpers.db import get_device_settings, get_all_units
 from plant_api.databases.models.device import device_model
 from plant_api.databases.models.units import units_model
 
@@ -39,7 +39,3 @@ def test_models_are_updated(app):
     assert "flowSensorPulsesPerLiter" in device_settings.keys()
     for unit in all_units:
         assert "wateringMode" in unit.keys()
-
-
-""" def test_check_and_update_array_db(app):
-    check_and_update_db(app, path_to_test_units_DB) """
