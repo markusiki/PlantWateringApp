@@ -19,6 +19,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 ads = ADS.ADS1115(i2c)
 
 wateringStatus = {"watering": False, "method": "", "id": ""}
+cancelWateringFlag = False
 
 
 class Pump:
@@ -163,8 +164,22 @@ def updateMoistValues():
     return moistValues
 
 
+def cancelWatering(id):
+    global cancelWateringFlag
+    if (
+        wateringStatus["watering"]
+        and wateringStatus["method"] == "Manual"
+        and wateringStatus["id"] == id
+    ):
+        cancelWateringFlag = True
+        return {"message": f"Cancelling watering process for unit {id}"}
+    else:
+        return {"message": f"No manual watering process in progress for unit {id}"}
+
+
 def waterNow(id, manual=False):
     global wateringStatus
+    global cancelWateringFlag
     if manual and wateringStatus["watering"]:
         return {
             "isWatered": False,
@@ -196,6 +211,10 @@ def waterNow(id, manual=False):
             message = "Flow sensor did not detect any water flow."
         else:
             unit.waterFlowRate = flowMeterData["avgFlowRate"]
+
+    if cancelWateringFlag:
+        message = "Watering cancelled by user."
+        cancelWateringFlag = False
 
     wateringStatus["watering"] = False
     wateringStatus["method"] = ""
@@ -248,13 +267,14 @@ def isWaterFlowing():
 
 
 def water(unit):
+    global cancelWateringFlag
     unit.valve.on()
     pump.pumpOn()
     useFlowSensor = getData("useFlowSensor")
     if useFlowSensor:
         if unit.wateringMode == "time":
             for _ in range(int(unit.waterTime)):
-                if not isWaterFlowing():
+                if not isWaterFlowing() or cancelWateringFlag:
                     break
                 sleep(1)
         elif unit.wateringMode == "amount":
@@ -262,7 +282,7 @@ def water(unit):
                 if flowMeter.getCurrentWateredAmount() >= unit.waterAmount:
                     break
 
-                if not isWaterFlowing():
+                if not isWaterFlowing() or cancelWateringFlag:
                     break
     else:
         if unit.wateringMode == "time":

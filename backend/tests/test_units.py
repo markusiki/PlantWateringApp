@@ -1,3 +1,7 @@
+from time import sleep
+import asyncio
+import pytest
+
 import pytest
 
 from tests.conftest import auth
@@ -126,6 +130,62 @@ def test_water_unit(app, client, auth):
         == units_in_db[0]["totalWateredAmount"]
         + units_in_db[0]["waterFlowRate"] * units_in_db[0]["waterTime"]
     )
+
+
+def test_cancel_watering(app, client, auth):
+    modified_unit = {
+        "id": "Unit2",
+        "name": "Test_unit2",
+        "moistLimit": 50,
+        "waterTime": 5,  # Increased to 5 seconds to have time to cancel
+        "waterAmount": 2,
+        "enableAutoWatering": True,
+        "enableMaxWaterInterval": True,
+        "enableMinWaterInterval": True,
+        "maxWaterInterval": 9,
+        "minWaterInterval": 10,
+        "waterFlowRate": 0.2,
+        "wateringMode": "time",
+    }
+
+    client.put(base_url, json=modified_unit, headers=auth.get_headers())
+
+    async def water():
+        response = await asyncio.to_thread(
+            client.post, f"{base_url}/Unit2", headers=auth.get_headers()
+        )
+        response_data = response.get_json()
+        assert response.status_code == 200
+        assert response_data["unit"]["logs"][0]["message"] == "Watering cancelled by user."
+
+    async def try_cancel_wrong_unit():
+        # Wait a bit to ensure watering has started
+        await asyncio.sleep(1)
+        response = await asyncio.to_thread(
+            client.post, f"{base_url}/cancelWatering/Unit1", headers=auth.get_headers()
+        )
+        assert response.status_code == 200
+        response_data = response.get_json()
+        assert "No manual watering process in progress for unit Unit1" in response_data["message"]
+
+    async def cancel_watering():
+        # Wait a bit to ensure watering has started
+        await asyncio.sleep(2)
+        response = await asyncio.to_thread(
+            client.post, f"{base_url}/cancelWatering/Unit2", headers=auth.get_headers()
+        )
+        assert response.status_code == 200
+        response_data = response.get_json()
+        assert "Cancelling watering process for unit Unit2" in response_data["message"]
+
+    async def run_test():
+        await asyncio.gather(
+            water(),
+            try_cancel_wrong_unit(),
+            cancel_watering(),
+        )
+
+    asyncio.run(run_test())
 
 
 def test_delete_unit_logs(app, client, auth):

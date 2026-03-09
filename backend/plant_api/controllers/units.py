@@ -14,7 +14,13 @@ from ..services.unitsDB import (
     calibrateUnitMoistValue,
 )
 from ..services.deviceSettings import getData
-from ..deviceFunctions import updateMoistValues, updateSprinklerUnitObject, measureSoil, waterNow
+from ..deviceFunctions import (
+    cancelWatering,
+    updateMoistValues,
+    updateSprinklerUnitObject,
+    measureSoil,
+    waterNow,
+)
 from ..schemas import UnitsSchema
 
 unitsRouter = Blueprint("unitsRouter", __name__)
@@ -75,6 +81,16 @@ def waterUnit(unitId):
         unit = getById(unitId, innerUse=False)
         waterAmount = getData("waterAmount")
         return jsonify({"unit": unit, "waterAmount": waterAmount})
+    except Exception:
+        return jsonify({"message": "Internal server error"}), 500
+
+
+@unitsRouter.post("/cancelWatering/<string:unitId>")
+@jwt_required()
+def cancelWateringUnit(unitId):
+    try:
+        response = cancelWatering(unitId)
+        return jsonify(response)
     except Exception:
         return jsonify({"message": "Internal server error"}), 500
 
