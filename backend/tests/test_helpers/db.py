@@ -17,11 +17,14 @@ def get_all_units(app):
         return units
 
 
-def save_to_units_db(app, units):
+def save_units(app, units):
     with app.app_context():
         from plant_api.services.unitsDB import saveToDb
+        from plant_api.deviceFunctions import updateSprinklerUnitObject
 
         saveToDb(units)
+        for index, unit in enumerate(units):
+            updateSprinklerUnitObject(unit["id"], index)
 
 
 def save_log_to_units_db(app, unitLog):

@@ -8,7 +8,7 @@ from tests.conftest import auth
 from .test_helpers.db import (
     get_all_units,
     convert_moist_value,
-    save_to_units_db,
+    save_units,
     get_device_settings,
     save_to_device_db,
 )
@@ -39,7 +39,7 @@ def test_get_all_units(app, client, auth):
             unit["dryMoistValue"] = 15000
             unit["wetMoistValue"] = 30000
 
-    save_to_units_db(app, units)
+    save_units(app, units)
 
     response = client.get(base_url, headers=auth.get_headers())
     assert response.status_code == 200
