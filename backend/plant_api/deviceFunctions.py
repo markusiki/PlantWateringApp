@@ -165,6 +165,7 @@ def updateMoistValues():
 
 
 def cancelWatering(id):
+    global wateringStatus
     global cancelWateringFlag
     if (
         wateringStatus["watering"]
