@@ -213,19 +213,24 @@ def waterNow(id, manual=False):
             message = "Flow sensor did not detect any water flow."
         elif not cancelWateringFlag:
             unit.waterFlowRate = flowMeterData["avgFlowRate"]
-
+    wasCancelled = False
     if cancelWateringFlag:
         message = "Watering cancelled by user."
         cancelWateringFlag = False
+        wasCancelled = True
 
     wateringStatus["watering"] = False
     wateringStatus["method"] = ""
     wateringStatus["id"] = ""
+
     return {
         "isWatered": True,
         "message": message,
-        "wateredTime": wateredTime,
-        "wateredAmount": flowMeterData["waterAmount"] if useFlowSensor else 0,
+        "wateredAmount": (
+            flowMeterData["waterAmount"]
+            if useFlowSensor
+            else round(unit.waterFlowRate * (wateredTime if wasCancelled else unit.waterTime), 2)
+        ),
         "flowRate": flowMeterData["avgFlowRate"] if useFlowSensor else 0,
     }
 
@@ -271,8 +276,8 @@ def isWaterFlowing():
 
 def water(unit):
     global cancelWateringFlag
-    start = datetime.now()
     unit.valve.on()
+    start = datetime.now()
     pump.pumpOn()
     useFlowSensor = getData("useFlowSensor")
     if useFlowSensor:
@@ -298,8 +303,8 @@ def water(unit):
             sleep(0.1)
 
     pump.pumpOff()
-    unit.valve.off()
     end = datetime.now()
+    unit.valve.off()
 
     return (end - start).total_seconds().__round__(1)
 
