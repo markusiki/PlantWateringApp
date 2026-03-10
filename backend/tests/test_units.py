@@ -1,16 +1,12 @@
-from time import sleep
+import pytest
 import asyncio
-import pytest
-
-import pytest
-
-from tests.conftest import auth
-from .test_helpers.db import (
+from datetime import datetime
+from .test_helpers import (
     get_all_units,
-    convert_moist_value,
     save_units,
     get_device_settings,
     save_to_device_db,
+    flow_sensor_simulation,
 )
 
 base_url = "/api/units"
@@ -133,30 +129,31 @@ def test_water_unit(app, client, auth):
 
 
 def test_cancel_watering(app, client, auth):
-    modified_unit = {
-        "id": "Unit2",
-        "name": "Test_unit2",
-        "moistLimit": 50,
-        "waterTime": 5,  # Increased to 5 seconds to have time to cancel
-        "waterAmount": 2,
-        "enableAutoWatering": True,
-        "enableMaxWaterInterval": True,
-        "enableMinWaterInterval": True,
-        "maxWaterInterval": 9,
-        "minWaterInterval": 10,
-        "waterFlowRate": 0.2,
-        "wateringMode": "time",
-    }
+    units = get_all_units(app)
+    units[0]["name"] = "Test_unit1"
+    units[1]["name"] = "Test_unit2"
+    units[1]["waterTime"] = 5
+    units[1]["waterFlowRate"] = 0.2
 
-    client.put(base_url, json=modified_unit, headers=auth.get_headers())
+    save_units(app, units)
 
     async def water():
+        start = datetime.now()
         response = await asyncio.to_thread(
             client.post, f"{base_url}/Unit2", headers=auth.get_headers()
         )
+        end = datetime.now()
         response_data = response.get_json()
+        waterAmount = response_data["unit"]["logs"][0]["waterAmount"]
+        assert (end - start).total_seconds() < units[1]["waterTime"]
         assert response.status_code == 200
         assert response_data["unit"]["logs"][0]["message"] == "Watering cancelled by user."
+        assert response_data["unit"]["logs"][0]["watered"] is True
+        assert waterAmount > 0 and waterAmount < units[1]["waterFlowRate"] * units[1]["waterTime"]
+        assert (
+            response_data["unit"]["totalWateredAmount"]
+            < units[1]["waterFlowRate"] * units[1]["waterTime"]
+        )
 
     async def try_cancel_wrong_unit():
         # Wait a bit to ensure watering has started
@@ -166,7 +163,10 @@ def test_cancel_watering(app, client, auth):
         )
         assert response.status_code == 200
         response_data = response.get_json()
-        assert "No manual watering process in progress for unit Unit1" in response_data["message"]
+        assert (
+            f"No manual watering process in progress for {units[0]['name']}."
+            in response_data["message"]
+        )
 
     async def cancel_watering():
         # Wait a bit to ensure watering has started
@@ -176,7 +176,76 @@ def test_cancel_watering(app, client, auth):
         )
         assert response.status_code == 200
         response_data = response.get_json()
-        assert "Cancelling watering process for unit Unit2" in response_data["message"]
+        assert f"Watering cancelled for {units[1]['name']}." in response_data["message"]
+
+    async def run_test():
+        await asyncio.gather(
+            water(),
+            try_cancel_wrong_unit(),
+            cancel_watering(),
+        )
+
+    asyncio.run(run_test())
+
+
+def test_cancel_watering_using_amount(app, client, auth, get_flow_meter, get_pump):
+    device = get_device_settings(app)
+    device["useFlowSensor"] = True
+    save_to_device_db(app, device)
+
+    units = get_all_units(app)
+    units[0]["name"] = "Test_unit1"
+    units[1]["name"] = "Test_unit2"
+    units[1]["waterTime"] = 5
+    units[1]["waterFlowRate"] = 0.2
+    units[1]["wateringMode"] = "amount"
+    units[1]["waterAmount"] = 1
+
+    save_units(app, units)
+    flow_sensor_simulation(
+        app=app,
+        get_flow_meter=get_flow_meter,
+        get_pump=get_pump,
+        unit=units[1],
+        flow_rate=units[1]["waterFlowRate"],
+    ).start()
+
+    async def water():
+        start = datetime.now()
+        response = await asyncio.to_thread(
+            client.post, f"{base_url}/Unit2", headers=auth.get_headers()
+        )
+        end = datetime.now()
+        response_data = response.get_json()
+        waterAmount = response_data["unit"]["logs"][0]["waterAmount"]
+        assert (end - start).total_seconds() < units[1]["waterTime"]
+        assert response.status_code == 200
+        assert response_data["unit"]["logs"][0]["message"] == "Watering cancelled by user."
+        assert response_data["unit"]["logs"][0]["watered"] is True
+        assert waterAmount > 0 and waterAmount < units[1]["waterAmount"]
+
+    async def try_cancel_wrong_unit():
+        # Wait a bit to ensure watering has started
+        await asyncio.sleep(1)
+        response = await asyncio.to_thread(
+            client.post, f"{base_url}/cancelWatering/Unit1", headers=auth.get_headers()
+        )
+        assert response.status_code == 200
+        response_data = response.get_json()
+        assert (
+            f"No manual watering process in progress for {units[0]['name']}."
+            in response_data["message"]
+        )
+
+    async def cancel_watering():
+        # Wait a bit to ensure watering has started
+        await asyncio.sleep(2)
+        response = await asyncio.to_thread(
+            client.post, f"{base_url}/cancelWatering/Unit2", headers=auth.get_headers()
+        )
+        assert response.status_code == 200
+        response_data = response.get_json()
+        assert f"Watering cancelled for {units[1]['name']}." in response_data["message"]
 
     async def run_test():
         await asyncio.gather(

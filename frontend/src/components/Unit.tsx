@@ -14,13 +14,14 @@ import {
 import Log from './Log'
 import UnitSettings from './UnitSettings'
 import { IUnitProps, IUnitState } from '../interfaces'
-import { settingsOutline } from 'ionicons/icons'
+import { settingsOutline, water } from 'ionicons/icons'
 
 const Unit: React.FC<IUnitProps> = ({
   unit,
   setUnits,
   handleUnitChange,
   waterNow,
+  cancelWatering,
   deleteLogs,
   waterNowDisabled,
   setWaterNowDisabled,
@@ -28,6 +29,8 @@ const Unit: React.FC<IUnitProps> = ({
   handleClearWaterCounter,
   deviceSettings
 }) => {
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
+
   let counterEnabled = false
 
   const getRelativeValue = (unit: IUnitState) => {
@@ -100,6 +103,30 @@ const Unit: React.FC<IUnitProps> = ({
     if (isCompleted) {
       counterEnabled = false
       setWaterNowDisabled(false)
+    }
+  }
+
+  const getButton = () => {
+    if (!waterNowDisabled || (waterNowDisabled && !unit.counter)) {
+      return (
+        <>
+          <IonButton
+            onClick={() => setIsAlertOpen(true)}
+            shape="round"
+            expand="block"
+            color="primary"
+            disabled={waterNowDisabled}
+          >
+            Water now
+          </IonButton>
+        </>
+      )
+    } else {
+      return (
+        <IonButton shape="round" expand="block" color="secondary" onClick={() => cancelWatering(unit.id)}>
+          Watering... {unit.counter} Click to cancel
+        </IonButton>
+      )
     }
   }
 
@@ -221,7 +248,8 @@ const Unit: React.FC<IUnitProps> = ({
               <Log unit={unit} deleteLogs={deleteLogs}></Log>
             </IonCol>
             <IonCol sizeSm="5" className="ion-text-center">
-              <IonButton
+              {getButton()}
+              {/* <IonButton
                 id={`confirm-water-${unit.id}`}
                 shape="round"
                 expand="block"
@@ -229,29 +257,30 @@ const Unit: React.FC<IUnitProps> = ({
                 disabled={waterNowDisabled}
               >
                 {buttonEffect(unit)}
-              </IonButton>
-              <IonAlert
-                header="Confirm"
-                message={`Confirm watering for ${unit.name}`}
-                trigger={`confirm-water-${unit.id}`}
-                buttons={[
-                  {
-                    text: 'CANCEL',
-                    role: 'cancel'
-                  },
-                  {
-                    text: 'WATER NOW',
-                    role: 'confirm',
-                    handler: () => {
-                      handleWaterNow(unit)
-                    }
-                  }
-                ]}
-              ></IonAlert>
+              </IonButton> */}
             </IonCol>
           </IonRow>
         </IonGrid>
       </IonCard>
+      <IonAlert
+        isOpen={isAlertOpen}
+        header="Confirm"
+        message={`Confirm watering for ${unit.name}`}
+        buttons={[
+          {
+            text: 'CANCEL',
+            role: 'cancel'
+          },
+          {
+            text: 'WATER NOW',
+            role: 'confirm',
+            handler: () => {
+              handleWaterNow(unit)
+            }
+          }
+        ]}
+        onDidDismiss={() => setIsAlertOpen(false)}
+      ></IonAlert>
     </>
   )
 }

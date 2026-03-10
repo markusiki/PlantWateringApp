@@ -5,7 +5,7 @@ import board
 import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
-from .services.unitsDB import getUnits, findById
+from .services.unitsDB import getUnits, findById, getById
 from .services.deviceSettings import getData
 from statistics import pstdev
 
@@ -167,15 +167,16 @@ def updateMoistValues():
 def cancelWatering(id):
     global wateringStatus
     global cancelWateringFlag
+    unit = getById(id)
     if (
         wateringStatus["watering"]
         and wateringStatus["method"] == "Manual"
         and wateringStatus["id"] == id
     ):
         cancelWateringFlag = True
-        return {"message": f"Cancelling watering process for unit {id}"}
+        return {"message": f"Watering cancelled for {unit['name']}."}
     else:
-        return {"message": f"No manual watering process in progress for unit {id}"}
+        return {"message": f"No manual watering process in progress for {unit['name']}."}
 
 
 def waterNow(id, manual=False):
@@ -202,7 +203,7 @@ def waterNow(id, manual=False):
     wateringStatus["watering"] = True
     wateringStatus["method"] = "Manual" if manual else "Auto"
     wateringStatus["id"] = id
-    water(unit)
+    wateredTime = water(unit)
     message = ""
     if useFlowSensor:
         flowMeterData = flowMeter.getData()
@@ -210,20 +211,26 @@ def waterNow(id, manual=False):
             message = "Run out of water while watering."
         if flowMeterData["avgFlowRate"] == 0:
             message = "Flow sensor did not detect any water flow."
-        else:
+        elif not cancelWateringFlag:
             unit.waterFlowRate = flowMeterData["avgFlowRate"]
-
+    wasCancelled = False
     if cancelWateringFlag:
         message = "Watering cancelled by user."
         cancelWateringFlag = False
+        wasCancelled = True
 
     wateringStatus["watering"] = False
     wateringStatus["method"] = ""
     wateringStatus["id"] = ""
+
     return {
         "isWatered": True,
         "message": message,
-        "wateredAmount": flowMeterData["waterAmount"] if useFlowSensor else 0,
+        "wateredAmount": (
+            flowMeterData["waterAmount"]
+            if useFlowSensor
+            else round(unit.waterFlowRate * (wateredTime if wasCancelled else unit.waterTime), 2)
+        ),
         "flowRate": flowMeterData["avgFlowRate"] if useFlowSensor else 0,
     }
 
@@ -270,6 +277,7 @@ def isWaterFlowing():
 def water(unit):
     global cancelWateringFlag
     unit.valve.on()
+    start = datetime.now()
     pump.pumpOn()
     useFlowSensor = getData("useFlowSensor")
     if useFlowSensor:
@@ -286,13 +294,19 @@ def water(unit):
                 if not isWaterFlowing() or cancelWateringFlag:
                     break
     else:
-        if unit.wateringMode == "time":
-            sleep(unit.waterTime)
-        elif unit.wateringMode == "amount":
-            sleep(unit.waterAmount / unit.waterFlowRate)
+        wateringTime = (
+            unit.waterTime if unit.wateringMode == "time" else unit.waterAmount / unit.waterFlowRate
+        )
+        for _ in range(int(wateringTime * 10)):
+            if cancelWateringFlag:
+                break
+            sleep(0.1)
 
     pump.pumpOff()
+    end = datetime.now()
     unit.valve.off()
+
+    return (end - start).total_seconds().__round__(1)
 
 
 def getObjects():

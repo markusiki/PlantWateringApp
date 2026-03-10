@@ -1,39 +1,14 @@
-from datetime import datetime
-from .test_helpers.db import (
+from .test_helpers import (
     get_all_units,
     save_units,
     get_device_settings,
     save_to_device_db,
+    flow_sensor_simulation,
 )
-from time import sleep
-from threading import Thread
 from gpiozero.pins.mock import *
 
 
 Device.pin_factory = MockFactory(pin_class=MockPWMPin)
-
-
-def simulate_flow_sensor(app, get_flow_meter, get_pump, units, flow_rate, stop_after=0):
-    device_settings = get_device_settings(app)
-    water_amount = device_settings["waterAmount"]
-    flow_meter = get_flow_meter
-    pulses_per_litre = 450
-    total_pulses = pulses_per_litre * units[0]["waterAmount"]
-    pump = get_pump
-    watering_time = units[0]["waterAmount"] / flow_rate
-    pulse_interval = 1 / (total_pulses / watering_time)
-    start = datetime.now()
-
-    while True:
-        if stop_after > 0 and (datetime.now() - start).total_seconds() > stop_after:
-            break
-        if pump.power.value:
-            flow_meter.pin.pin.drive_high()
-            flow_meter.pin.pin.drive_low()
-            water_amount = water_amount - (1 / pulses_per_litre)
-            sleep(pulse_interval / 2)
-            if water_amount <= 0 or not pump.power.value:
-                break
 
 
 def test_water_now_waters_unit_with_time_mode(app, water_now):
@@ -64,14 +39,9 @@ def test_water_now_waters_unit_with_amount_mode(
     save_units(app, units)
     update_object(units[0]["id"], 0)
 
-    flow_rate = 0.01
-
-    flow_sensor_simulation_thread = Thread(
-        target=simulate_flow_sensor,
-        daemon=True,
-        args=(app, get_flow_meter, get_pump, units, flow_rate),
-    )
-    flow_sensor_simulation_thread.start()
+    flow_sensor_simulation(
+        app=app, get_flow_meter=get_flow_meter, get_pump=get_pump, unit=units[0]
+    ).start()
     status = water_now(units[0]["id"])
 
     assert status["isWatered"]
@@ -111,14 +81,9 @@ def test_water_now_stops_watering_if_no_water_left_with_amount_mode(
 
     update_object(units[0]["id"], 0)
 
-    flow_rate = 0.01
-
-    flow_sensor_simulation_thread = Thread(
-        target=simulate_flow_sensor,
-        daemon=True,
-        args=(app, get_flow_meter, get_pump, units, flow_rate, 2),
-    )
-    flow_sensor_simulation_thread.start()
+    flow_sensor_simulation(
+        app=app, get_flow_meter=get_flow_meter, get_pump=get_pump, unit=units[0], stop_after=2
+    ).start()
     flow_meter = get_flow_meter
 
     status = water_now(units[0]["id"])

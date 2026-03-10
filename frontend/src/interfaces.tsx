@@ -70,6 +70,7 @@ export interface IUnitProps extends IUnitSettingsProps {
   unit: IUnitState
   setUnits: React.Dispatch<React.SetStateAction<IUnitState[]>>
   waterNow: (id: string) => Promise<boolean>
+  cancelWatering: (id: string) => Promise<boolean>
   deleteLogs: (event: React.MouseEvent, id: string) => Promise<void>
   waterNowDisabled: boolean
   setWaterNowDisabled: React.Dispatch<React.SetStateAction<boolean>>
