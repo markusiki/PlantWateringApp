@@ -239,7 +239,7 @@ def test_moist_measure_interval_can_be_changed_while_timeprogram_is_running(app,
 
     set_time_program()
 
-    sleep(1)
+    sleep(2)
     units = get_all_units(app)
     for unit in units:
         assert len(unit["logs"]) == 1
@@ -283,7 +283,7 @@ def test_auto_watering_does_not_water_if_the_same_unit_is_being_watered_manually
     app, client, auth, set_time_program
 ):
     units = get_all_units(app)
-    units[0]["waterTime"] = 5
+    units[0]["waterTime"] = 3
     for unit in units:
         unit["enableAutoWatering"] = True
         unit["enableMinWaterInterval"] = True
@@ -304,7 +304,7 @@ def test_auto_watering_does_not_water_if_the_same_unit_is_being_watered_manually
     # Water unit manually using POST request while time program is running to prevent auto watering of the same unit
     client.post("/api/units/Unit1", headers=auth.get_headers())
 
-    sleep(6)
+    sleep(5)
 
     units = get_all_units(app)
     for unit in units:
