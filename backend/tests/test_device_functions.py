@@ -1,7 +1,7 @@
 from datetime import datetime
 from .test_helpers.db import (
     get_all_units,
-    save_to_units_db,
+    save_units,
     get_device_settings,
     save_to_device_db,
 )
@@ -44,7 +44,7 @@ def test_water_now_waters_unit_with_time_mode(app, water_now):
     units = get_all_units(app)
     units[0]["wateringMode"] = "time"
     units[0]["waterTime"] = 1
-    save_to_units_db(app, units)
+    save_units(app, units)
     status = water_now(units[0]["id"])
     assert status["isWatered"]
     assert status["message"] == ""
@@ -61,7 +61,7 @@ def test_water_now_waters_unit_with_amount_mode(
     units = get_all_units(app)
     units[0]["wateringMode"] = "amount"
     units[0]["waterAmount"] = 0.05
-    save_to_units_db(app, units)
+    save_units(app, units)
     update_object(units[0]["id"], 0)
 
     flow_rate = 0.01
@@ -87,7 +87,7 @@ def test_water_now_does_not_water_if_no_water_left_with_time_mode(app, update_ob
     save_to_device_db(app, device_settings)
     units = get_all_units(app)
     units[0]["waterFlowRate"] = 1
-    save_to_units_db(app, units)
+    save_units(app, units)
     update_object(units[0]["id"], 0)
 
     status = water_now(units[0]["id"])
@@ -107,7 +107,7 @@ def test_water_now_stops_watering_if_no_water_left_with_amount_mode(
     units = get_all_units(app)
     units[0]["wateringMode"] = "amount"
     units[0]["waterAmount"] = 1
-    save_to_units_db(app, units)
+    save_units(app, units)
 
     update_object(units[0]["id"], 0)
 

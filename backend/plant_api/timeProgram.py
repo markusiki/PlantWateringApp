@@ -1,6 +1,6 @@
 from flask import current_app
 from datetime import datetime
-from time import monotonic
+from time import monotonic, sleep
 from .services.deviceSettings import getAll, getData
 from .services.unitsDB import getUnits, updateMoistValuesToDB, updateLog
 from .deviceFunctions import updateMoistValues, waterNow
@@ -23,12 +23,7 @@ def setTimeProgram():
     global measureInterval
 
     measureInterval = settings["moistMeasureInterval"]
-
-    if settings["runTimeProgram"] is True and runTimeProgram is False:
-        runTimeProgram = True
-
-    if settings["runTimeProgram"] is False and runTimeProgram:
-        runTimeProgram = False
+    runTimeProgram = settings["runTimeProgram"]
 
 
 def lastTimeWatered(unit):
@@ -50,6 +45,7 @@ def lastTimeWatered(unit):
 
 
 def timer():
+    global runTimeProgram
     start_time = monotonic()
 
     while True:
@@ -65,6 +61,7 @@ def timer():
 
 
 def timeProgram():
+    global runTimeProgram
     while True:
         try:
             if runTimeProgram:
