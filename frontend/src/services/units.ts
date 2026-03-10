@@ -23,6 +23,11 @@ const waterPlant = async (id: string) => {
   return response
 }
 
+const cancelWatering = async (id: string) => {
+  const response = await axios.post(`${baseUrl}/cancelWatering/${id}`, {}, serviceHelper.getConfig())
+  return response
+}
+
 const deleteLogs = async (id: string) => {
   const response = await axios.delete(`${baseUrl}/logs/${id}`, serviceHelper.getConfig())
   return response
@@ -32,7 +37,7 @@ const calibrateUnit = async (id: string, moistValueType: string) => {
   const response = await axios.put(
     `${baseUrl}/calibrate/${moistValueType}MoistValue/${id}`,
     {},
-    serviceHelper.getConfig(),
+    serviceHelper.getConfig()
   )
   return response
 }
@@ -52,10 +57,11 @@ const unitServices = {
   getMoistValues,
   changeSettings,
   waterPlant,
+  cancelWatering,
   deleteLogs,
   calibrateUnit,
   getRawMoistValue,
-  deleteWaterCounter,
+  deleteWaterCounter
 }
 
 export default unitServices

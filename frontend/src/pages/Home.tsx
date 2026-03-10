@@ -237,6 +237,27 @@ const Home: React.FC = () => {
     }
   }
 
+  const cancelWatering = async (id: string) => {
+    try {
+      const response = await unitService.cancelWatering(id)
+      toast(response.data.message, 3000)
+    } catch (error: any) {
+      const status = error?.response.status
+      if (status === 401 || status === 422) {
+        deauthorize()
+      }
+      if (status === 400) {
+        toast(error.response.data.message, 5000)
+      } else if (status === 401 || status === 422) {
+        deauthorize()
+      } else {
+        setIsBackendConnected(false)
+      }
+    } finally {
+      return true
+    }
+  }
+
   const handleDeviceSettingsChange = async (event: React.MouseEvent, settings: IDeviceSettingsState) => {
     event.preventDefault()
     try {
@@ -350,6 +371,7 @@ const Home: React.FC = () => {
                         setUnits={setUnits}
                         handleUnitChange={handleUnitChange}
                         waterNow={waterNow}
+                        cancelWatering={cancelWatering}
                         deleteLogs={deleteLogs}
                         waterNowDisabled={waterNowDisabeled}
                         setWaterNowDisabled={setWaterNowDisabled}
