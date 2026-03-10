@@ -133,8 +133,7 @@ def updateLog(
     index = findById(id)
     unit = units[index]
     useFlowSensor = getData("useFlowSensor")
-    if not useFlowSensor:
-        wateredAmount = unit["waterFlowRate"] * unit["waterTime"]
+
     if isWatered:
         unit["totalWateredAmount"] = round((unit["totalWateredAmount"] + wateredAmount), 3)
         if useFlowSensor and flowRate > 0:
