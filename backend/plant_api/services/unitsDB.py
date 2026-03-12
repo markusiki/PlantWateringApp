@@ -14,6 +14,9 @@ def convertMoistValue(unit, value):
     def valueToRange(val, inMin, inMax, outMin, outMax):
         return round(outMin + (float(val - inMin) / float(inMax - inMin) * (outMax - outMin)))
 
+    if value == 0:
+        return 0
+
     if value > 100:
         inMin = unit["wetMoistValue"] if inverseScaling else unit["dryMoistValue"]
         inMax = unit["dryMoistValue"] if inverseScaling else unit["wetMoistValue"]
@@ -170,29 +173,30 @@ def analyzeMoistValue(unit, moistValue):
     upperLimit = unit["dryMoistValue"] if inverseScaling else unit["wetMoistValue"]
     lowerLimit = unit["wetMoistValue"] if inverseScaling else unit["dryMoistValue"]
 
+    status = ""
+
     if moistValue["moistValue"] > upperLimit:
-        unit["status"] = (
+        status = (
             "ERROR: Moisture sensor may not be in soil."
             if inverseScaling
-            else "ERROR: The soil may be floading."
+            else "ERROR: The soil may be flooding."
         )
         unit["moistValue"] = upperLimit
 
-    elif moistValue["moistValue"] < 1000:
-        unit["status"] = "ERROR: The moisture sensor may be defective."
-        unit["moistValue"] = lowerLimit
-
-    elif moistValue["moistValue"] < lowerLimit:
-        unit["status"] = (
-            "ERROR: Watering unit may not be connected or the soil is floading."
+    elif moistValue["moistValue"] < lowerLimit and moistValue["moistValue"] > lowerLimit - 2000:
+        status = (
+            "ERROR: The soil may be flooding."
             if inverseScaling
             else "ERROR: Watering unit may not be connected."
         )
         unit["moistValue"] = lowerLimit
 
     else:
-        unit["status"] = "OK" if moistValue["status"] == "OK" else moistValue["status"]
         unit["moistValue"] = round(moistValue["moistValue"] / 100) * 100
+
+    unit["status"] = (
+        moistValue["status"] if moistValue["status"] != "OK" else status if status != "" else "OK"
+    )
 
     return unit
 
