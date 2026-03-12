@@ -250,6 +250,16 @@ def measureSoil(id):
     valueSum = 0
     for unit in sprinkler_units_in_use:
         if unit.id == id:
+            voltage = unit.sensor.voltage
+            if voltage < 0.5:
+                return {
+                    "id": id,
+                    "status": "ERROR: Watering unit is disconnected.",
+                    "standardDeviation": 0,
+                    "moistValue": 0,
+                }
+
+            # Take 5 readings to calculate average and standard deviation
             for i in range(5):
                 value = unit.sensor.value
                 values.append(value)
@@ -257,7 +267,6 @@ def measureSoil(id):
                 sleep(0.05)
             pstdev = calculateStandardDeviation(values)
             valueMean = valueSum / 5
-
     return {
         "id": id,
         "status": pstdev["status"],
