@@ -179,7 +179,7 @@ const Home: React.FC = () => {
         setUnits((prev) =>
           prev.map((unit) => {
             const updatedUnit = response.data.find((u) => u.id === unit.id)
-            return updatedUnit ? { ...unit, moistValue: updatedUnit.moistValue } : unit
+            return updatedUnit ? { ...unit, ...updatedUnit } : unit
           })
         )
       }
