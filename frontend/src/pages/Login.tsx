@@ -10,6 +10,7 @@ import {
   IonContent,
   IonGrid,
   IonInput,
+  IonInputPasswordToggle,
   IonItem,
   IonList,
   IonLoading,
@@ -81,7 +82,9 @@ const Login: React.FC<ILoginProps> = ({
                         maxlength={50}
                         onInput={(event) => setPassword((event.target as HTMLInputElement).value)}
                         onKeyDown={handleLoginEnter}
-                      ></IonInput>
+                      >
+                        <IonInputPasswordToggle slot="end" color="dark"></IonInputPasswordToggle>
+                      </IonInput>
                     </IonItem>
                   </IonList>
                   <IonButton onClick={handleLoginButton} disabled={isLoggingIn}>
