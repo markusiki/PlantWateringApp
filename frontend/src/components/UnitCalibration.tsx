@@ -10,7 +10,7 @@ import {
   IonText,
   IonCol,
   IonGrid,
-  IonRow,
+  IonRow
 } from '@ionic/react'
 import { IUnitCalibrationProps } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
@@ -21,7 +21,7 @@ const UnitCalibration: React.FC<IUnitCalibrationProps> = ({
   isCalibrating,
   setIsCalibrating,
   unit,
-  handleUnitCalibration,
+  handleUnitCalibration
 }) => {
   const [rawMoistValue, setRawMoistValue] = useState({ moistValue: 0, standardDeviation: 0 })
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -29,6 +29,14 @@ const UnitCalibration: React.FC<IUnitCalibrationProps> = ({
   const [presentAlert] = useIonAlert()
 
   useEffect(() => {
+    const getRawMoistValue = async () => {
+      try {
+        const response = await unitService.getRawMoistValue(unit.id)
+        setRawMoistValue(response.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
     if (isCalibrating) {
       intervalRef.current = setInterval(getRawMoistValue, 2000)
     } else if (intervalRef.current) {
@@ -41,20 +49,11 @@ const UnitCalibration: React.FC<IUnitCalibrationProps> = ({
         clearInterval(intervalRef.current)
       }
     }
-  }, [isCalibrating])
+  }, [isCalibrating, unit.id])
 
   useEffect(() => {
     rawMoistValueRef.current = rawMoistValue
-  }, [rawMoistValue])
-
-  const getRawMoistValue = async () => {
-    try {
-      const response = await unitService.getRawMoistValue(unit.id)
-      setRawMoistValue(response.data)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  }, [rawMoistValue, unit.id])
 
   const calibrateUnit = async (event: React.MouseEvent<HTMLIonButtonElement, MouseEvent>, moistType: string) => {
     event.preventDefault()
@@ -72,9 +71,9 @@ const UnitCalibration: React.FC<IUnitCalibrationProps> = ({
           role: 'confirm',
           handler: async () => {
             await handleUnitCalibration(event, unit.id, moistType)
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
   }
 
