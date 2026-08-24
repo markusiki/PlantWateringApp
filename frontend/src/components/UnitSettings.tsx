@@ -20,7 +20,6 @@ import { IUnitSettingsProps, IUnitSettingsState } from '../interfaces'
 import { useEffect, useRef, useState } from 'react'
 import './UnitSettings.css'
 import UnitCalibration from './UnitCalibration'
-import Unit from './Unit'
 
 const UnitSettings: React.FC<IUnitSettingsProps> = ({
   unit,

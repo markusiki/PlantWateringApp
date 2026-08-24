@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
 import { IMoistValueResponse, IUnitToUpdate } from '../interfaces'
 import serviceHelper from './helpers'
 const baseUrl = `/api/units`

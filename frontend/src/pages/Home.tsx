@@ -24,7 +24,6 @@ const Home: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isLoggingIn, setIsLoggingIn] = useState(false)
   const [loginSpinner, setLoginSpinner] = useState(false)
-  const [isInitialized, setIsInitialized] = useState(false)
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [units, setUnits] = useState<IUnitState[]>([])
@@ -54,29 +53,11 @@ const Home: React.FC = () => {
   }
 
   useEffect(() => {
-    const initialize = async () => {
-      await refresh()
-      setIsInitialized(true)
-    }
-    initialize()
-  }, [isLoggedIn])
-
-  useEffect(() => {
     const loggedUser = window.localStorage.getItem('user')
     if (loggedUser) {
       serviceHelper.setUser(loggedUser)
     }
   }, [])
-
-  useEffect(() => {
-    const setRefresher = () => {
-      refresherRef.current = setInterval(refreshMoistValues, 30000)
-    }
-    clearInterval(refresherRef.current)
-    if (isLoggedIn) {
-      setRefresher()
-    }
-  }, [isLoggedIn])
 
   const deauthorize = () => {
     setUnits([])
@@ -98,6 +79,8 @@ const Home: React.FC = () => {
         setUsername('')
         setPassword('')
         setIsLoggedIn(true)
+        refresh()
+        setRefresher()
         router.push('/')
       } else {
         toast('The device is offline. Please make sure that the device is turned on and connected to WiFi.', 8000)
@@ -108,9 +91,7 @@ const Home: React.FC = () => {
       } else if (error.status === 503) {
         toast('Wormhole is closed. Please contact the admin.')
       } else if (error.status === 401 || error.status === 500) {
-        {
-          toast(error.response.data.message!, 1500)
-        }
+        toast(error.response.data.message!, 1500)
       }
     } finally {
       setIsLoggingIn(false)
@@ -127,6 +108,7 @@ const Home: React.FC = () => {
     } catch (error) {
     } finally {
       deauthorize()
+      clearRefresher()
     }
   }
 
@@ -170,6 +152,15 @@ const Home: React.FC = () => {
         deauthorize()
       }
     }
+  }
+
+  const setRefresher = () => {
+    clearInterval(refresherRef.current)
+    refresherRef.current = setInterval(refreshMoistValues, 30000)
+  }
+
+  const clearRefresher = () => {
+    clearInterval(refresherRef.current)
   }
 
   const refreshMoistValues = async () => {
@@ -322,10 +313,6 @@ const Home: React.FC = () => {
         deauthorize()
       }
     }
-  }
-
-  if (!isInitialized) {
-    return null
   }
 
   return (

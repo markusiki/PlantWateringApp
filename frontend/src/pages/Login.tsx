@@ -13,10 +13,8 @@ import {
   IonInputPasswordToggle,
   IonItem,
   IonList,
-  IonLoading,
   IonPage,
-  IonRow,
-  IonSpinner
+  IonRow
 } from '@ionic/react'
 import { ILoginProps } from '../interfaces'
 import LoadingSpinner from '../components/LoadingSpinner'
