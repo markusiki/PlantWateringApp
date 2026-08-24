@@ -6,10 +6,9 @@ import {
   IonText,
   IonTitle,
   IonButton,
-  IonItem,
   IonGrid,
   IonRow,
-  IonCol,
+  IonCol
 } from '@ionic/react'
 import { IHeaderProps } from '../interfaces'
 import './Header.css'
