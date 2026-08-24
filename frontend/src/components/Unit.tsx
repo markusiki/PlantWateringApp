@@ -14,7 +14,7 @@ import {
 import Log from './Log'
 import UnitSettings from './UnitSettings'
 import { IUnitProps, IUnitState } from '../interfaces'
-import { settingsOutline, water } from 'ionicons/icons'
+import { settingsOutline } from 'ionicons/icons'
 
 const Unit: React.FC<IUnitProps> = ({
   unit,
@@ -43,14 +43,6 @@ const Unit: React.FC<IUnitProps> = ({
       return 0
     }
     return relativeValue
-  }
-
-  const buttonEffect = (unit: IUnitState) => {
-    if (!unit.counter) {
-      return 'Water now'
-    } else {
-      return <p style={{ textTransform: 'capitalize' }}>Watering... {unit.counter} seconds to complete</p>
-    }
   }
 
   const setColor = (moistValue: IUnitState['moistValue']) => {
