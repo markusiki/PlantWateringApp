@@ -53,16 +53,19 @@ const Home: React.FC = () => {
   }
 
   useEffect(() => {
-    const loggedUser = window.localStorage.getItem('user')
+    const loggedUser = window.localStorage.getItem('pwa_user')
     if (loggedUser) {
       serviceHelper.setUser(loggedUser)
+      setIsLoggedIn(true)
+      refresh()
     }
   }, [])
 
   const deauthorize = () => {
     setUnits([])
     setIsLoggedIn(false)
-    window.localStorage.removeItem('user')
+    window.localStorage.removeItem('pwa_user')
+    clearRefresher()
   }
 
   const handleLogin = async (event: React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>) => {
@@ -74,7 +77,7 @@ const Home: React.FC = () => {
     try {
       const response = await userService.login({ username, password })
       if (response?.status === 200 && response.headers['content-type'] === 'application/json') {
-        window.localStorage.setItem('user', username)
+        window.localStorage.setItem('pwa_user', username)
         serviceHelper.setUser(username)
         setUsername('')
         setPassword('')
@@ -108,7 +111,6 @@ const Home: React.FC = () => {
     } catch (error) {
     } finally {
       deauthorize()
-      clearRefresher()
     }
   }
 
@@ -143,7 +145,12 @@ const Home: React.FC = () => {
       const unitsResponse = await unitService.getAll()
       if (unitsResponse?.status === 200 && unitsResponse.headers['content-type'] === 'application/json') {
         setIsBackendConnected(true)
-        setUnits(unitsResponse.data)
+        setUnits((prevUnits) =>
+          unitsResponse.data.map((unit) => ({
+            ...unit,
+            counter: prevUnits.find((u) => u.id === unit.id)?.counter
+          }))
+        )
       }
     } catch (error: any) {
       const status = error?.response.status
@@ -156,7 +163,7 @@ const Home: React.FC = () => {
 
   const setRefresher = () => {
     clearInterval(refresherRef.current)
-    refresherRef.current = setInterval(refreshMoistValues, 30000)
+    refresherRef.current = setInterval(refreshMoistValues, 5000)
   }
 
   const clearRefresher = () => {
