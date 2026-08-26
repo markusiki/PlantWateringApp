@@ -1,10 +1,10 @@
 import axios from 'axios'
-import { IMoistValueResponse, IUnitToUpdate } from '../interfaces'
+import { IMoistValueResponse, IUnitState, IUnitToUpdate } from '../interfaces'
 import serviceHelper from './helpers'
 const baseUrl = `/api/units`
 
 const getAll = async () => {
-  const response = await axios.get(baseUrl, serviceHelper.getConfig())
+  const response = await axios.get<IUnitState[]>(baseUrl, serviceHelper.getConfig())
   return response
 }
 
