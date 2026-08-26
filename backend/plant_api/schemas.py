@@ -12,17 +12,29 @@ class UnitsSchema(Schema):
     enableAutoWatering = fields.Bool(required=True)
     enableMaxWaterInterval = fields.Bool(required=True)
     enableMinWaterInterval = fields.Bool(required=True)
-    maxWaterInterval = fields.Int(required=True, validate=validate.Range(min=1, max=180))
-    minWaterInterval = fields.Int(required=True, validate=validate.Range(min=1, max=180))
-    waterFlowRate = fields.Decimal(required=True, validate=validate.Range(min=0.001, max=10))
-    wateringMode = fields.Str(required=True, validate=validate.OneOf(["time", "amount"]))
+    maxWaterInterval = fields.Int(
+        required=True, validate=validate.Range(min=1, max=180)
+    )
+    minWaterInterval = fields.Int(
+        required=True, validate=validate.Range(min=1, max=180)
+    )
+    waterFlowRate = fields.Decimal(
+        required=True, validate=validate.Range(min=0.001, max=10)
+    )
+    wateringMode = fields.Str(
+        required=True, validate=validate.OneOf(["time", "amount"])
+    )
 
 
 class DeviceSchema(Schema):
     runTimeProgram = fields.Bool(required=True)
-    moistMeasureInterval = fields.Int(required=True, validate=validate.Range(min=1, max=100))
+    moistMeasureInterval = fields.Int(
+        required=True, validate=validate.Range(min=1, max=100)
+    )
     numberOfUnits = fields.Int(required=True, validate=validate.Range(min=1, max=4))
     tankVolume = fields.Int(required=True, validate=validate.Range(min=0, max=100000))
     waterAmount = fields.Int(required=True, validate=validate.Range(min=0, max=100000))
     useFlowSensor = fields.Bool(required=True)
-    flowSensorPulsesPerLiter = fields.Int(required=True, validate=validate.Range(min=300, max=500))
+    flowSensorPulsesPerLiter = fields.Int(
+        required=True, validate=validate.Range(min=300, max=500)
+    )

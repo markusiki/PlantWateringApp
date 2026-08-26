@@ -75,7 +75,10 @@ def waterUnit(unitId):
         del moistValue["standardDeviation"]
         status = waterNow(unitId, manual=True)
         if status["isWatered"] == False:
-            return jsonify({"message": f"Cannot handle the request: {status['message']}"}), 400
+            return (
+                jsonify({"message": f"Cannot handle the request: {status['message']}"}),
+                400,
+            )
         logKwargs = {**moistValue, **status}
         updateLog(**logKwargs, waterMethod="manual")
         unit = getById(unitId, innerUse=False)
