@@ -2,7 +2,8 @@ import mongoose from 'mongoose'
 import config from './utils/config'
 import express from 'express'
 import iotService from './utils/iotService'
-import { createProxyMiddleware, Options } from 'http-proxy-middleware'
+import { createProxyMiddleware } from 'http-proxy-middleware'
+import { proxyOptions } from './utils/proxyOptions'
 import morgan from 'morgan'
 import deviceRouter from './controllers/deviceRouter'
 import loginRouter from './controllers/login'
@@ -26,36 +27,6 @@ iotService
   .catch((error) => {
     console.error('error connection to IOT Service', error.message)
   })
-
-const proxyOptions: Options = {
-  changeOrigin: true,
-  secure: true,
-  router: (req: any) => {
-    const target = `${req.user?.wormhole_url}/api`
-    return target
-  },
-  on: {
-    proxyReq: (proxyReq, req: any, res) => {
-      if (req.body) {
-        const bodyData = JSON.stringify(req.body)
-        proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
-        proxyReq.write(bodyData)
-      }
-    },
-    proxyRes: async (proxyRes, req: any, res: any) => {
-      const proxyCookies = proxyRes.headers['set-cookie'] || []
-      if (req.path === '/login') {
-        proxyRes.headers['set-cookie'] = [...proxyCookies, `bff_access_token=${req.token}; Path=/; HttpOnly`]
-      }
-      if (req.path === '/logout') {
-        proxyRes.headers['set-cookie'] = [
-          ...proxyCookies,
-          `bff_access_token=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; HttpOnly`,
-        ]
-      }
-    },
-  },
-}
 
 const proxy = createProxyMiddleware(proxyOptions)
 
